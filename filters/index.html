@@ -1,0 +1,1624 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.9">
+    
+    
+      
+        <title>Filters - DC1 Visualization</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.120efc48.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.9647289d.min.css">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#filters" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="DC1 Visualization" class="md-header__button md-logo" aria-label="DC1 Visualization" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DC1 Visualization
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Filters
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="DC1 Visualization" class="md-nav__button md-logo" aria-label="DC1 Visualization" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    DC1 Visualization
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../todo/" class="md-nav__link">
+        To Dos
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Source
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Source" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Source
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../analysis/" class="md-nav__link">
+        Analysis
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4_2">
+          Data
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Data" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          Data
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DC1DataContainer/" class="md-nav__link">
+        Data Container
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-loading/" class="md-nav__link">
+        Data Loading
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Filters
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Filters
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters" class="md-nav__link">
+    dc1DataVis.pyqt.src.data.filters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterAuto" class="md-nav__link">
+    applyFilterAuto()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterFastBandpass" class="md-nav__link">
+    applyFilterFastBandpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterFasterBandpass" class="md-nav__link">
+    applyFilterFasterBandpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterH0bandpass" class="md-nav__link">
+    applyFilterH0bandpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterHierlemann" class="md-nav__link">
+    applyFilterHierlemann()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterHighpass" class="md-nav__link">
+    applyFilterHighpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterLitke" class="md-nav__link">
+    applyFilterLitke()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterModHierlemann" class="md-nav__link">
+    applyFilterModHierlemann()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterToAllData" class="md-nav__link">
+    applyFilterToAllData()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterToChannelData" class="md-nav__link">
+    applyFilterToChannelData()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../preprocessing/" class="md-nav__link">
+        Preprocessing
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4_3">
+          GUI
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="GUI" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          GUI
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gui-base/" class="md-nav__link">
+        Base
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gui-interactivity/" class="md-nav__link">
+        Interactivity
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gui-layout/" class="md-nav__link">
+        Layout
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vis_graphs/" class="md-nav__link">
+        viz_graphs
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters" class="md-nav__link">
+    dc1DataVis.pyqt.src.data.filters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterAuto" class="md-nav__link">
+    applyFilterAuto()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterFastBandpass" class="md-nav__link">
+    applyFilterFastBandpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterFasterBandpass" class="md-nav__link">
+    applyFilterFasterBandpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterH0bandpass" class="md-nav__link">
+    applyFilterH0bandpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterHierlemann" class="md-nav__link">
+    applyFilterHierlemann()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterHighpass" class="md-nav__link">
+    applyFilterHighpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterLitke" class="md-nav__link">
+    applyFilterLitke()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterModHierlemann" class="md-nav__link">
+    applyFilterModHierlemann()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterToAllData" class="md-nav__link">
+    applyFilterToAllData()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dc1DataVis.pyqt.src.data.filters.applyFilterToChannelData" class="md-nav__link">
+    applyFilterToChannelData()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+<h1 id="filters">Filters</h1>
+
+
+  <div class="doc doc-object doc-module">
+
+<a id="dc1DataVis.pyqt.src.data.filters"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.filters.applyFilterAuto">
+<code class="highlight language-python"><span class="n">applyFilterAuto</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>dataAll</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>dataFilt</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>numChan</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>chMap</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>pyqt/src/data/filters.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">applyFilterAuto</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataAll:</span>
+<span class="sd">        dataFilt:</span>
+<span class="sd">        numChan:</span>
+<span class="sd">        chMap:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">samFreq</span> <span class="o">=</span> <span class="mf">20e3</span> <span class="o">*</span> <span class="mf">1.0</span>
+    <span class="n">passband</span> <span class="o">=</span> <span class="p">[</span><span class="mi">250</span><span class="p">,</span> <span class="mi">4000</span><span class="p">]</span>
+    <span class="n">stopband</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6000</span><span class="p">]</span>
+    <span class="n">max_loss_passband</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">min_loss_stopband</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">order</span><span class="p">,</span> <span class="n">normal_cutoff</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">buttord</span><span class="p">(</span><span class="n">passband</span><span class="p">,</span> <span class="n">stopband</span><span class="p">,</span> <span class="n">max_loss_passband</span><span class="p">,</span> <span class="n">min_loss_stopband</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">samFreq</span><span class="p">)</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">normal_cutoff</span><span class="p">,</span> <span class="n">btype</span><span class="o">=</span><span class="s1">&#39;bandpass&#39;</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">samFreq</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Order = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">order</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">numChan</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">dataFilt</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">dataAll</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:])</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">text1</span> <span class="o">=</span> <span class="s1">&#39;Estimated Time Remaining: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">numChan</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; min&#39;</span>
+        <span class="n">text2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numChan</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; Channels Filtered&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text1</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">text2</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataFilt</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.filters.applyFilterFastBandpass">
+<code class="highlight language-python"><span class="n">applyFilterFastBandpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>dataAll</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>dataFilt</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>numChan</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>chMap</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>pyqt/src/data/filters.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">applyFilterFastBandpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataAll:</span>
+<span class="sd">        dataFilt:</span>
+<span class="sd">        numChan:</span>
+<span class="sd">        chMap:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nyq</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">20e3</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">cutoff1</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">/</span> <span class="n">nyq</span>
+    <span class="n">cutoff2</span> <span class="o">=</span> <span class="mi">4000</span> <span class="o">/</span> <span class="n">nyq</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">cutoff1</span><span class="p">,</span> <span class="n">cutoff2</span><span class="p">],</span> <span class="n">btype</span><span class="o">=</span><span class="s1">&#39;bandpass&#39;</span><span class="p">,</span> <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Order = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">numChan</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">dataFilt</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">dataAll</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:])</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">text1</span> <span class="o">=</span> <span class="s1">&#39;Estimated Time Remaining: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">numChan</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; min&#39;</span>
+        <span class="n">text2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numChan</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; Channels Filtered&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text1</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">text2</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataFilt</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.filters.applyFilterFasterBandpass">
+<code class="highlight language-python"><span class="n">applyFilterFasterBandpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>dataAll</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>dataFilt</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>numChan</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>chMap</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>pyqt/src/data/filters.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">applyFilterFasterBandpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataAll:</span>
+<span class="sd">        dataFilt:</span>
+<span class="sd">        numChan:</span>
+<span class="sd">        chMap:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nyq</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">20e3</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">cutoff1</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">/</span> <span class="n">nyq</span>
+    <span class="n">cutoff2</span> <span class="o">=</span> <span class="mi">4000</span> <span class="o">/</span> <span class="n">nyq</span>
+    <span class="n">sos1</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="n">cutoff1</span><span class="p">,</span> <span class="n">cutoff2</span><span class="p">],</span> <span class="n">btype</span><span class="o">=</span><span class="s1">&#39;bandpass&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s1">&#39;sos&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Order = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">numChan</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">dataFilt</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfiltfilt</span><span class="p">(</span><span class="n">sos1</span><span class="p">,</span> <span class="n">dataAll</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:])</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">text1</span> <span class="o">=</span> <span class="s1">&#39;Estimated Time Remaining: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">numChan</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; min&#39;</span>
+        <span class="n">text2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numChan</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; Channels Filtered&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text1</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">text2</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataFilt</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.filters.applyFilterH0bandpass">
+<code class="highlight language-python"><span class="n">applyFilterH0bandpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>dataAll</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>dataFilt</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>numChan</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>chMap</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>pyqt/src/data/filters.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">applyFilterH0bandpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataAll:</span>
+<span class="sd">        dataFilt:</span>
+<span class="sd">        numChan:</span>
+<span class="sd">        chMap:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nyq</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">20e3</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">cutoff1</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">/</span> <span class="n">nyq</span>
+    <span class="n">cutoff2</span> <span class="o">=</span> <span class="mi">4000</span> <span class="o">/</span> <span class="n">nyq</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="n">cutoff1</span><span class="p">,</span> <span class="n">cutoff2</span><span class="p">],</span> <span class="n">btype</span><span class="o">=</span><span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Order = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">numChan</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">dataFilt</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">dataAll</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:])</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">text1</span> <span class="o">=</span> <span class="s1">&#39;Estimated Time Remaining: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">numChan</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; min&#39;</span>
+        <span class="n">text2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numChan</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; Channels Filtered&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text1</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">text2</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataFilt</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.filters.applyFilterHierlemann">
+<code class="highlight language-python"><span class="n">applyFilterHierlemann</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>dataAll</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>dataFilt</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>numChan</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>chMap</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>pyqt/src/data/filters.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">applyFilterHierlemann</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataAll:</span>
+<span class="sd">        dataFilt:</span>
+<span class="sd">        numChan:</span>
+<span class="sd">        chMap:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">BP_LOW_CUTOFF</span> <span class="o">=</span> <span class="mf">100.0</span>
+    <span class="n">NUM_TAPS</span> <span class="o">=</span> <span class="mi">75</span>
+    <span class="n">TAPS</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">firwin</span><span class="p">(</span><span class="n">NUM_TAPS</span><span class="p">,</span>
+                         <span class="p">[</span><span class="n">BP_LOW_CUTOFF</span><span class="p">,</span> <span class="p">],</span>
+                         <span class="n">pass_zero</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">fs</span><span class="o">=</span><span class="mf">20e3</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">numChan</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">dataFilt</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">TAPS</span><span class="p">,</span> <span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">dataAll</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:])</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">text1</span> <span class="o">=</span> <span class="s1">&#39;Estimated Time Remaining: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">numChan</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; min&#39;</span>
+        <span class="n">text2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numChan</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; Channels Filtered&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text1</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">text2</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataFilt</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.filters.applyFilterHighpass">
+<code class="highlight language-python"><span class="n">applyFilterHighpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>dataAll</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>dataFilt</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>numChan</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>chMap</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>pyqt/src/data/filters.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">applyFilterHighpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataAll:</span>
+<span class="sd">        dataFilt:</span>
+<span class="sd">        numChan:</span>
+<span class="sd">        chMap:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nyq</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">20e3</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">cutoff</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">/</span> <span class="n">nyq</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">[</span><span class="n">cutoff</span><span class="p">],</span> <span class="n">btype</span><span class="o">=</span><span class="s2">&quot;highpass&quot;</span><span class="p">,</span> <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">numChan</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">dataFilt</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">dataAll</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:])</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">text1</span> <span class="o">=</span> <span class="s1">&#39;Estimated Time Remaining: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">numChan</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; min&#39;</span>
+        <span class="n">text2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numChan</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; Channels Filtered&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text1</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">text2</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataFilt</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.filters.applyFilterLitke">
+<code class="highlight language-python"><span class="n">applyFilterLitke</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>dataAll</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>dataFilt</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>numChan</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>chMap</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>pyqt/src/data/filters.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">applyFilterLitke</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataAll:</span>
+<span class="sd">        dataFilt:</span>
+<span class="sd">        numChan:</span>
+<span class="sd">        chMap:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nyq</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">20e3</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">cutoff1</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">/</span> <span class="n">nyq</span>
+    <span class="n">cutoff2</span> <span class="o">=</span> <span class="mi">2000</span> <span class="o">/</span> <span class="n">nyq</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="n">cutoff1</span><span class="p">,</span> <span class="n">cutoff2</span><span class="p">],</span> <span class="n">btype</span><span class="o">=</span><span class="s2">&quot;bandpass&quot;</span><span class="p">,</span> <span class="n">analog</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">numChan</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">dataFilt</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">dataAll</span><span class="p">[</span><span class="n">chMap</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="n">chMap</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">],</span> <span class="p">:])</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">text1</span> <span class="o">=</span> <span class="s1">&#39;Estimated Time Remaining: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">numChan</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; min&#39;</span>
+        <span class="n">text2</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numChan</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; Channels Filtered&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">text1</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">text2</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataFilt</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.filters.applyFilterModHierlemann">
+<code class="highlight language-python"><span class="n">applyFilterModHierlemann</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>channel_data</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>dataFilt</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>pyqt/src/data/filters.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">applyFilterModHierlemann</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        channel_data:</span>
+<span class="sd">        dataFilt:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">BP_LOW_CUTOFF</span> <span class="o">=</span> <span class="mf">250.0</span>
+    <span class="n">BP_HIGH_CUTOFF</span> <span class="o">=</span> <span class="mf">4000.0</span>
+    <span class="n">NUM_TAPS</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">TAPS</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">firwin</span><span class="p">(</span><span class="n">NUM_TAPS</span><span class="p">,</span>
+                         <span class="p">[</span><span class="n">BP_LOW_CUTOFF</span><span class="p">,</span> <span class="n">BP_HIGH_CUTOFF</span><span class="p">],</span>
+                         <span class="n">pass_zero</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">fs</span><span class="o">=</span><span class="mf">20e3</span> <span class="o">*</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">TAPS</span><span class="p">,</span> <span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">channel_data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataFilt</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.filters.applyFilterToAllData">
+<code class="highlight language-python"><span class="n">applyFilterToAllData</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">,</span> <span class="n">filtType</span><span class="o">=</span><span class="s1">&#39;modHierlemann&#39;</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>dataAll</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>numChan</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>chMap</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>filtType</code></td>
+        <td></td>
+        <td></td>
+        <td><code>&#39;modHierlemann&#39;</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>pyqt/src/data/filters.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">applyFilterToAllData</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">,</span> <span class="n">filtType</span><span class="o">=</span><span class="s1">&#39;modHierlemann&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataAll:</span>
+<span class="sd">        numChan:</span>
+<span class="sd">        chMap:</span>
+<span class="sd">        filtType:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Future update: only calculate for channels recorded not all</span>
+    <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">dataAll</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;Hierlemann&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterHierlemann</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;modHierlemann&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterModHierlemann</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;highpass&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterHighpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;hObandpass&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterH0bandpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterAuto</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;fastBandpass&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterFastBandpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;fasterBandpass&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterFasterBandpass</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;Litke&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterLitke</span><span class="p">(</span><span class="n">dataAll</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">,</span> <span class="n">numChan</span><span class="p">,</span> <span class="n">chMap</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">dataAll</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">dataAll</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Filter not recognized. Options include Hierlemann, highpass, bandpass, Litke or none&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataFilt</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.filters.applyFilterToChannelData">
+<code class="highlight language-python"><span class="n">applyFilterToChannelData</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">filtType</span><span class="o">=</span><span class="s1">&#39;Hierlemann&#39;</span><span class="p">)</span></code>
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>channel_data</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>filtType</code></td>
+        <td></td>
+        <td></td>
+        <td><code>&#39;Hierlemann&#39;</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>pyqt/src/data/filters.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">applyFilterToChannelData</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">filtType</span><span class="o">=</span><span class="s1">&#39;Hierlemann&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        channel_data:</span>
+<span class="sd">        filtType:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">channel_data</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;Hierlemann&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterHierlemann</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;modHierlemann&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterModHierlemann</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;highpass&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterHighpass</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;hObandpass&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterH0bandpass</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterAuto</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;fastBandpass&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterFastBandpass</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;fasterBandpass&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterFasterBandpass</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;Litke&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">applyFilterLitke</span><span class="p">(</span><span class="n">channel_data</span><span class="p">,</span> <span class="n">dataFilt</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">filtType</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">channel_data</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dataFilt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">channel_data</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Filter not recognized. Options include Hierlemann, highpass, bandpass, Litke or none&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataFilt</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../data-loading/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Data Loading" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Data Loading
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../preprocessing/" class="md-footer__link md-footer__link--next" aria-label="Next: Preprocessing" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Preprocessing
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.6e54b5cd.min.js"></script>
+      
+    
+  </body>
+</html>
