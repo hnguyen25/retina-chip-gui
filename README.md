@@ -1,1 +1,1 @@
-# artifical-retina-pipeline-guis
+# Stanford Artifical Retina Project - Deployment and Visualization GUIs
