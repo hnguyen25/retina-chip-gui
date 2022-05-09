@@ -371,28 +371,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#dc1DataVis.pyqt.src.data.preprocessing" class="md-nav__link">
-    dc1DataVis.pyqt.src.data.preprocessing
+  <a href="#dc1DataVis.app.src.data.preprocessing" class="md-nav__link">
+    dc1DataVis.app.src.data.preprocessing
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dc1DataVis.pyqt.src.data.preprocessing.identify_relevant_channels" class="md-nav__link">
+  <a href="#dc1DataVis.app.src.data.preprocessing.identify_relevant_channels" class="md-nav__link">
     identify_relevant_channels()
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dc1DataVis.pyqt.src.data.preprocessing.idx2map" class="md-nav__link">
+  <a href="#dc1DataVis.app.src.data.preprocessing.idx2map" class="md-nav__link">
     idx2map()
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dc1DataVis.pyqt.src.data.preprocessing.map2idx" class="md-nav__link">
+  <a href="#dc1DataVis.app.src.data.preprocessing.map2idx" class="md-nav__link">
     map2idx()
   </a>
   
@@ -536,28 +536,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#dc1DataVis.pyqt.src.data.preprocessing" class="md-nav__link">
-    dc1DataVis.pyqt.src.data.preprocessing
+  <a href="#dc1DataVis.app.src.data.preprocessing" class="md-nav__link">
+    dc1DataVis.app.src.data.preprocessing
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dc1DataVis.pyqt.src.data.preprocessing.identify_relevant_channels" class="md-nav__link">
+  <a href="#dc1DataVis.app.src.data.preprocessing.identify_relevant_channels" class="md-nav__link">
     identify_relevant_channels()
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dc1DataVis.pyqt.src.data.preprocessing.idx2map" class="md-nav__link">
+  <a href="#dc1DataVis.app.src.data.preprocessing.idx2map" class="md-nav__link">
     idx2map()
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#dc1DataVis.pyqt.src.data.preprocessing.map2idx" class="md-nav__link">
+  <a href="#dc1DataVis.app.src.data.preprocessing.map2idx" class="md-nav__link">
     map2idx()
   </a>
   
@@ -582,7 +582,7 @@
 
   <div class="doc doc-object doc-module">
 
-<a id="dc1DataVis.pyqt.src.data.preprocessing"></a>
+<a id="dc1DataVis.app.src.data.preprocessing"></a>
     <div class="doc doc-contents first">
 
       <p>@authors Maddy Hays, Huy Nguyen (2022)</p>
@@ -602,7 +602,7 @@
 
 
 
-<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.preprocessing.identify_relevant_channels">
+<h2 class="doc doc-heading" id="dc1DataVis.app.src.data.preprocessing.identify_relevant_channels">
 <code class="highlight language-python"><span class="n">identify_relevant_channels</span><span class="p">(</span><span class="n">raw_data</span><span class="p">)</span></code>
 
 
@@ -652,7 +652,7 @@ start_idx:</p></td>
 </table>      <p>@param raw_data: all the raw data loaded thus far from files</p>
 
         <details class="quote">
-          <summary>Source code in <code>pyqt/src/data/preprocessing.py</code></summary>
+          <summary>Source code in <code>app/src/data/preprocessing.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">identify_relevant_channels</span><span class="p">(</span><span class="n">raw_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Only n number of channels can be recorded at a given time due to bandwidth concerns--the rest are shut off.</span>
 <span class="sd">    For given data recorded at during a certain window, find which channels were recorded.</span>
@@ -698,7 +698,7 @@ start_idx:</p></td>
 
 
 
-<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.preprocessing.idx2map">
+<h2 class="doc doc-heading" id="dc1DataVis.app.src.data.preprocessing.idx2map">
 <code class="highlight language-python"><span class="n">idx2map</span><span class="p">(</span><span class="n">ch_idx</span><span class="p">)</span></code>
 
 
@@ -743,7 +743,7 @@ start_idx:</p></td>
   </tbody>
 </table>
         <details class="quote">
-          <summary>Source code in <code>pyqt/src/data/preprocessing.py</code></summary>
+          <summary>Source code in <code>app/src/data/preprocessing.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">idx2map</span><span class="p">(</span><span class="n">ch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Given a channel index, return the channel&#39;s row and col</span>
 
@@ -771,7 +771,7 @@ start_idx:</p></td>
 
 
 
-<h2 class="doc doc-heading" id="dc1DataVis.pyqt.src.data.preprocessing.map2idx">
+<h2 class="doc doc-heading" id="dc1DataVis.app.src.data.preprocessing.map2idx">
 <code class="highlight language-python"><span class="n">map2idx</span><span class="p">(</span><span class="n">ch_row</span><span class="p">,</span> <span class="n">ch_col</span><span class="p">)</span></code>
 
 
@@ -808,7 +808,7 @@ start_idx:</p></td>
 </table>      <p>Returns: numerical index of array</p>
 
         <details class="quote">
-          <summary>Source code in <code>pyqt/src/data/preprocessing.py</code></summary>
+          <summary>Source code in <code>app/src/data/preprocessing.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">map2idx</span><span class="p">(</span><span class="n">ch_row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ch_col</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Given a channel&#39;s row and col, return channel&#39;s index</span>
 
