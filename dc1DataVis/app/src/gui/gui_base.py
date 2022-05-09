@@ -1,6 +1,6 @@
 """
 Huy Nguyen (2022)
-Contains the base pyqt framework for loading up the GUI.
+Contains the base app framework for loading up the GUI.
 
 Note: To regenerate gui_layout.py, in terminal do
 pyuic5 layout.ui -o gui_layout.py

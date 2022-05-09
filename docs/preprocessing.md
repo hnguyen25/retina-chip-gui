@@ -1,2 +1,2 @@
 # Data Preprocessing
-:::dc1DataVis.pyqt.src.data.preprocessing
+:::dc1DataVis.app.src.data.preprocessing

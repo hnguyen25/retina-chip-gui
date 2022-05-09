@@ -1,3 +1,3 @@
 # DC1 Data Container
 
-:::dc1DataVis.pyqt.src.data.DC1DataContainer
+:::dc1DataVis.app.src.data.DC1DataContainer

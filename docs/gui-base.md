@@ -1,3 +1,3 @@
 # GUI Base Class
-::: dc1DataVis.pyqt.src.gui.gui_base
-::: dc1DataVis.pyqt.src.gui.gui_base.MainWindow
+::: dc1DataVis.app.src.gui.gui_base
+::: dc1DataVis.app.src.gui.gui_base.MainWindow

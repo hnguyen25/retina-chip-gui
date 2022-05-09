@@ -1,2 +1,2 @@
 # Filters
-:::dc1DataVis.pyqt.src.data.filters
+:::dc1DataVis.app.src.data.filters

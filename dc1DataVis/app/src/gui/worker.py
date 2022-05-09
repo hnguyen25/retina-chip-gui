@@ -1,5 +1,5 @@
 """
-modified from pyqt multihreading code from https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/#caveats
+modified from app multihreading code from https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/#caveats
 @author Huy Nguyen (2022)
 """
 
