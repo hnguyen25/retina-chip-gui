@@ -1,0 +1,24 @@
+site_name: DC1 Visualization
+theme:
+  name: material
+
+nav:
+  - Introduction: 'index.md'
+  - Getting Started: 'getting-started.md'
+  - To Dos: 'todo.md'
+  - Source:
+      - Analysis: 'analysis.md'
+      - Data:
+        - Data Container: 'DC1DataContainer.md'
+        - Data Loading: 'data-loading.md'
+        - Filters: 'filters.md'
+        - Preprocessing: 'preprocessing.md'
+      - GUI:
+        - Base: 'gui-base.md'
+        - Interactivity: 'gui-interactivity.md'
+        - Layout: 'gui-layout.md'
+      - viz_graphs: 'vis_graphs.md'
+
+plugins:
+  - search
+  - mkdocstrings
