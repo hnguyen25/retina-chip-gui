@@ -20,7 +20,9 @@ from ..data.DC1DataContainer import *
 from ..analysis.PyqtGraphParams import *
 from ..gui.worker import * # multithreading
 
-class MainWindow(QtWidgets.QMainWindow):
+from ..gui.default_vis import Ui_mainWindow
+
+class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     """ Inherited from PyQt main window class. Contains all the functions necessary
     to start and run GUI elements.
     """
@@ -62,8 +64,15 @@ class MainWindow(QtWidgets.QMainWindow):
     win1_colorbar = None
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        # old way
+        #super().__init__(*args, **kwargs)
+        # Load layout based on QtDesigner .ui file
+        #uic.loadUi("./src/gui/default-vis.ui", self)
 
+        super(MainWindow, self).__init__(*args, **kwargs)
+        self.setupUi(self)
+
+        self.openSessionParams()
         # ======================
         # DEBUGGING (tests + profiling)
         # =====================
@@ -88,8 +97,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # FRONT END (GUI layout + design)
         # =====================
 
-        # Load layout based on QtDesigner .ui file
-        uic.loadUi("./src/gui/default-vis.ui", self)
+        #self.openSessionParams()
 
         # TODO make window system more flexible+modular
         # top left window = Array Map
@@ -200,8 +208,19 @@ class MainWindow(QtWidgets.QMainWindow):
         # END __INIT__ FUNCTION
         # =====================
 
+    def openSessionParams(self):
+        session_dialog = QDialog(self)
+        uic.loadUi("./src/gui/startup.ui", session_dialog)
+        session_dialog.setWindowTitle("Set Session Parameters...")
+        session_dialog.exec()
+
+
+
     def newWidgetInPane(self):
         pass
+
+
+
 
     def toggleDarkMode(self):
         self.is_dark_mode = not self.is_dark_mode
