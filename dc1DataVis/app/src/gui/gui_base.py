@@ -18,14 +18,19 @@ from ..data.preprocessing import *
 from ..data.filters import *
 from ..data.DC1DataContainer import *
 from ..analysis.PyqtGraphParams import *
-from ..gui.worker import * # multithreading
+from ..gui.worker import *  # multithreading
 
-from ..gui.default_vis import Ui_mainWindow
+from ..gui.default_vis import Ui_mainWindow # layout
+from ..gui.gui_guipreferences import *
 
 class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     """ Inherited from PyQt main window class. Contains all the functions necessary
     to start and run GUI elements.
     """
+    # Settings
+    settings = {
+
+    }
 
     # MODES
     mode_profiling = True
@@ -72,7 +77,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setupUi(self)
 
-        self.openSessionParams()
+        gui_preferences = GUIPreferences()
+        gui_preferences.exec()
+
+
         # ======================
         # DEBUGGING (tests + profiling)
         # =====================
@@ -208,19 +216,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         # END __INIT__ FUNCTION
         # =====================
 
-    def openSessionParams(self):
-        session_dialog = QDialog(self)
-        uic.loadUi("./src/gui/startup.ui", session_dialog)
-        session_dialog.setWindowTitle("Set Session Parameters...")
-        session_dialog.exec()
-
-
-
     def newWidgetInPane(self):
         pass
-
-
-
 
     def toggleDarkMode(self):
         self.is_dark_mode = not self.is_dark_mode
@@ -305,7 +302,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     def onLoadRealtimeStream(self):
         """
-
         Returns:
 
         """
