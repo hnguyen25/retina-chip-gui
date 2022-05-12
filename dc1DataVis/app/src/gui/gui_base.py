@@ -189,7 +189,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         self.actionIndividualChannelInfo.triggered.connect(self.viewNewIndividalChannelInformation)
         self.actionListElectrodesInfo.triggered.connect(self.viewChannelListInformation)
-
+        self.actionAnalysisParameters.triggered.connect(self.viewGUIPreferences)
 
         #hack no longer needed - self.windowTitleChanged.connect(self.newOfflineDataSession)
 
@@ -215,6 +215,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
+        new_window.show()
+        new_window.exec()
+        self.external_windows.append(new_window)
+
+    def viewGUIPreferences(self):
+        print("viewPreferences()")
+        from ..gui.gui_sessionparameters import GUIPreferences
+        new_window = GUIPreferences()
+        new_window.label = QLabel("GUI Preferences")
         new_window.show()
         new_window.exec()
         self.external_windows.append(new_window)
