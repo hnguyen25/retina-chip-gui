@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>AllChannelsInformation</class>
+ <widget class="QWidget" name="AllChannelsInformation">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>459</width>
-    <height>590</height>
+    <height>562</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>All Channels Information</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
@@ -26,10 +26,10 @@
     <string>Sort by...</string>
    </property>
    <property name="buddy">
-    <cstring>comboBox</cstring>
+    <cstring>chooseSortOption</cstring>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox">
+  <widget class="QComboBox" name="chooseSortOption">
    <property name="geometry">
     <rect>
      <x>150</x>
@@ -59,7 +59,7 @@
     </property>
    </item>
   </widget>
-  <widget class="QTableView" name="tableView">
+  <widget class="QTableView" name="electrodeTable">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -70,6 +70,14 @@
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Widget</class>
+   <extends>QWidget</extends>
+   <header>widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

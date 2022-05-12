@@ -12,6 +12,7 @@ from PyQt5 import uic
 import pyqtgraph as pg
 import random
 import matplotlib as plt
+import sys, os
 
 from ..data.data_loading import *
 from ..data.preprocessing import *
@@ -28,17 +29,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     to start and run GUI elements.
     """
     # Settings
-    settings = {
-
-    }
+    settings = {}
 
     # MODES
-    mode_profiling = True
+    mode_profiling = False
     mode_multithreading = True
     first_time_plotting = True
     is_dark_mode = False
     # GUI GRAPHS
     win1, win2, win3, win4 = None, None, None, None
+    external_windows = []
 
     # ==== DATA PARAMETERS ====
     graph_params = None
@@ -52,7 +52,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     dataAll, cntAll, times = None, None, None
     numChan, chMap, chId, startIdx, findCoors = None, None, None, None, None
     filtered_data = None
-    loading_dict = None
+    loading_dict = {}
     p = None
     window_update_counter = 0
     profile_data = None
@@ -69,17 +69,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     win1_colorbar = None
 
     def __init__(self, *args, **kwargs):
-        # old way
-        #super().__init__(*args, **kwargs)
-        # Load layout based on QtDesigner .ui file
-        #uic.loadUi("./src/gui/default-vis.ui", self)
-
         super(MainWindow, self).__init__(*args, **kwargs)
-        self.setupUi(self)
-
-        gui_preferences = GUIPreferences()
-        gui_preferences.exec()
-
 
         # ======================
         # DEBUGGING (tests + profiling)
@@ -101,94 +91,67 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         if self.mode_multithreading:
             print('GUI is multithreading')
 
-        # =====================
-        # FRONT END (GUI layout + design)
-        # =====================
+    def setSettings(self, settings):
+        self.settings = settings
 
-        #self.openSessionParams()
+    def setupLayout(self):
+        # old way
+        #super().__init__(*args, **kwargs)
 
-        # TODO make window system more flexible+modular
+        #uic.loadUi("./src/gui/default_vis.ui", self)
+
+        print("Session settings: " + str(self.settings))
+        # Load layout based on QtDesigner .ui file
+        if self.settings["visStyle"] == "Default":
+            uic.loadUi("./src/gui/default_vis.ui", self)
+
+        elif self.settings["visStyle"] == "Spike Search":
+            print('yesafewafe')
+
+        else:
+            print("else")
+
+        self.setupCharts()
+        self.setupInteractivity()
+
+    def setupCharts(self):
+
         # top left window = Array Map
+        from ..gui.gui_charts_helper import setupArrayMap
         self.win1 = self.arrayMap
-        self.win1.setBackground('w')
-        self.win1.showGrid(x=True, y=True, alpha=0)
-        self.win1.setXRange(-10, 40, padding=0)
-        self.win1.setAspectLocked()
-        self.win1.setLimits(xMin=-10, xMax=45, yMin=-5, yMax=37)
-        self.win1.setLabel('top', "Spike Amplitude")
-        self.win1.setLabel('left', "Electrode No. (vertical)")
-        self.win1.setLabel('bottom', "Electrode No. (horizontal)")
+        setupArrayMap(self.win1)
 
         # top right = Trace Search
+        from ..gui.gui_charts_helper import setupSpikeTrace
         self.win2 = self.traceplot_verticalLayout
-        self.traceplot_1.setBackground('w')
-        self.traceplot_2.setBackground('w')
-        self.traceplot_3.setBackground('w')
-        self.traceplot_4.setBackground('w')
-        self.traceplot_1.setLabel('left', "# XXX")
-        self.traceplot_2.setLabel('left', "# XXX")
-        self.traceplot_3.setLabel('left', "# XXX")
-        self.traceplot_4.setLabel('left', "# XXX")
+        setupSpikeTrace(self.traceplot_1,
+                        self.traceplot_2,
+                        self.traceplot_3,
+                        self.traceplot_4)
 
         # bottom left = Spike Rate Plot
+        from ..gui.gui_charts_helper import setupSpikeRatePlot
         self.win3 = self.spikeRatePlot
-        self.win3.setLabel('top', "Noise")
-        self.win3.setLabel('left', "Count")
-        self.win3.setLabel('bottom', "Standard Dev")
-        self.win3.setLimits(xMin=0, yMin=0)
-        self.win3.setBackground('w')
+        setupSpikeRatePlot(self.win3)
 
         # bottom right window = Array Map
         self.win4 = self.miniMapWidget
         self.win4.setBackground('w')
         self.win4.showGrid(x=True, y=True, alpha=0)
-        self.win4.setXRange(-10, 40, padding=0)
-        self.win4.setAspectLocked()
-        self.win4.setLimits(xMin=-10, xMax=45, yMin=-5, yMax=37)
-        self.win4.setLabel('top', "Spike Cnt")
-        self.win4.setLabel('left', "Electrode No. (vertical)")
-        self.win4.setLabel('bottom', "Electrode No. (horizontal)")
+        #self.win4.setXRange(-0.5, 40, padding=0)
+        #self.win4.setYRange(0, 500, padding=0)
 
-        # init debug plot
-        ## make interesting distribution of values
-        vals = np.hstack([np.random.normal(size=500), np.random.normal(size=260, loc=4)])
+        #self.win4.setLimits(xMin=0, xMax=550, yMin=-2, yMax=2000)
+        self.win4.enableAutoRange(axis='x', enable=True)
+        self.win4.enableAutoRange(axis='y', enable=True)
+        self.win4.setLimits(xMin=0, yMin=0)
 
-        ## compute standard histogram
-        y, x = np.histogram(vals, bins=np.linspace(-3, 8, 40))
-
-        ## notice that len(x) == len(y)+1
-        ## We are required to use stepMode=True so that PlotCurveItem will interpret this data correctly.
-        curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
-        self.win3.addItem(curve)
+        self.win4.setLabel('top', "Spike Rate")
+        self.win4.setLabel('left', "Spiking Frequency")
+        self.win4.setLabel('bottom', "Time (s)")
 
         # bottom right - Spike Rate Plot // MiniMap Widget -> in development
-        # ======================
-        # BACKEND (multithreading + interactivity)
-        # =====================
-
-        self.LoadedData = DC1DataContainer()  # class for holding and manipulating data
-
-        # Set up PyQt multithreading
-        self.threadpool = QThreadPool()
-        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
-
-        # >>>> MENU BAR <<<<<
-        # TODO hook up interactivity for all menu bar buttons
-        # >> FILE BUTTON
-        self.action_npz.triggered.connect(self.onActionLoadNPZ)
-        self.action_mat.triggered.connect(self.onActionLoadMAT)
-        self.actionUpdateSession.triggered.connect(self.onLoadRealtimeStream)
-
-        #hack no longer needed - self.windowTitleChanged.connect(self.newOfflineDataSession)
-
-        # >> EDIT BUTTON
-        # >> VIEW BUTTON
-        # >> WINDOW BUTTON
-        # >> SETTINGS BUTTON
-        # >> HELP BUTTON
-
         # plot 1 - hover
-
         self.region = pg.LinearRegionItem()
         self.region.setZValue(10)
         # Add the LinearRegionItem to the ViewBox, but tell the ViewBox to exclude this
@@ -204,20 +167,57 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.win1.addItem(self.vLine, ignoreBounds=True)
         self.win1.addItem(self.hLine, ignoreBounds=True)
         self.vb = self.win1.plotItem.vb
-
         self.proxy = pg.SignalProxy(self.win1.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)
 
         self.update_win1()
         self.update_win4()
 
-        #containing_layout = self.win4.parent().layout()
-        #containing_layout.replaceWidget(self.win4, self.win2)
+    def setupInteractivity(self):
+        self.LoadedData = DC1DataContainer()  # class for holding and manipulating data
+        print("setupinteractivity", self.settings["spikeThreshold"])
+        self.LoadedData.setSpikeThreshold(self.settings["spikeThreshold"])
+        # Set up PyQt multithreading
+        self.threadpool = QThreadPool()
+        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
-        # END __INIT__ FUNCTION
-        # =====================
+        # >>>> MENU BAR <<<<<
+        # TODO hook up interactivity for all menu bar buttons
+        # >> FILE BUTTON
+        self.action_npz.triggered.connect(self.onActionLoadNPZ)
+        self.action_mat.triggered.connect(self.onActionLoadMAT)
+        self.actionUpdateSession.triggered.connect(self.onLoadRealtimeStream)
 
-    def newWidgetInPane(self):
-        pass
+        self.actionIndividualChannelInfo.triggered.connect(self.viewNewIndividalChannelInformation)
+        self.actionListElectrodesInfo.triggered.connect(self.viewChannelListInformation)
+
+
+        #hack no longer needed - self.windowTitleChanged.connect(self.newOfflineDataSession)
+
+        # >> EDIT BUTTON
+        # >> VIEW BUTTON
+        # >> WINDOW BUTTON
+        # >> SETTINGS BUTTON
+        # >> HELP BUTTON
+
+    def viewNewIndividalChannelInformation(self):
+        print("viewNew()")
+        from ..gui.gui_individualchannel import IndividualChannelInformation
+        new_window = IndividualChannelInformation()
+        new_window.label = QLabel("Individual Channel Analysis")
+        new_window.setSessionParent(self)
+        new_window.show()
+        new_window.exec()
+        self.external_windows.append(new_window)
+
+    def viewChannelListInformation(self):
+        print("viewNewList()")
+        from ..gui.gui_electrodelist import ElectrodeListInformation
+        new_window = ElectrodeListInformation()
+        new_window.label = QLabel("Electrode List Analysis")
+        new_window.setSessionParent(self)
+        new_window.show()
+        new_window.exec()
+        self.external_windows.append(new_window)
 
     def toggleDarkMode(self):
         self.is_dark_mode = not self.is_dark_mode
@@ -248,15 +248,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         if self.win1.sceneBoundingRect().contains(pos):
             mousePoint = self.vb.mapSceneToView(pos)
 
-            print("array_stats")
-            print(self.LoadedData.array_stats['spike_avg'])
+            #print("array_stats")
+            #print(self.LoadedData.array_stats['spike_avg'])
 
             int_x = int(mousePoint.x())
             int_y = int(mousePoint.y())
-            if 0 <= int_x < 32 and 0 <= int_y < 32:
+            if -1 <= int_x < 31 and -1 <= int_y < 31:
                 self.statusBar().showMessage(
-                    "Array Map Spike Average @ " + str(int_x) + ", " + str(int_y) +
-                    ": " + str(self.LoadedData.array_stats['spike_avg'][int_x][int_y])
+                    "Array Map Spike Average @ " + str(int_y) + ", " + str(int_x) +
+                    ": " + str(self.LoadedData.array_stats['spike_avg'][int_y+1][int_x+1])
                 )
 
             self.vLine.setPos(mousePoint.x())
@@ -300,26 +300,69 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         if file_path: print(file_path)
         return file_path
 
-    def onLoadRealtimeStream(self):
-        """
-        Returns:
 
-        """
-        path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
-        self.loading_dict = initDataLoading(path)
+    def loadSession(self):
+        print(self.settings)
+
+        # debug
+
+        if self.settings["path"] == "":
+            raise ValueError("Path is not specified!")
+
+        if self.settings['realTime'] == "Yes, load first .mat chunk":
+            self.onLoadRealtimeStream(load_from_beginning=True)
+        elif self.settings['realTime'] == "Yes, load latest .mat chunk":
+            self.onLoadRealtimeStream(load_from_beginning=False)
+        elif self.settings['realTime'] == "No, load raw .mat file":
+            #TODO parallelize
+            self.onLoadRealTimeStraet(load_from_beginning=True)
+        elif self.settings['realTime'] == "No, load pre-processed .npz file":
+            #TODO
+            self.onActionLoadNPZ()
+        elif self.settings['realTime'] == "No, load filtered .npz file":
+            #TODO
+            self.onActionLoadNPZ()
+        else:
+            raise ValueError("this should not be possible")
+
+    # (1) Yes, load first .mat chunk & (2) Yes, load latest .mat chunk
+    def onLoadRealtimeStream(self, load_from_beginning = True):
+        self.loading_dict = initDataLoading(self.settings["path"])
 
         # TODO parallelize loading already saved .mat files
-        load_realtime_worker = Worker(self.realtimeLoading, path, self.loading_dict)
+        load_realtime_worker = Worker(self.realtimeLoading, self.settings["path"], self.loading_dict, load_from_beginning)
         load_realtime_worker.signals.progress.connect(self.updateStatusBar)
         load_realtime_worker.signals.gui_callback.connect(self.updateGUIWithNewData)
         self.threadpool.start(load_realtime_worker)
+
+    # TODO (3) No, load raw .mat file
+    # parallelize this faster
+
+    # TODO (4) No, load pre-processed .npz file
+    def onActionLoadNPZ(self):
+        """
+
+        Returns:
+
+        """
+        path = self.getDataPath("Numpy files (*.npz)")
+        self.loading_dict["path"] = path
+        data = loadDataFromFileNpz(path)
+        self.updateGUIWithNewData()
+
+    # TODO (5) No, load filtered .npz file
+
+
+
+
 
     # callback from progress signal
     def updateStatusBar(self, message):
         self.statusBar().showMessage(message)
 
     # Continuously Check for New Data
-    def realtimeLoading(self, path, loadingDict, progress_callback, gui_callback, dataIdentifierString='gmem1'):
+    def realtimeLoading(self, path, loadingDict, load_from_beginning,
+                        progress_callback, gui_callback, dataIdentifierString='gmem1'):
         """
 
         Args:
@@ -339,12 +382,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         split_path = os.path.split(path)
         data_run = split_path[1]
         data_piece = os.path.split(split_path[0])[1]
-        last_file_idx = 0
+
+        if load_from_beginning:
+            last_file_idx = 0
+        else:
+            last_file_idx = loadingDict["num_of_buf"] - 2
+
 
         while True:
             # In case multiple files coming in at once, hold 100ms (not likely)
             #     time.sleep(0.1)
-
             next_file = path + "/" + data_run + "_" + str(last_file_idx+1) + ".mat"
 
             # If the next numbered file doesn't exist, just wait
@@ -387,16 +434,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 # we need to call the main GUI thread to update graphs (can't do with non GUI-thread)
                 gui_callback.emit()
 
-    def onActionLoadNPZ(self):
-        """
 
-        Returns:
-
-        """
-        path = self.getDataPath("Numpy files (*.npz)")
-
-        data = loadDataFromFileNpz(path)
-        self.updateGUIWithNewData()
 
     def onActionLoadMAT(self):
         """
@@ -439,7 +477,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.numChan, self.chMap, self.chId, self.startIdx, self.findCoors = identify_relevant_channels(
             self.dataAll)
         print('applying filter...')
-        self.filtered_data = applyFilterToAllData(self.dataAll, self.numChan, self.chMap, filtType='modHierlemann')
+        self.filtered_data = applyFilterToAllData(self.dataAll, self.numChan, self.chMap, filtType=self.settings["filter"])
 
         if self.mode_multithreading is False:  # if multi-threaded, then this function is already connected on completion of fn
             self.updateGUIWithNewData()
@@ -450,7 +488,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         Returns:
 
         """
+        print("Update GUI with new data()")
         self.setWindowTitle('DC1 Vis - ' + self.loading_dict['path']) # -> connects to newOfflineDataSession
+
+        for window in self.external_windows:
+            window.update()
 
         print("GUI Counter: ", self.window_update_counter)
 
@@ -474,6 +516,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         self.update_win4()
 
+
         if self.mode_profiling:
             print("Current profiling statistics:")
             for key in self.profile_data.keys():
@@ -484,36 +527,147 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     def update_win1(self):
 
         self.win1.clear()
-        # prepare demonstration data:
         if self.first_time_plotting is False:
             colors = self.LoadedData.array_stats['spike_avg']
+            data = colors.T # for old pixel-based data
 
-            data = colors.T
+
+            max_dot = 100
+            # AX1) Size by Number of Samples
+            spike_cnt = self.LoadedData.array_stats['spike_cnt']
+            scale1 = (max_dot - 15) / (np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0]))
+            b_add = max_dot - (np.max(spike_cnt) * scale1)
+            size = np.round(spike_cnt * scale1 + b_add)
+            size[size < 15] = 10  # TODO fix saturation point
+
         else:
-            data = np.fromfunction(lambda i, j: (1 + 0.3 * np.sin(i)) * (i) ** 2 + (j) ** 2, (32, 32))
-            data = data * (1 + 0.2 * np.random.random(data.shape))
+            data = np.fromfunction(lambda i, j: (1 + 0.01 * np.sin(i)) * (i) ** 1 + (j) ** 1, (32, 32))
+            data = data * (1 + 0.001 * np.random.random(data.shape))
 
-
-
-        # Example: False color image with interactive level adjustment
-        #self.first_time_plotting = False
-
-        cm = pg.colormap.get('CET-D1')
-
-
+        cm = pg.colormap.get('CET-L9')
         image = pg.ImageItem(data)
-        self.win1.clear()
         self.win1.addItem(image)
 
         # bound the LinearRegionItem to the plotted data
         self.region.setClipItem(image)
 
-        # TODO fix color limits
         if self.win1_colorbar is None:
-            self.win1_colorbar = self.win1.addColorBar(image, colorMap=cm, values=(0, np.max(data)))
+            self.win1_colorbar = self.win1.addColorBar(image, colorMap=cm, values=(0, 150)) #values=(0, np.max(data)))
+            self.win1_colorbar.sigLevelsChanged.connect(self.colorBarLevelsChanged)
         else:
             self.win1_colorbar.setImageItem(image)
-            self.win1_colorbar.setLevels((0, np.max(data)))
+            #self.win1_colorbar.setLevels((0, np.max(data)))
+
+            # Set pxMode=False to allow spots to transform with the view
+            scatter = pg.ScatterPlotItem(pxMode=False)
+
+            # creating empty list for spots
+            spots = []
+
+            # color modulated by amplitude
+            cmap = plt.cm.get_cmap("jet")
+
+            for i in range(32):
+                for j in range(32):
+                    # creating  spot position which get updated after each iteration
+                    # of color which also get updated
+
+                    if self.first_time_plotting is True:
+                        spot_dic = {'pos': (i, j), 'size': 0,
+                                    'pen': {'color': 'w', 'width': 1},
+                                    'brush': pg.intColor(1, 100)}
+                    else:
+                        color_map = self.win1_colorbar.colorMap()
+                        levels = self.win1_colorbar.levels()
+
+                        value = colors[i,j]
+                        if value < levels[0]: value = levels[0]
+                        elif value > levels[1]: value = levels[1]
+
+                        adjusted_value = (value - levels[0]) / (levels[1] - levels[0])
+                        color_indicator = color_map.map(adjusted_value)
+
+                        #print('color indicator', color_indicator)
+
+                        #print("level:", color_map)
+                        spot_dic = {'pos': (j, i), 'size': size[i, j] / 60,
+                                    'pen': {'color': 'w', 'width': size[i, j] / 60},
+                                    'brush': pg.mkColor(color_indicator)}  # TODO fix coloring
+
+                        # used to be 'brush': pg.intColor(color_indicator, 100)
+                    # adding spot_dic in the list of spots
+                    spots.append(spot_dic)
+
+            self.first_time_plotting = False
+
+            self.win1.clear()
+            scatter.addPoints(spots)  # adding spots to the scatter plot
+            self.win1.addItem(scatter)  # adding scatter plot to the plot window
+
+    def colorBarLevelsChanged(self):
+        self.win1.clear()
+
+        colors = self.LoadedData.array_stats['spike_avg']
+        data = colors.T # for old pixel-based data
+
+
+        max_dot = 100
+        # AX1) Size by Number of Samples
+        spike_cnt = self.LoadedData.array_stats['spike_cnt']
+        scale1 = (max_dot - 15) / (np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0]))
+        b_add = max_dot - (np.max(spike_cnt) * scale1)
+        size = np.round(spike_cnt * scale1 + b_add)
+        size[size < 15] = 10  # TODO fix saturation point
+
+        # Set pxMode=False to allow spots to transform with the view
+        scatter = pg.ScatterPlotItem(pxMode=False)
+
+        # creating empty list for spots
+        spots = []
+
+        # color modulated by amplitude
+        cmap = plt.cm.get_cmap("jet")
+
+        for i in range(32):
+            for j in range(32):
+                # creating  spot position which get updated after each iteration
+                # of color which also get updated
+
+                if self.first_time_plotting is True:
+                    spot_dic = {'pos': (i, j), 'size': random.random() * 0.5 + 0.5,
+                                'pen': {'color': 'w', 'width': 2},
+                                'brush': pg.intColor(i * 10 + j, 100)}
+                else:
+                    color_map = self.win1_colorbar.colorMap()
+                    levels = self.win1_colorbar.levels()
+
+                    value = colors[i, j]
+                    if value < levels[0]:
+                        value = levels[0]
+                    elif value > levels[1]:
+                        value = levels[1]
+
+                    adjusted_value = (value - levels[0]) / (levels[1] - levels[0])
+                    color_indicator = color_map.map(adjusted_value)
+
+                    #print('color indicator', color_indicator)
+
+                    #print("level:", color_map)
+                    spot_dic = {'pos': (j, i), 'size': size[i, j] / 60,
+                                'pen': {'color': 'w', 'width': size[i, j] / 60},
+                                'brush': pg.mkColor(color_indicator)}  # TODO fix coloring
+
+                    # used to be 'brush': pg.intColor(color_indicator, 100)
+
+                # adding spot_dic in the list of spots
+                spots.append(spot_dic)
+
+
+        self.win1.clear()
+        scatter.addPoints(spots)  # adding spots to the scatter plot
+        self.win1.addItem(scatter)  # adding scatter plot to the plot window
+
+
 
     def update_win2(self):
         trace_plots = [self.traceplot_1, self.traceplot_2, self.traceplot_3, self.traceplot_4]
@@ -542,35 +696,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     def update_win4(self):
         self.win4.clear()
-        # prepare demonstration data:
 
-        if self.first_time_plotting is False:
-            spike_cnt = self.LoadedData.array_stats['spike_cnt']
+        if self.LoadedData is not None:
 
-            # AX1) Size by Number of Samples
-            scale1 = (max_dot - 15) / (np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0]))
-            b_add = max_dot - (np.max(spike_cnt) * scale1)
-            size = np.round(spike_cnt * scale1 + b_add)
-            size[size < 15] = 10
-
-            data = spike_cnt.T
-        else:
-            data = np.fromfunction(lambda i, j: (1 + 0.3 * np.sin(i)) * (i) ** 2 + (j) ** 2, (32, 32))
-            data = data * (1 + 0.2 * np.random.random(data.shape))
-
-        self.first_time_plotting = False
-
-        # Example: False color image with interactive level adjustment
-        #self.first_time_plotting = False
-
-        cm = pg.colormap.get('CET-D1')
-
-        image = pg.ImageItem(data)
-
-        self.win4.addItem(image)
-        # TODO fix color limits
-
-        self.win4.addColorBar(image, colorMap=cm, values=(0, np.max(data)))
+            avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
+            x = np.cumsum(avg_spike_rate_times)
+            y = self.LoadedData.array_stats["array spike rate"]
+            print("x", x)
+            print("y", y)
+            print("")
+            line_plot = self.win4.plot(x, y, pen='b', symbol='o', symbolPen='b',
+                             symbolBrush=0.2)
 
 
     def change_win1(self):

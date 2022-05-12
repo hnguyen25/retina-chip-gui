@@ -19,9 +19,10 @@ class GUIPreferences(QtWidgets.QDialog, Ui_Startup):
         self.setWindowTitle("Set Session Parameters...")
 
         self.chooseVisStyle.activated.connect(self.setVisStyle)
-        self.settings["VisStyle"] = self.chooseVisStyle.currentText()
+        self.settings["visStyle"] = self.chooseVisStyle.currentText()
 
         self.chooseFilePath.clicked.connect(self.getFolderDir)
+        self.settings["path"] = '/Users/huy/artifical-retina-pipeline-guis/dc1DataVis/debugData/2022-02-17-0/data002'
 
         self.chooseRealTime.activated.connect(self.setRealTime)
         self.settings["realTime"] = self.chooseRealTime.currentText()
@@ -41,12 +42,10 @@ class GUIPreferences(QtWidgets.QDialog, Ui_Startup):
         self.LabelSpikeThreshold.setText(str(self.THRESHOLD_DEFAULT))
         self.settings["spikeThreshold"] = float(self.THRESHOLD_DEFAULT)
 
-        self.DialogButtonBox.accepted.connect(self.triggerAccepted)
-        self.DialogButtonBox.rejected.connect(self.triggerRejected)
-
     def getFolderDir(self):
         path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
         self.LabelFilePath.setText(os.path.basename(path))
+        self.settings["path"] = path
 
     def setVisStyle(self):
         self.settings["visStyle"] = self.chooseVisStyle.currentText()
@@ -66,11 +65,3 @@ class GUIPreferences(QtWidgets.QDialog, Ui_Startup):
     def setSpikeThreshold(self):
         self.settings["spikeThreshold"] = round(self.chooseSpikeThreshold.value() / 100, 2)
         self.LabelSpikeThreshold.setText(str(self.settings["spikeThreshold"]))
-
-    def triggerAccepted(self):
-        # TODO connect to main window
-        print('yes')
-
-    def triggerRejected(self):
-        # TODO connect to main window
-        print('no')

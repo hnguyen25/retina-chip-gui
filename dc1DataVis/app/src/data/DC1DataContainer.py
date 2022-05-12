@@ -5,7 +5,6 @@ from ..data.filters import *
 
 piece_no = 1
 time_win = 190  # The amount of time (ms) you want to view in each frame
-spike_t = 3  # How many standard deviations above noise to find spikes
 max_dot = 300  # Saturation point for dot size
 
 class DC1DataContainer():
@@ -40,8 +39,13 @@ class DC1DataContainer():
         "spike_std": np.zeros((32, 32)),
         "spike_cnt": np.zeros((32, 32)),
         "size": None,
-        "times": None
+        "times": None,
+
+        "array spike rate times": [], # x
+        "array spike rate": [] # y
     }
+
+    spikeThreshold = 3 # How many standard deviations above noise to find spikes
 
     # TODO combine with identity_relevant_channels
     def __init__(self):
@@ -54,6 +58,9 @@ class DC1DataContainer():
         self.counts = np.zeros((32, 32, 1000))
         self.times = np.zeros((1000,))
         self.container_length = 1000
+
+    def setSpikeThreshold(self, threshold):
+        self.spikeThreshold = threshold
 
     def extend_data_containers(self, mode='double'):
         """Change data containers dynamically to accommodate longer time windows of data
@@ -162,23 +169,15 @@ class DC1DataContainer():
         self.array_stats['num_sam'][:, :, 0] = np.count_nonzero(data_real, axis=2)
         incom_cnt = self.array_stats['num_sam'][:, :, 0]
 
-        # AX2) Time Domain Electrodes to Plot
-        fig_rows = np.count_nonzero(self.array_stats['num_sam'])
-        if fig_rows == 0:
-            fig_rows = 1
-        if fig_rows > 4:
-            fig_rows = 4
-        fig_elec = np.zeros((fig_rows, 2))
-
-        fig_ind = np.argsort(self.array_stats['num_sam'].flatten())[-fig_rows:]
-        fig_elec[:, 0] = (fig_ind[:] / 32).astype(int)
-        fig_elec[:, 1] = fig_ind[:] - (fig_elec[:, 0] * 32)
-        fig_elec = fig_elec.astype(int)
 
         # AX1,AX3,AX4) Finding average ADC of samples per electrode
         mask = np.copy(data_real)
         mask[mask == 0] = np.nan
-        self.array_stats['avg_val'][:, :, 0] = np.nanmean(mask, axis=2)
+
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            self.array_stats['avg_val'][:, :, 0] = np.nanmean(mask, axis=2)
         avg_val = np.nan_to_num(self.array_stats['avg_val'], nan=0)
         incom_mean = avg_val[:, :, 0]
 
@@ -211,18 +210,24 @@ class DC1DataContainer():
         incom_spike_std = np.zeros((32, 32))
         mask2 = np.copy(data_real)
 
+        print("spike threhsold", self.spikeThreshold)
         for x in range(len(chan_ind)):
             self.array_stats["noise_std"] = self.array_stats["noise_std"]
             incom_spike_cnt[chan_elec[x, 0], chan_elec[x, 1]] = np.count_nonzero(
-                mask[chan_elec[x, 0], chan_elec[x, 1], :] >= self.array_stats["noise_mean"][chan_elec[x, 0], chan_elec[x, 1]] + spike_t *
+                mask[chan_elec[x, 0], chan_elec[x, 1], :] >= self.array_stats["noise_mean"][chan_elec[x, 0], chan_elec[x, 1]] + self.spikeThreshold *
                 self.array_stats["noise_std"][chan_elec[x, 0], chan_elec[x, 1]])
             mask2[chan_elec[x, 0], chan_elec[x, 1], mask2[chan_elec[x, 0], chan_elec[x, 1], :] <= self.array_stats["noise_mean"][
-                chan_elec[x, 0], chan_elec[x, 1]] + spike_t * self.array_stats["noise_std"][chan_elec[x, 0], chan_elec[x, 1]]] = np.nan
+                chan_elec[x, 0], chan_elec[x, 1]] + self.spikeThreshold * self.array_stats["noise_std"][chan_elec[x, 0], chan_elec[x, 1]]] = np.nan
 
-        incom_spike_avg = np.nanmean(mask2, axis=2)
-        incom_spike_avg = np.nan_to_num(incom_spike_avg, nan=0)
-        incom_spike_std = np.nanstd(mask2, axis=2)
-        incom_spike_std = np.nan_to_num(incom_spike_std, nan=0)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            incom_spike_avg = np.nanmean(mask2, axis=2)
+            incom_spike_avg = np.nan_to_num(incom_spike_avg, nan=0)
+            incom_spike_std = np.nanstd(mask2, axis=2)
+            incom_spike_std = np.nan_to_num(incom_spike_std, nan=0)
+
+
+
 
         pre_spike_avg = np.copy(self.array_stats["spike_avg"])
         pre_spike_std = np.copy(self.array_stats["spike_std"])
@@ -239,26 +244,14 @@ class DC1DataContainer():
                                               new_spike_cnt), nan=0))
         self.array_stats["spike_cnt"] = np.nan_to_num(new_spike_cnt, nan=0)
 
-        # AX1) Colors by Average Electrode Amplitude
-        self.array_stats["colors"] = np.copy(self.array_stats["spike_avg"])
-
-        # AX1) Size by Number of Samples
-        scale1 = (max_dot - 15) / (np.max(self.array_stats["spike_cnt"]) - np.min(self.array_stats["spike_cnt"][self.array_stats["spike_cnt"]!=0]))
-        b_add = max_dot - (np.max(self.array_stats["spike_cnt"]) * scale1)
-        self.array_stats["size"] = np.round(self.array_stats["spike_cnt"] * scale1 + b_add)
-        self.array_stats["size"][self.array_stats["size"] < 15] = 10
-
-        #     max_sam = np.max(num_sam[:,:,0])
-        #     min_sam = np.min(num_sam[num_sam!=0])
-        #     if max_sam == min_sam:
-        #         min_sam = 0
-        #     scale = (max_dot - 15) / (max_sam - min_sam)
-        #     b_add = max_dot - (max_sam*scale)
-        #     size = np.append(size,np.round(num_sam*scale+b_add),axis=2)
-        #     size[size<15] = 10
-
         # AX2) Determine the Time of Each Sample
         total_time = N * 0.05  # Sampling rate 1/0.05 ms
         self.array_stats["times"] = np.linspace(0, total_time, N)
+
+        self.array_stats["array spike rate times"].append(total_time/1000)
+        self.array_stats["array spike rate"].append(np.sum(incom_spike_avg))
+        #print("avg spike rate:", self.array_stats["array spike rate"])
+        #print("spike rate times: ", self.array_stats["times"])
+
 
 

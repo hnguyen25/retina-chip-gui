@@ -6,6 +6,7 @@ nav:
   - Introduction: 'index.md'
   - Getting Started: 'getting-started.md'
   - To Dos: 'todo.md'
+  - Change Log: 'changelog.md'
   - Source:
       - Analysis: 'analysis.md'
       - Data:

@@ -11,33 +11,34 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_Dialog(object):
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(459, 590)
-        self.label = QtWidgets.QLabel(Dialog)
+class Ui_AllChannelsInformation(object):
+    def setupUi(self, AllChannelsInformation):
+        AllChannelsInformation.setObjectName("AllChannelsInformation")
+        AllChannelsInformation.resize(459, 562)
+        self.label = QtWidgets.QLabel(AllChannelsInformation)
         self.label.setGeometry(QtCore.QRect(30, 10, 101, 31))
         self.label.setObjectName("label")
-        self.comboBox = QtWidgets.QComboBox(Dialog)
-        self.comboBox.setGeometry(QtCore.QRect(150, 10, 291, 31))
-        self.comboBox.setObjectName("comboBox")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.tableView = QtWidgets.QTableView(Dialog)
-        self.tableView.setGeometry(QtCore.QRect(0, 50, 461, 541))
-        self.tableView.setObjectName("tableView")
-        self.label.setBuddy(self.comboBox)
+        self.chooseSortOption = QtWidgets.QComboBox(AllChannelsInformation)
+        self.chooseSortOption.setGeometry(QtCore.QRect(150, 10, 291, 31))
+        self.chooseSortOption.setObjectName("chooseSortOption")
+        self.chooseSortOption.addItem("")
+        self.chooseSortOption.addItem("")
+        self.chooseSortOption.addItem("")
+        self.chooseSortOption.addItem("")
+        self.electrodeTable = QtWidgets.QTableView(AllChannelsInformation)
+        self.electrodeTable.setGeometry(QtCore.QRect(0, 50, 461, 541))
+        self.electrodeTable.setObjectName("electrodeTable")
+        self.label.setBuddy(self.chooseSortOption)
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(AllChannelsInformation)
+        QtCore.QMetaObject.connectSlotsByName(AllChannelsInformation)
 
-    def retranslateUi(self, Dialog):
+    def retranslateUi(self, AllChannelsInformation):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.label.setText(_translate("Dialog", "Sort by..."))
-        self.comboBox.setItemText(0, _translate("Dialog", "Spike Rate"))
-        self.comboBox.setItemText(1, _translate("Dialog", "Amplitude"))
-        self.comboBox.setItemText(2, _translate("Dialog", "Time Recorded"))
-        self.comboBox.setItemText(3, _translate("Dialog", "Location on Array"))
+        AllChannelsInformation.setWindowTitle(_translate("AllChannelsInformation", "All Channels Information"))
+        self.label.setText(_translate("AllChannelsInformation", "Sort by..."))
+        self.chooseSortOption.setItemText(0, _translate("AllChannelsInformation", "Spike Rate"))
+        self.chooseSortOption.setItemText(1, _translate("AllChannelsInformation", "Amplitude"))
+        self.chooseSortOption.setItemText(2, _translate("AllChannelsInformation", "Time Recorded"))
+        self.chooseSortOption.setItemText(3, _translate("AllChannelsInformation", "Location on Array"))
+from widget import Widget
