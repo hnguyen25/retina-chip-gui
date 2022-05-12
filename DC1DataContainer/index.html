@@ -223,6 +223,21 @@
 
   
   
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        Change Log
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
     
   
   
@@ -230,18 +245,18 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_4">
+        <label class="md-nav__link" for="__nav_5">
           Source
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Source" data-md-level="1">
-        <label class="md-nav__title" for="__nav_4">
+        <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           Source
         </label>
@@ -272,18 +287,18 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2" type="checkbox" id="__nav_5_2" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_4_2">
+        <label class="md-nav__link" for="__nav_5_2">
           Data
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Data" data-md-level="2">
-        <label class="md-nav__title" for="__nav_4_2">
+        <label class="md-nav__title" for="__nav_5_2">
           <span class="md-nav__icon md-icon"></span>
           Data
         </label>
@@ -436,18 +451,18 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3" type="checkbox" id="__nav_5_3" >
       
       
       
       
-        <label class="md-nav__link" for="__nav_4_3">
+        <label class="md-nav__link" for="__nav_5_3">
           GUI
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="GUI" data-md-level="2">
-        <label class="md-nav__title" for="__nav_4_3">
+        <label class="md-nav__title" for="__nav_5_3">
           <span class="md-nav__icon md-icon"></span>
           GUI
         </label>
@@ -625,7 +640,6 @@
 
 
 
-
   <div class="doc doc-object doc-class">
 
 
@@ -676,8 +690,13 @@ DC1DataContainer        </code>
         <span class="s2">&quot;spike_std&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)),</span>
         <span class="s2">&quot;spike_cnt&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">)),</span>
         <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="kc">None</span>
+        <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+
+        <span class="s2">&quot;array spike rate times&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="c1"># x</span>
+        <span class="s2">&quot;array spike rate&quot;</span><span class="p">:</span> <span class="p">[]</span> <span class="c1"># y</span>
     <span class="p">}</span>
+
+    <span class="n">spikeThreshold</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># How many standard deviations above noise to find spikes</span>
 
     <span class="c1"># TODO combine with identity_relevant_channels</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -690,6 +709,9 @@ DC1DataContainer        </code>
         <span class="bp">self</span><span class="o">.</span><span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">1000</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1000</span><span class="p">,))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">container_length</span> <span class="o">=</span> <span class="mi">1000</span>
+
+    <span class="k">def</span> <span class="nf">setSpikeThreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spikeThreshold</span> <span class="o">=</span> <span class="n">threshold</span>
 
     <span class="k">def</span> <span class="nf">extend_data_containers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;double&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Change data containers dynamically to accommodate longer time windows of data</span>
@@ -798,23 +820,15 @@ DC1DataContainer        </code>
         <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;num_sam&#39;</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">data_real</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">incom_cnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;num_sam&#39;</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
 
-        <span class="c1"># AX2) Time Domain Electrodes to Plot</span>
-        <span class="n">fig_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;num_sam&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">fig_rows</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">fig_rows</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">fig_rows</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="n">fig_rows</span> <span class="o">=</span> <span class="mi">4</span>
-        <span class="n">fig_elec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">fig_rows</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-
-        <span class="n">fig_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;num_sam&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="o">-</span><span class="n">fig_rows</span><span class="p">:]</span>
-        <span class="n">fig_elec</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">fig_ind</span><span class="p">[:]</span> <span class="o">/</span> <span class="mi">32</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">fig_elec</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fig_ind</span><span class="p">[:]</span> <span class="o">-</span> <span class="p">(</span><span class="n">fig_elec</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
-        <span class="n">fig_elec</span> <span class="o">=</span> <span class="n">fig_elec</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
         <span class="c1"># AX1,AX3,AX4) Finding average ADC of samples per electrode</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data_real</span><span class="p">)</span>
         <span class="n">mask</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;avg_val&#39;</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="kn">import</span> <span class="nn">warnings</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;avg_val&#39;</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">avg_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;avg_val&#39;</span><span class="p">],</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">incom_mean</span> <span class="o">=</span> <span class="n">avg_val</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
 
@@ -847,18 +861,24 @@ DC1DataContainer        </code>
         <span class="n">incom_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
         <span class="n">mask2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data_real</span><span class="p">)</span>
 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;spike threhsold&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spikeThreshold</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chan_ind</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_std&quot;</span><span class="p">]</span>
             <span class="n">incom_spike_cnt</span><span class="p">[</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span>
-                <span class="n">mask</span><span class="p">[</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_mean&quot;</span><span class="p">][</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="n">spike_t</span> <span class="o">*</span>
+                <span class="n">mask</span><span class="p">[</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_mean&quot;</span><span class="p">][</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">spikeThreshold</span> <span class="o">*</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_std&quot;</span><span class="p">][</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
             <span class="n">mask2</span><span class="p">[</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">mask2</span><span class="p">[</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_mean&quot;</span><span class="p">][</span>
-                <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="n">spike_t</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_std&quot;</span><span class="p">][</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">spikeThreshold</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_std&quot;</span><span class="p">][</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
-        <span class="n">incom_spike_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">mask2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">incom_spike_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">incom_spike_avg</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">incom_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">mask2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">incom_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">incom_spike_std</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="n">incom_spike_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">mask2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">incom_spike_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">incom_spike_avg</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">incom_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">mask2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">incom_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">incom_spike_std</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+
 
         <span class="n">pre_spike_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_avg&quot;</span><span class="p">])</span>
         <span class="n">pre_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_std&quot;</span><span class="p">])</span>
@@ -875,33 +895,19 @@ DC1DataContainer        </code>
                                               <span class="n">new_spike_cnt</span><span class="p">),</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">new_spike_cnt</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="c1"># AX1) Colors by Average Electrode Amplitude</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;colors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_avg&quot;</span><span class="p">])</span>
-
-        <span class="c1"># AX1) Size by Number of Samples</span>
-        <span class="n">scale1</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_dot</span> <span class="o">-</span> <span class="mi">15</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">]))</span>
-        <span class="n">b_add</span> <span class="o">=</span> <span class="n">max_dot</span> <span class="o">-</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale1</span> <span class="o">+</span> <span class="n">b_add</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
-
-        <span class="c1">#     max_sam = np.max(num_sam[:,:,0])</span>
-        <span class="c1">#     min_sam = np.min(num_sam[num_sam!=0])</span>
-        <span class="c1">#     if max_sam == min_sam:</span>
-        <span class="c1">#         min_sam = 0</span>
-        <span class="c1">#     scale = (max_dot - 15) / (max_sam - min_sam)</span>
-        <span class="c1">#     b_add = max_dot - (max_sam*scale)</span>
-        <span class="c1">#     size = np.append(size,np.round(num_sam*scale+b_add),axis=2)</span>
-        <span class="c1">#     size[size&lt;15] = 10</span>
-
         <span class="c1"># AX2) Determine the Time of Each Sample</span>
         <span class="n">total_time</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="mf">0.05</span>  <span class="c1"># Sampling rate 1/0.05 ms</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">total_time</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;array spike rate times&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_time</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;array spike rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">incom_spike_avg</span><span class="p">))</span>
 </code></pre></div>
         </details>
 
 
 
   <div class="doc doc-children">
+
 
 
 
@@ -1109,6 +1115,7 @@ DC1DataContainer        </code>
 
 
 
+
   <div class="doc doc-object doc-method">
 
 
@@ -1163,23 +1170,15 @@ DC1DataContainer        </code>
     <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;num_sam&#39;</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">data_real</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">incom_cnt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;num_sam&#39;</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
 
-    <span class="c1"># AX2) Time Domain Electrodes to Plot</span>
-    <span class="n">fig_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;num_sam&#39;</span><span class="p">])</span>
-    <span class="k">if</span> <span class="n">fig_rows</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">fig_rows</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">if</span> <span class="n">fig_rows</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
-        <span class="n">fig_rows</span> <span class="o">=</span> <span class="mi">4</span>
-    <span class="n">fig_elec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">fig_rows</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-
-    <span class="n">fig_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;num_sam&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="o">-</span><span class="n">fig_rows</span><span class="p">:]</span>
-    <span class="n">fig_elec</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">fig_ind</span><span class="p">[:]</span> <span class="o">/</span> <span class="mi">32</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">fig_elec</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">fig_ind</span><span class="p">[:]</span> <span class="o">-</span> <span class="p">(</span><span class="n">fig_elec</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
-    <span class="n">fig_elec</span> <span class="o">=</span> <span class="n">fig_elec</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
     <span class="c1"># AX1,AX3,AX4) Finding average ADC of samples per electrode</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data_real</span><span class="p">)</span>
     <span class="n">mask</span><span class="p">[</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;avg_val&#39;</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">warnings</span>
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;avg_val&#39;</span><span class="p">][:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">avg_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s1">&#39;avg_val&#39;</span><span class="p">],</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">incom_mean</span> <span class="o">=</span> <span class="n">avg_val</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
 
@@ -1212,18 +1211,24 @@ DC1DataContainer        </code>
     <span class="n">incom_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">))</span>
     <span class="n">mask2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data_real</span><span class="p">)</span>
 
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;spike threhsold&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spikeThreshold</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chan_ind</span><span class="p">)):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_std&quot;</span><span class="p">]</span>
         <span class="n">incom_spike_cnt</span><span class="p">[</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span>
-            <span class="n">mask</span><span class="p">[</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_mean&quot;</span><span class="p">][</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="n">spike_t</span> <span class="o">*</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_mean&quot;</span><span class="p">][</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">spikeThreshold</span> <span class="o">*</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_std&quot;</span><span class="p">][</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
         <span class="n">mask2</span><span class="p">[</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">mask2</span><span class="p">[</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">:]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_mean&quot;</span><span class="p">][</span>
-            <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="n">spike_t</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_std&quot;</span><span class="p">][</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">spikeThreshold</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;noise_std&quot;</span><span class="p">][</span><span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">chan_elec</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
-    <span class="n">incom_spike_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">mask2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">incom_spike_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">incom_spike_avg</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">incom_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">mask2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">incom_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">incom_spike_std</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">)</span>
+        <span class="n">incom_spike_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">mask2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">incom_spike_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">incom_spike_avg</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">incom_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">mask2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">incom_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">incom_spike_std</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+
 
     <span class="n">pre_spike_avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_avg&quot;</span><span class="p">])</span>
     <span class="n">pre_spike_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_std&quot;</span><span class="p">])</span>
@@ -1240,27 +1245,12 @@ DC1DataContainer        </code>
                                           <span class="n">new_spike_cnt</span><span class="p">),</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">new_spike_cnt</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="c1"># AX1) Colors by Average Electrode Amplitude</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;colors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_avg&quot;</span><span class="p">])</span>
-
-    <span class="c1"># AX1) Size by Number of Samples</span>
-    <span class="n">scale1</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_dot</span> <span class="o">-</span> <span class="mi">15</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">]))</span>
-    <span class="n">b_add</span> <span class="o">=</span> <span class="n">max_dot</span> <span class="o">-</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale1</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;spike_cnt&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale1</span> <span class="o">+</span> <span class="n">b_add</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
-
-    <span class="c1">#     max_sam = np.max(num_sam[:,:,0])</span>
-    <span class="c1">#     min_sam = np.min(num_sam[num_sam!=0])</span>
-    <span class="c1">#     if max_sam == min_sam:</span>
-    <span class="c1">#         min_sam = 0</span>
-    <span class="c1">#     scale = (max_dot - 15) / (max_sam - min_sam)</span>
-    <span class="c1">#     b_add = max_dot - (max_sam*scale)</span>
-    <span class="c1">#     size = np.append(size,np.round(num_sam*scale+b_add),axis=2)</span>
-    <span class="c1">#     size[size&lt;15] = 10</span>
-
     <span class="c1"># AX2) Determine the Time of Each Sample</span>
     <span class="n">total_time</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="mf">0.05</span>  <span class="c1"># Sampling rate 1/0.05 ms</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">total_time</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;array spike rate times&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">total_time</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">array_stats</span><span class="p">[</span><span class="s2">&quot;array spike rate&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">incom_spike_avg</span><span class="p">))</span>
 </code></pre></div>
         </details>
     </div>
