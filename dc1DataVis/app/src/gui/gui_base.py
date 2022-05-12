@@ -29,6 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
     mode_profiling = True
     mode_multithreading = True
     first_time_plotting = True
+    is_dark_mode = False
     # GUI GRAPHS
     win1, win2, win3, win4 = None, None, None, None
 
@@ -58,6 +59,8 @@ class MainWindow(QtWidgets.QMainWindow):
     vb = None
     proxy = None
 
+    win1_colorbar = None
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -78,11 +81,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 'spike rate': []
             }
 
-
         if self.mode_multithreading:
             print('GUI is multithreading')
-
-
 
         # =====================
         # FRONT END (GUI layout + design)
@@ -146,8 +146,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.win3.addItem(curve)
 
         # bottom right - Spike Rate Plot // MiniMap Widget -> in development
-
-
         # ======================
         # BACKEND (multithreading + interactivity)
         # =====================
@@ -166,6 +164,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionNew_session.triggered.connect(self.onLoadRealtimeStream)
         self.action_save_npz.triggered.connect(self.plot)
         self.action_save_mat.triggered.connect(self.plot)
+        self.actionToggle_light_dark_mode.triggered.connect(self.toggleDarkMode)
 
         #hack no longer needed - self.windowTitleChanged.connect(self.newOfflineDataSession)
 
@@ -195,14 +194,30 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.proxy = pg.SignalProxy(self.win1.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)
 
-
         self.update_win1()
         self.update_win4()
 
-
+        #containing_layout = self.win4.parent().layout()
+        #containing_layout.replaceWidget(self.win4, self.win2)
 
         # END __INIT__ FUNCTION
         # =====================
+
+    def newWidgetInPane(self):
+        pass
+
+    def toggleDarkMode(self):
+        self.is_dark_mode = not self.is_dark_mode
+        if self.is_dark_mode: # dark mode
+            self.win1.setBackground('d')
+            self.win2.setBackground('d')
+            self.win3.setBackground('d')
+            self.win4.setBackground('d')
+        else: # light mode
+            self.win1.setBackground('w')
+            self.win2.setBackground('w')
+            self.win3.setBackground('w')
+            self.win4.setBackground('w')
 
     # for crosshairs
     def update(self):
@@ -215,21 +230,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.region.setRegion(rgn)
 
     def mouseMoved(self, evt):
-        print("mouseMoved")
+
         pos = evt[0]  ## using signal proxy turns original arguments into a tuple
         if self.win1.sceneBoundingRect().contains(pos):
             mousePoint = self.vb.mapSceneToView(pos)
-            index = int(mousePoint.x())
-            if index > 0 and index < 100:
-                int_x = int(mousePoint.x())
-                int_y = int(mousePoint.y())
+
+            print("array_stats")
+            print(self.LoadedData.array_stats['spike_avg'])
+
+            int_x = int(mousePoint.x())
+            int_y = int(mousePoint.y())
+            if 0 <= int_x < 32 and 0 <= int_y < 32:
                 self.statusBar().showMessage(
-                    str( int_x ) + ", " + str( int_y ) +
-                    ": " + str(self.LoadedData.array_stats['spike_avg'][int_x][int_y] )
+                    "Array Map Spike Average @ " + str(int_x) + ", " + str(int_y) +
+                    ": " + str(self.LoadedData.array_stats['spike_avg'][int_x][int_y])
                 )
+
             self.vLine.setPos(mousePoint.x())
             self.hLine.setPos(mousePoint.y())
-
 
     """
     =======================
@@ -354,10 +372,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.mode_profiling:
                     self.profile_data['calculate array stats'] = end - start
 
-
                 # we need to call the main GUI thread to update graphs (can't do with non GUI-thread)
                 gui_callback.emit()
-
 
     def onActionLoadNPZ(self):
         """
@@ -481,9 +497,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.region.setClipItem(image)
 
         # TODO fix color limits
-        self.win1.addColorBar(image, colorMap=cm, values=(0, np.max(data)))
-
-
+        if self.win1_colorbar is None:
+            self.win1_colorbar = self.win1.addColorBar(image, colorMap=cm, values=(0, np.max(data)))
+        else:
+            self.win1_colorbar.setImageItem(image)
+            self.win1_colorbar.setLevels((0, np.max(data)))
 
     def update_win2(self):
         trace_plots = [self.traceplot_1, self.traceplot_2, self.traceplot_3, self.traceplot_4]
@@ -534,7 +552,6 @@ class MainWindow(QtWidgets.QMainWindow):
         #self.first_time_plotting = False
 
         cm = pg.colormap.get('CET-D1')
-
 
         image = pg.ImageItem(data)
 

@@ -8,7 +8,6 @@ time_win = 190  # The amount of time (ms) you want to view in each frame
 spike_t = 3  # How many standard deviations above noise to find spikes
 max_dot = 300  # Saturation point for dot size
 
-
 class DC1DataContainer():
     """
     Container for holding all different types of data.
