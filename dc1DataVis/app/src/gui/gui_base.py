@@ -89,7 +89,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # =====================
 
         # Load layout based on QtDesigner .ui file
-        uic.loadUi("./src/gui/layout.ui", self)
+        uic.loadUi("./src/gui/default-vis.ui", self)
 
         # TODO make window system more flexible+modular
         # top left window = Array Map
@@ -161,10 +161,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # >> FILE BUTTON
         self.action_npz.triggered.connect(self.onActionLoadNPZ)
         self.action_mat.triggered.connect(self.onActionLoadMAT)
-        self.actionNew_session.triggered.connect(self.onLoadRealtimeStream)
-        self.action_save_npz.triggered.connect(self.plot)
-        self.action_save_mat.triggered.connect(self.plot)
-        self.actionToggle_light_dark_mode.triggered.connect(self.toggleDarkMode)
+        self.actionUpdateSession.triggered.connect(self.onLoadRealtimeStream)
 
         #hack no longer needed - self.windowTitleChanged.connect(self.newOfflineDataSession)
 
