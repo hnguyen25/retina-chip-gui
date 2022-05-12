@@ -200,7 +200,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         # >> HELP BUTTON
 
     def viewNewIndividalChannelInformation(self):
-        print("viewNew()")
+
         from ..gui.gui_individualchannel import IndividualChannelInformation
         new_window = IndividualChannelInformation()
         new_window.label = QLabel("Individual Channel Analysis")
@@ -210,7 +210,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.external_windows.append(new_window)
 
     def viewChannelListInformation(self):
-        print("viewNewList()")
+
         from ..gui.gui_electrodelist import ElectrodeListInformation
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
@@ -220,7 +220,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIPreferences(self):
-        print("viewPreferences()")
+
         from ..gui.gui_sessionparameters import GUIPreferences
         new_window = GUIPreferences()
         new_window.label = QLabel("GUI Preferences")
@@ -257,8 +257,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         if self.win1.sceneBoundingRect().contains(pos):
             mousePoint = self.vb.mapSceneToView(pos)
 
-            #print("array_stats")
-            #print(self.LoadedData.array_stats['spike_avg'])
 
             int_x = int(mousePoint.x())
             int_y = int(mousePoint.y())
@@ -311,7 +309,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
     def loadSession(self):
-        print(self.settings)
+
 
         # debug
 
@@ -596,9 +594,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                         adjusted_value = (value - levels[0]) / (levels[1] - levels[0])
                         color_indicator = color_map.map(adjusted_value)
 
-                        #print('color indicator', color_indicator)
-
-                        #print("level:", color_map)
                         spot_dic = {'pos': (j, i), 'size': size[i, j] / 60,
                                     'pen': {'color': 'w', 'width': size[i, j] / 60},
                                     'brush': pg.mkColor(color_indicator)}  # TODO fix coloring
@@ -659,9 +654,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     adjusted_value = (value - levels[0]) / (levels[1] - levels[0])
                     color_indicator = color_map.map(adjusted_value)
 
-                    #print('color indicator', color_indicator)
-
-                    #print("level:", color_map)
                     spot_dic = {'pos': (j, i), 'size': size[i, j] / 60,
                                 'pen': {'color': 'w', 'width': size[i, j] / 60},
                                 'brush': pg.mkColor(color_indicator)}  # TODO fix coloring
@@ -711,9 +703,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
             x = np.cumsum(avg_spike_rate_times)
             y = self.LoadedData.array_stats["array spike rate"]
-            print("x", x)
-            print("y", y)
-            print("")
             line_plot = self.win4.plot(x, y, pen='b', symbol='o', symbolPen='b',
                              symbolBrush=0.2)
 
