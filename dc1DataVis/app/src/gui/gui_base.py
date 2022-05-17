@@ -32,13 +32,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     settings = {}
 
     # MODES
-    mode_profiling = False
+    mode_profiling = True
     mode_multithreading = True
     first_time_plotting = True
     is_dark_mode = False
     # GUI GRAPHS
+
     win1, win2, win3, win4 = None, None, None, None
     external_windows = []
+
+
+
 
     # ==== DATA PARAMETERS ====
     graph_params = None
@@ -66,7 +70,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     vb = None
     proxy = None
 
-    win1_colorbar = None
+    arrayMap_colorbar = None
+
+    charts, chart_update_function_mapping = None, None
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -76,16 +82,41 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         # =====================
         self.graph_params = PyqtGraphParams({})
 
+        self.charts = {
+            "arrayMap": None,
+            "miniMap": None,
+            "spikeRatePlot": None,
+            "noiseHistogram": None,
+            "channelTraceVerticalLayout": None,
+            "channelTrace1": None,
+            "channelTrace2": None,
+            "channelTrace3": None,
+            "channelTrace4": None
+        }
+
+        self.chart_update_function_mapping = {
+            "arrayMap": self.updateArrayMapPlot,
+            "miniMap": self.updateMiniMapPlot,
+            "spikeRatePlot": self.updateSpikeRatePlot,
+            "noiseHistogram": self.updateNoiseHistogramPlot,
+            "channelTrace1": self.updateChannelTracePlot,
+            "channelTrace2": self.updateChannelTracePlot,
+            "channelTrace3": self.updateChannelTracePlot,
+            "channelTrace4": self.updateChannelTracePlot
+        }
+
         if self.mode_profiling:
             print('GUI is in profiling mode')
             self.profile_data = {
                 'append raw data': [],
                 'filter data': [],
                 'calculate array stats': [],
-                'array map': [],
-                'spike trace': [],
-                'noise histogram': [],
-                'spike rate': []
+                'arrayMap': [],
+                'channelTrace': [],
+                'noiseHistogram': [],
+                'spikeRatePlot': [],
+                'miniMap': [],
+                'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
             }
 
         if self.mode_multithreading:
@@ -95,82 +126,58 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.settings = settings
 
     def setupLayout(self):
-        # old way
-        #super().__init__(*args, **kwargs)
-
-        #uic.loadUi("./src/gui/default_vis.ui", self)
 
         print("Session settings: " + str(self.settings))
         # Load layout based on QtDesigner .ui file
         if self.settings["visStyle"] == "Default":
             uic.loadUi("./src/gui/default_vis.ui", self)
+            self.charts["arrayMap"] = self.arrayMap
+            self.charts["miniMap"] = self.miniMap
+            self.charts["spikeRatePlot"] = self.spikeRatePlot
+            self.charts["noiseHistogram"] = self.noiseHistogram
+            self.charts["channelTraceVerticalLayout"] = self.channelTraceVerticalLayout
+            self.charts["channelTrace1"] = self.channelTrace1
+            self.charts["channelTrace2"] = self.channelTrace2
+            self.charts["channelTrace3"] = self.channelTrace3
+            self.charts["channelTrace4"] = self.channelTrace4
 
         elif self.settings["visStyle"] == "Spike Search":
-            print('yesafewafe')
-
+            uic.loadUi("./src/gui/default_vis.ui", self)
         else:
             print("else")
 
         self.setupCharts()
         self.setupInteractivity()
+        self.toggleDarkMode()
 
     def setupCharts(self):
-
-        # top left window = Array Map
         from ..gui.gui_charts_helper import setupArrayMap
-        self.win1 = self.arrayMap
-        setupArrayMap(self.win1)
+        setupArrayMap(self.charts["arrayMap"])
+        from ..gui.gui_charts_helper import HoverRegion
+        self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar)
 
-        # top right = Trace Search
         from ..gui.gui_charts_helper import setupSpikeTrace
-        self.win2 = self.traceplot_verticalLayout
-        setupSpikeTrace(self.traceplot_1,
-                        self.traceplot_2,
-                        self.traceplot_3,
-                        self.traceplot_4)
+        setupSpikeTrace(self.channelTrace1,
+                        self.channelTrace2,
+                        self.channelTrace3,
+                        self.channelTrace4)
 
-        # bottom left = Spike Rate Plot
         from ..gui.gui_charts_helper import setupSpikeRatePlot
-        self.win3 = self.spikeRatePlot
-        setupSpikeRatePlot(self.win3)
+        setupSpikeRatePlot(self.charts["spikeRatePlot"])
 
-        # bottom right window = Array Map
-        self.win4 = self.miniMapWidget
-        self.win4.setBackground('w')
-        self.win4.showGrid(x=True, y=True, alpha=0)
-        #self.win4.setXRange(-0.5, 40, padding=0)
-        #self.win4.setYRange(0, 500, padding=0)
+        from ..gui.gui_charts_helper import setupNoiseHistogram
+        setupNoiseHistogram(self.charts["noiseHistogram"])
 
-        #self.win4.setLimits(xMin=0, xMax=550, yMin=-2, yMax=2000)
-        self.win4.enableAutoRange(axis='x', enable=True)
-        self.win4.enableAutoRange(axis='y', enable=True)
-        self.win4.setLimits(xMin=0, yMin=0)
+    def showArrayLocOnStatusBar(self, x, y):
+        int_x = int(x)
+        int_y = int(y)
 
-        self.win4.setLabel('top', "Spike Rate")
-        self.win4.setLabel('left', "Spiking Frequency")
-        self.win4.setLabel('bottom', "Time (s)")
+        if -1 <= int_x < 31 and -1 <= int_y < 31:
+            self.statusBar().showMessage(
+                "Array Map Spike Average @ " + str(int_y) + ", " + str(int_x) +
+                ": " + str(self.LoadedData.array_stats['spike_avg'][int_y + 1][int_x + 1])
+            )
 
-        # bottom right - Spike Rate Plot // MiniMap Widget -> in development
-        # plot 1 - hover
-        self.region = pg.LinearRegionItem()
-        self.region.setZValue(10)
-        # Add the LinearRegionItem to the ViewBox, but tell the ViewBox to exclude this
-        # item when doing auto-range calculations.
-        self.win1.addItem(self.region, ignoreBounds=True)
-
-        self.win1.sigRangeChanged.connect(self.updateRegion)
-        self.region.setRegion([-10, 50])
-        self.region.sigRegionChanged.connect(self.update)
-        # cross hair
-        self.vLine = pg.InfiniteLine(angle=90, movable=False)
-        self.hLine = pg.InfiniteLine(angle=0, movable=False)
-        self.win1.addItem(self.vLine, ignoreBounds=True)
-        self.win1.addItem(self.hLine, ignoreBounds=True)
-        self.vb = self.win1.plotItem.vb
-        self.proxy = pg.SignalProxy(self.win1.scene().sigMouseMoved, rateLimit=60, slot=self.mouseMoved)
-
-        self.update_win1()
-        self.update_win4()
 
     def setupInteractivity(self):
         self.LoadedData = DC1DataContainer()  # class for holding and manipulating data
@@ -191,16 +198,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.actionListElectrodesInfo.triggered.connect(self.viewChannelListInformation)
         self.actionAnalysisParameters.triggered.connect(self.viewGUIPreferences)
 
-        #hack no longer needed - self.windowTitleChanged.connect(self.newOfflineDataSession)
-
-        # >> EDIT BUTTON
-        # >> VIEW BUTTON
-        # >> WINDOW BUTTON
-        # >> SETTINGS BUTTON
-        # >> HELP BUTTON
-
     def viewNewIndividalChannelInformation(self):
-
         from ..gui.gui_individualchannel import IndividualChannelInformation
         new_window = IndividualChannelInformation()
         new_window.label = QLabel("Individual Channel Analysis")
@@ -210,7 +208,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.external_windows.append(new_window)
 
     def viewChannelListInformation(self):
-
         from ..gui.gui_electrodelist import ElectrodeListInformation
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
@@ -220,7 +217,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIPreferences(self):
-
         from ..gui.gui_sessionparameters import GUIPreferences
         new_window = GUIPreferences()
         new_window.label = QLabel("GUI Preferences")
@@ -230,44 +226,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     def toggleDarkMode(self):
         self.is_dark_mode = not self.is_dark_mode
-        if self.is_dark_mode: # dark mode
-            self.win1.setBackground('d')
-            self.win2.setBackground('d')
-            self.win3.setBackground('d')
-            self.win4.setBackground('d')
-        else: # light mode
-            self.win1.setBackground('w')
-            self.win2.setBackground('w')
-            self.win3.setBackground('w')
-            self.win4.setBackground('w')
 
-    # for crosshairs
-    def update(self):
-        self.region.setZValue(10)
-        minX, maxX = self.region.getRegion()
-        self.win1.setXRange(-10, 40, padding=0)
+        if self.is_dark_mode is True:
+            color = 'k'
+        else:
+            color = 'w'
 
-    def updateRegion(self, window, viewRange):
-        rgn = viewRange[0]
-        self.region.setRegion(rgn)
-
-    def mouseMoved(self, evt):
-
-        pos = evt[0]  ## using signal proxy turns original arguments into a tuple
-        if self.win1.sceneBoundingRect().contains(pos):
-            mousePoint = self.vb.mapSceneToView(pos)
+        print("TOGGLE DARK MODE")
+        for chart in self.charts.keys():
+            chart_type = type(self.charts[chart])
+            if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
+                self.charts[chart].setBackground(color)
 
 
-            int_x = int(mousePoint.x())
-            int_y = int(mousePoint.y())
-            if -1 <= int_x < 31 and -1 <= int_y < 31:
-                self.statusBar().showMessage(
-                    "Array Map Spike Average @ " + str(int_y) + ", " + str(int_x) +
-                    ": " + str(self.LoadedData.array_stats['spike_avg'][int_y+1][int_x+1])
-                )
-
-            self.vLine.setPos(mousePoint.x())
-            self.hLine.setPos(mousePoint.y())
 
     """
     =======================
@@ -358,10 +329,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.updateGUIWithNewData()
 
     # TODO (5) No, load filtered .npz file
-
-
-
-
 
     # callback from progress signal
     def updateStatusBar(self, message):
@@ -503,26 +470,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         print("GUI Counter: ", self.window_update_counter)
 
-        start = time.time()
-        self.update_win1()
-        end = time.time()
-        if self.mode_profiling:
-            self.profile_data['array map'].append(end - start)
-
-        start = time.time()
-        self.update_win2()
-        end = time.time()
-        if self.mode_profiling:
-            self.profile_data['spike trace'].append(end - start)
-
-        start = time.time()
-        self.update_win3()
-        end = time.time()
-        if self.mode_profiling:
-            self.profile_data['noise histogram'].append(end - start)
-
-        self.update_win4()
-
+        for chart in self.charts.keys():
+            chart_type = type(self.charts[chart])
+            if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
+                start = time.time()
+                self.chart_update_function_mapping[chart]()
+                end = time.time()
+                self.profile_data[chart].append(end-start)
 
         if self.mode_profiling:
             print("Current profiling statistics:")
@@ -531,9 +485,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 print(key, avg_time)
         print("")
 
-    def update_win1(self):
-
-        self.win1.clear()
+    def updateArrayMapPlot(self):
+        self.charts["arrayMap"].clear()
         if self.first_time_plotting is False:
             colors = self.LoadedData.array_stats['spike_avg']
             data = colors.T # for old pixel-based data
@@ -553,17 +506,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         cm = pg.colormap.get('CET-L9')
         image = pg.ImageItem(data)
-        self.win1.addItem(image)
+        self.charts["arrayMap"].addItem(image)
 
         # bound the LinearRegionItem to the plotted data
-        self.region.setClipItem(image)
+        self.charts["arrayMapHover"].region.setClipItem(image)
 
-        if self.win1_colorbar is None:
-            self.win1_colorbar = self.win1.addColorBar(image, colorMap=cm, values=(0, 150)) #values=(0, np.max(data)))
-            self.win1_colorbar.sigLevelsChanged.connect(self.colorBarLevelsChanged)
+        if self.arrayMap_colorbar is None:
+            self.arrayMap_colorbar = self.charts["arrayMap"].addColorBar(image, colorMap=cm, values=(0, 150)) #values=(0, np.max(data)))
+            self.arrayMap_colorbar.sigLevelsChanged.connect(self.colorBarLevelsChanged)
         else:
-            self.win1_colorbar.setImageItem(image)
-            #self.win1_colorbar.setLevels((0, np.max(data)))
+            self.arrayMap_colorbar.setImageItem(image)
+            #self.charts["arrayMap"]_colorbar.setLevels((0, np.max(data)))
 
             # Set pxMode=False to allow spots to transform with the view
             scatter = pg.ScatterPlotItem(pxMode=False)
@@ -584,8 +537,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                                     'pen': {'color': 'w', 'width': 1},
                                     'brush': pg.intColor(1, 100)}
                     else:
-                        color_map = self.win1_colorbar.colorMap()
-                        levels = self.win1_colorbar.levels()
+                        color_map = self.arrayMap_colorbar.colorMap()
+                        levels = self.arrayMap_colorbar.levels()
 
                         value = colors[i,j]
                         if value < levels[0]: value = levels[0]
@@ -604,16 +557,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
             self.first_time_plotting = False
 
-            self.win1.clear()
+            self.charts["arrayMap"].clear()
             scatter.addPoints(spots)  # adding spots to the scatter plot
-            self.win1.addItem(scatter)  # adding scatter plot to the plot window
+            self.charts["arrayMap"].addItem(scatter)  # adding scatter plot to the plot window
 
     def colorBarLevelsChanged(self):
-        self.win1.clear()
+        self.charts["arrayMap"].clear()
 
         colors = self.LoadedData.array_stats['spike_avg']
         data = colors.T # for old pixel-based data
-
 
         max_dot = 100
         # AX1) Size by Number of Samples
@@ -642,8 +594,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                                 'pen': {'color': 'w', 'width': 2},
                                 'brush': pg.intColor(i * 10 + j, 100)}
                 else:
-                    color_map = self.win1_colorbar.colorMap()
-                    levels = self.win1_colorbar.levels()
+                    color_map = self.arrayMap_colorbar.colorMap()
+                    levels = self.arrayMap_colorbar.levels()
 
                     value = colors[i, j]
                     if value < levels[0]:
@@ -663,15 +615,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 # adding spot_dic in the list of spots
                 spots.append(spot_dic)
 
-
-        self.win1.clear()
+        self.charts["arrayMap"].clear()
         scatter.addPoints(spots)  # adding spots to the scatter plot
-        self.win1.addItem(scatter)  # adding scatter plot to the plot window
+        self.charts["arrayMap"].addItem(scatter)  # adding scatter plot to the plot window
 
-
-
-    def update_win2(self):
-        trace_plots = [self.traceplot_1, self.traceplot_2, self.traceplot_3, self.traceplot_4]
+    def updateChannelTracePlot(self):
+        trace_plots = [self.channelTrace1, self.channelTrace2, self.channelTrace3, self.channelTrace4]
         len_data = len(self.LoadedData.filtered_data)
 
         # Generate subplots
@@ -685,79 +634,33 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             plt.enableAutoRange(axis='y')
             plt.setAutoVisible(y=True)
 
-    def update_win3(self):
-        self.win3.clear()
+    def updateSpikeRatePlot(self):
+        self.charts["spikeRatePlot"].clear()
         vals = self.LoadedData.array_stats['noise_std']
         vals = vals[np.nonzero(vals)]
         # get nonzero vals because zeros have not had noise calculation done yet
 
         y, x = np.histogram(vals, bins=np.linspace(0,20,40))
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0,0,255,80))
-        self.win3.addItem(curve)
+        self.charts["spikeRatePlot"].addItem(curve)
 
-    def update_win4(self):
-        self.win4.clear()
+    def updateNoiseHistogramPlot(self):
+        self.charts["noiseHistogram"].clear()
 
         if self.LoadedData is not None:
 
             avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
             x = np.cumsum(avg_spike_rate_times)
             y = self.LoadedData.array_stats["array spike rate"]
-            line_plot = self.win4.plot(x, y, pen='b', symbol='o', symbolPen='b',
+            line_plot = self.charts["noiseHistogram"].plot(x, y, pen='b', symbol='o', symbolPen='b',
                              symbolBrush=0.2)
 
+    def updateMiniMapPlot(self):
+        pass
 
     def change_win1(self):
-        self.horizontalLayout_top.removeItem(self.win1)
-        self.horizontalLayout_top.addItem(self.win1)
+        self.horizontalLayout_top.removeItem(self.charts["arrayMap"])
+        self.horizontalLayout_top.addItem(self.charts["arrayMap"])
 
     def plot_data(self, widget, x, y):
         widget.plot(x, y)
-
-    """
-    =======================
-    MENU BAR // EDIT...
-    =======================
-    """
-
-
-    """
-    =======================
-    MENU BAR // VIEW...
-    =======================
-    """
-
-
-    """
-    =======================
-    MENU BAR // WINDOW...
-    =======================
-    """
-    # TODO func - update window with new data
-    def updateWindowWithNewData(self, window):
-        pass
-
-    """
-    =======================
-    MENU BAR // SETTINGS...
-    =======================
-    """
-
-
-    """
-    =======================
-    TEST FUNCTIONS
-    =======================
-    """
-    def plot(self, hour, temperature):
-        self.traceplot_1.plot(hour, temperature)
-
-class PlotWindow():
-    data = None
-
-    def __init__(self):
-        pass
-
-    def update(self):
-        pass
-

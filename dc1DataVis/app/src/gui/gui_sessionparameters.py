@@ -17,8 +17,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 
 class GUIPreferences(QDialog):
-
-
     def __init__(self, *args, **kwargs):
         super(QtWidgets.QDialog, self).__init__(*args, **kwargs)
         uic.loadUi("./src/gui/GUIPreferences.ui", self)

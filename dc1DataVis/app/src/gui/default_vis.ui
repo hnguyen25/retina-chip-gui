@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>936</width>
-    <height>613</height>
+    <height>557</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,18 +23,18 @@
          <widget class="PlotWidget" name="arrayMap" native="true"/>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="traceplot_verticalLayout">
+         <layout class="QVBoxLayout" name="channelTraceVerticalLayout">
           <item>
-           <widget class="PlotWidget" name="traceplot_1" native="true"/>
+           <widget class="PlotWidget" name="channelTrace1" native="true"/>
           </item>
           <item>
-           <widget class="PlotWidget" name="traceplot_2" native="true"/>
+           <widget class="PlotWidget" name="channelTrace2" native="true"/>
           </item>
           <item>
-           <widget class="PlotWidget" name="traceplot_3" native="true"/>
+           <widget class="PlotWidget" name="channelTrace3" native="true"/>
           </item>
           <item>
-           <widget class="PlotWidget" name="traceplot_4" native="true"/>
+           <widget class="PlotWidget" name="channelTrace4" native="true"/>
           </item>
          </layout>
         </item>
@@ -43,10 +43,17 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_bottom">
         <item>
-         <widget class="PlotWidget" name="spikeRatePlot" native="true"/>
+         <widget class="PlotWidget" name="miniMap" native="true"/>
         </item>
         <item>
-         <widget class="PlotWidget" name="miniMapWidget" native="true"/>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="PlotWidget" name="spikeRatePlot" native="true"/>
+          </item>
+          <item>
+           <widget class="PlotWidget" name="noiseHistogram" native="true"/>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -61,7 +68,7 @@
      <x>0</x>
      <y>0</y>
      <width>936</width>
-     <height>24</height>
+     <height>37</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
