@@ -496,7 +496,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             data = np.fromfunction(lambda i, j: (1 + 0.01 * np.sin(i)) * (i) ** 1 + (j) ** 1, (32, 32))
             data = data * (1 + 0.001 * np.random.random(data.shape))
 
-        cm = pg.colormap.get('CET-L9')
+        cm = pg.colormap.get('plasma', source='matplotlib')
         image = pg.ImageItem(data)
         self.charts["arrayMap"].addItem(image)
 
@@ -515,9 +515,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
             # creating empty list for spots
             spots = []
-
-            # color modulated by amplitude
-            cmap = plt.cm.get_cmap("jet")
 
             for i in range(32):
                 for j in range(32):
