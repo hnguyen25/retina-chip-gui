@@ -23,154 +23,95 @@ from ..gui.worker import *  # multithreading
 
 from ..gui.default_vis import Ui_mainWindow # layout
 from ..gui.gui_guipreferences import *
+from ..gui.gui_charts_helper import *
 
 class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     """ Inherited from PyQt main window class. Contains all the functions necessary
     to start and run GUI elements.
     """
-    # Settings
-    settings = {}
-
     # MODES
     mode_profiling = True
     mode_multithreading = True
     first_time_plotting = True
     is_dark_mode = False
-    # GUI GRAPHS
 
-    win1, win2, win3, win4 = None, None, None, None
-    external_windows = []
-
-    center_row, center_col = 16, 16 # for Mini Map
-
-
-    # ==== DATA PARAMETERS ====
-    graph_params = None
-
-    # ==== DATA CONTAINERS ====
-    # Raw data stream from chip, only double/triple/etc. counts removed
-    LoadedData = None
-
-    # TODO reconsolidate into new data containers
-    data = None
-    dataAll, cntAll, times = None, None, None
-    numChan, chMap, chId, startIdx, findCoors = None, None, None, None, None
-    filtered_data = None
+    # Program State
+    settings = {}
     loading_dict = {}
-    p = None
-    window_update_counter = 0
+    LoadedData = None  # Raw data stream from chip, only double/triple/etc. counts removed
     profile_data = None
-
-    bar1=None
-    bar2=None
-
-    #crosshair
-    region = None
-    vLine, hLine = None, None
-    vb = None
-    proxy = None
-
-    arrayMap_colorbar = None
-
     charts, chart_update_function_mapping = None, None
+    external_windows = []
+    # Misc
+    p = None
+    center_row, center_col = 16, 16  # for Mini Map
+    arrayMap_colorbar = None
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
-        # ======================
-        # DEBUGGING (tests + profiling)
-        # =====================
-        self.graph_params = PyqtGraphParams({})
-
         self.charts = {
-            "arrayMap": None,
-            "miniMap": None,
-            "spikeRatePlot": None,
-            "noiseHistogram": None,
-            "channelTraceVerticalLayout": None,
-            "channelTrace1": None,
-            "channelTrace2": None,
-            "channelTrace3": None,
-            "channelTrace4": None
+            "arrayMap": None, "miniMap": None, "spikeRatePlot": None, "noiseHistogram": None,
+            "channelTraceVerticalLayout": None, "channelTrace1": None, "channelTrace2": None,
+            "channelTrace3": None, "channelTrace4": None
         }
 
         self.chart_update_function_mapping = {
-            "arrayMap": self.updateArrayMapPlot,
-            "miniMap": self.updateMiniMapPlot,
-            "spikeRatePlot": self.updateSpikeRatePlot,
-            "noiseHistogram": self.updateNoiseHistogramPlot,
-            "channelTrace1": self.updateChannelTracePlot,
-            "channelTrace2": self.updateChannelTracePlot,
-            "channelTrace3": self.updateChannelTracePlot,
-            "channelTrace4": self.updateChannelTracePlot
+            "arrayMap": self.updateArrayMapPlot, "miniMap": self.updateMiniMapPlot,
+            "spikeRatePlot": self.updateSpikeRatePlot, "noiseHistogram": self.updateNoiseHistogramPlot,
+            "channelTrace1": self.updateChannelTracePlot, "channelTrace2": self.updateChannelTracePlot,
+            "channelTrace3": self.updateChannelTracePlot, "channelTrace4": self.updateChannelTracePlot
         }
 
         if self.mode_profiling:
-            print('GUI is in profiling mode')
             self.profile_data = {
-                'append raw data': [],
-                'filter data': [],
-                'calculate array stats': [],
-                'arrayMap': [],
-                'channelTrace': [],
-                'noiseHistogram': [],
-                'spikeRatePlot': [],
-                'miniMap': [],
+                'appendRawData': [], 'filterData': [], 'calculateArrayStats': [], 'arrayMap': [],
+                'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [], 'miniMap': [],
                 'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
             }
 
-        if self.mode_multithreading:
-            print('GUI is multithreading')
+        if self.mode_multithreading: print('GUI is multithreading')
 
     def setSettings(self, settings):
         self.settings = settings
 
     def setupLayout(self):
-
         print("Session settings: " + str(self.settings))
+
         # Load layout based on QtDesigner .ui file
         if self.settings["visStyle"] == "Default":
             uic.loadUi("./src/gui/default_vis.ui", self)
             self.charts["arrayMap"] = self.arrayMap
+            setupArrayMap(self.charts["arrayMap"])
+            self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,
+                                                       self.setMiniMapLoc)
             self.charts["miniMap"] = self.miniMap
+            setupMiniMapPlot(self.charts["miniMap"])
+
             self.charts["spikeRatePlot"] = self.spikeRatePlot
+            setupSpikeRatePlot(self.charts["spikeRatePlot"])
+
             self.charts["noiseHistogram"] = self.noiseHistogram
+            setupNoiseHistogram(self.charts["noiseHistogram"])
+
             self.charts["channelTraceVerticalLayout"] = self.channelTraceVerticalLayout
             self.charts["channelTrace1"] = self.channelTrace1
             self.charts["channelTrace2"] = self.channelTrace2
             self.charts["channelTrace3"] = self.channelTrace3
             self.charts["channelTrace4"] = self.channelTrace4
+            setupSpikeTrace(self.channelTrace1,
+                            self.channelTrace2,
+                            self.channelTrace3,
+                            self.channelTrace4)
 
         elif self.settings["visStyle"] == "Spike Search":
             uic.loadUi("./src/gui/default_vis.ui", self)
         else:
             print("else")
 
-        self.setupCharts()
         self.setupInteractivity()
         self.toggleDarkMode()
         self.toggleDarkMode()
-
-    def setupCharts(self):
-        from ..gui.gui_charts_helper import setupArrayMap
-        setupArrayMap(self.charts["arrayMap"])
-        from ..gui.gui_charts_helper import HoverRegion
-        self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar, self.setMiniMapLoc)
-
-        from ..gui.gui_charts_helper import setupSpikeTrace
-        setupSpikeTrace(self.channelTrace1,
-                        self.channelTrace2,
-                        self.channelTrace3,
-                        self.channelTrace4)
-
-        from ..gui.gui_charts_helper import setupSpikeRatePlot
-        setupSpikeRatePlot(self.charts["spikeRatePlot"])
-
-        from ..gui.gui_charts_helper import setupNoiseHistogram
-        setupNoiseHistogram(self.charts["noiseHistogram"])
-
-        from ..gui.gui_charts_helper import setupMiniMapPlot
-        setupMiniMapPlot(self.charts["miniMap"])
 
     def showArrayLocOnStatusBar(self, x, y):
         int_x = int(x)
@@ -257,8 +198,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
                 self.charts[chart].setBackground(color)
 
-
-
     """
     =======================
     MULTITHREADING PROGRESS FUNCS
@@ -299,10 +238,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
     def loadSession(self):
-
-
-        # debug
-
         if self.settings["path"] == "":
             raise ValueError("Path is not specified!")
 
@@ -381,7 +316,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         else:
             last_file_idx = loadingDict["num_of_buf"] - 2
 
-
         while True:
             # In case multiple files coming in at once, hold 100ms (not likely)
             #     time.sleep(0.1)
@@ -410,19 +344,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 self.LoadedData.append_raw_data(data_real, cnt_real, N)
                 end = time.time()
                 if self.mode_profiling:
-                    self.profile_data['append raw data'] = end - start
+                    self.profile_data['appendRawData'] = end - start
 
                 start = time.time()
                 self.LoadedData.update_filtered_data()
                 end = time.time()
                 if self.mode_profiling:
-                    self.profile_data['filter data'] = end - start
+                    self.profile_data['filterData'] = end - start
 
                 start = time.time()
                 self.LoadedData.update_array_stats(data_real, N)
                 end = time.time()
                 if self.mode_profiling:
-                    self.profile_data['calculate array stats'] = end - start
+                    self.profile_data['calculateArrayStats'] = end - start
 
                 # we need to call the main GUI thread to update graphs (can't do with non GUI-thread)
                 gui_callback.emit()
@@ -444,8 +378,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         if self.mode_multithreading:
             worker = Worker(self.loadDataFromFileMat, path, loadingDict)
             worker.signals.result.connect(self.updateGUIWithNewData)
-            #worker.signals.finished.connect(self.thread_complete)
-            #worker.signals.progress.connect(self.progress_fn)
             self.threadpool.start(worker)
 
         else:
@@ -461,7 +393,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         Returns:
 
         """
-
         self.dataAll, self.cntAll, self.times = processData(loadingDict, dataIdentifierString='gmem1',
                                                             buffer_num=0)  # Any other args, kwargs
         print('identify relevant channels...')
@@ -485,25 +416,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         for window in self.external_windows:
             window.update()
 
-        print("GUI Counter: ", self.window_update_counter)
-
         for chart in self.charts.keys():
             chart_type = type(self.charts[chart])
             if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
                 start = time.time()
-                print("counter chart", chart)
                 self.chart_update_function_mapping[chart]()
                 end = time.time()
                 self.profile_data[chart].append(end-start)
 
-        if self.mode_profiling:
-            """
-            print("Current profiling statistics:")
-            for key in self.profile_data.keys():
-                avg_time = np.round(np.mean(self.profile_data[key]), 3)
-                print(key, avg_time)
-            """
-        print("")
+        if self.mode_profiling: self.printProfilingData()
+
+    def printProfilingData(self):
+        print("------------------------------")
+        print("Current profiling statistics:")
+        for key in self.profile_data.keys():
+            avg_time = np.round(np.mean(self.profile_data[key]), 3)
+            print(key, avg_time)
+        print("------------------------------")
 
     def updateArrayMapPlot(self):
         self.charts["arrayMap"].clear()
@@ -665,9 +594,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     def updateNoiseHistogramPlot(self):
         self.charts["noiseHistogram"].clear()
-
         if self.LoadedData is not None:
-
             avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
             x = np.cumsum(avg_spike_rate_times)
             y = self.LoadedData.array_stats["array spike rate"]
@@ -704,10 +631,3 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 self.charts["miniMap"].addItem(spike_indicator_base)
                 self.charts["miniMap"].addItem(spike_indicator_text)
 
-
-    def change_win1(self):
-        self.horizontalLayout_top.removeItem(self.charts["arrayMap"])
-        self.horizontalLayout_top.addItem(self.charts["arrayMap"])
-
-    def plot_data(self, widget, x, y):
-        widget.plot(x, y)
