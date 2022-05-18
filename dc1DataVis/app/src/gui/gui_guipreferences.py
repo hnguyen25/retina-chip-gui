@@ -25,7 +25,7 @@ class GUIPreferences(QtWidgets.QDialog, Ui_Startup):
 
         # ensure correct directory for packaged app
         os.chdir(basedir)
-        os.chdir('../')
+        #os.chdir('../')
         self.settings["path"] = os.path.join(os.getcwd(), "debugData/2022-02-17-0/data002")
         #'/Users/huy/artifical-retina-pipeline-guis/dc1DataVis/debugData/2022-02-17-0/data002'
 
