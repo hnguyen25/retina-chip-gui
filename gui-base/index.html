@@ -818,6 +818,8 @@ to start and run GUI elements.</p>
     <span class="n">profile_data</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">charts</span><span class="p">,</span> <span class="n">chart_update_function_mapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
     <span class="n">external_windows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">basedir</span> <span class="o">=</span> <span class="kc">None</span>
+
     <span class="c1"># Misc</span>
     <span class="n">p</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">center_row</span><span class="p">,</span> <span class="n">center_col</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span>  <span class="c1"># for Mini Map</span>
@@ -850,6 +852,8 @@ to start and run GUI elements.</p>
 
     <span class="k">def</span> <span class="nf">setSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">settings</span>
+    <span class="k">def</span> <span class="nf">setBaseDir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basedir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span> <span class="o">=</span> <span class="n">basedir</span>
 
     <span class="k">def</span> <span class="nf">setupLayout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Session settings: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">))</span>
@@ -1452,6 +1456,7 @@ to start and run GUI elements.</p>
 
 
   <div class="doc doc-children">
+
 
 
 
@@ -1834,6 +1839,7 @@ to start and run GUI elements.</p>
 
 
 
+
   <div class="doc doc-object doc-method">
 
 
@@ -1934,6 +1940,8 @@ to start and run GUI elements.</p>
     <span class="n">profile_data</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">charts</span><span class="p">,</span> <span class="n">chart_update_function_mapping</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
     <span class="n">external_windows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">basedir</span> <span class="o">=</span> <span class="kc">None</span>
+
     <span class="c1"># Misc</span>
     <span class="n">p</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">center_row</span><span class="p">,</span> <span class="n">center_col</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">16</span>  <span class="c1"># for Mini Map</span>
@@ -1966,6 +1974,8 @@ to start and run GUI elements.</p>
 
     <span class="k">def</span> <span class="nf">setSettings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">settings</span>
+    <span class="k">def</span> <span class="nf">setBaseDir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basedir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basedir</span> <span class="o">=</span> <span class="n">basedir</span>
 
     <span class="k">def</span> <span class="nf">setupLayout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Session settings: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">))</span>
@@ -2594,6 +2604,7 @@ to start and run GUI elements.</p>
 
 
 
+
   <div class="doc doc-object doc-method">
 
 
@@ -2938,6 +2949,7 @@ to start and run GUI elements.</p>
     </div>
 
   </div>
+
 
 
 
