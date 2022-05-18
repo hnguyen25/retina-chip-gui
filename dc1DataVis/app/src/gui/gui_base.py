@@ -41,7 +41,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     win1, win2, win3, win4 = None, None, None, None
     external_windows = []
 
-
+    center_row, center_col = 16, 16 # for Mini Map
 
 
     # ==== DATA PARAMETERS ====
@@ -149,12 +149,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.setupCharts()
         self.setupInteractivity()
         self.toggleDarkMode()
+        self.toggleDarkMode()
 
     def setupCharts(self):
         from ..gui.gui_charts_helper import setupArrayMap
         setupArrayMap(self.charts["arrayMap"])
         from ..gui.gui_charts_helper import HoverRegion
-        self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar)
+        self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar, self.setMiniMapLoc)
 
         from ..gui.gui_charts_helper import setupSpikeTrace
         setupSpikeTrace(self.channelTrace1,
@@ -168,6 +169,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         from ..gui.gui_charts_helper import setupNoiseHistogram
         setupNoiseHistogram(self.charts["noiseHistogram"])
 
+        from ..gui.gui_charts_helper import setupMiniMapPlot
+        setupMiniMapPlot(self.charts["miniMap"])
+
     def showArrayLocOnStatusBar(self, x, y):
         int_x = int(x)
         int_y = int(y)
@@ -178,6 +182,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 ": " + str(self.LoadedData.array_stats['spike_avg'][int_y + 1][int_x + 1])
             )
 
+    def setMiniMapLoc(self, x, y):
+        print("setMiniMapLoc")
+        print(x, y)
+        self.center_row = int(x)
+        if self.center_row < 6:
+            self.center_row = 6
+        elif self.center_row > 26:
+            self.center_row = 26
+
+        if self.center_col < 4:
+            self.center_col = 4
+        elif self.center_col > 29:
+            self.center_col = 29
+
+        self.center_col = int(y)
+        self.updateMiniMapPlot()
 
     def setupInteractivity(self):
         self.LoadedData = DC1DataContainer()  # class for holding and manipulating data
@@ -232,7 +252,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         else:
             color = 'w'
 
-        print("TOGGLE DARK MODE")
         for chart in self.charts.keys():
             chart_type = type(self.charts[chart])
             if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
@@ -408,8 +427,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 # we need to call the main GUI thread to update graphs (can't do with non GUI-thread)
                 gui_callback.emit()
 
-
-
     def onActionLoadMAT(self):
         """
 
@@ -474,15 +491,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             chart_type = type(self.charts[chart])
             if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
                 start = time.time()
+                print("counter chart", chart)
                 self.chart_update_function_mapping[chart]()
                 end = time.time()
                 self.profile_data[chart].append(end-start)
 
         if self.mode_profiling:
+            """
             print("Current profiling statistics:")
             for key in self.profile_data.keys():
                 avg_time = np.round(np.mean(self.profile_data[key]), 3)
                 print(key, avg_time)
+            """
         print("")
 
     def updateArrayMapPlot(self):
@@ -490,7 +510,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         if self.first_time_plotting is False:
             colors = self.LoadedData.array_stats['spike_avg']
             data = colors.T # for old pixel-based data
-
 
             max_dot = 100
             # AX1) Size by Number of Samples
@@ -656,7 +675,35 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                              symbolBrush=0.2)
 
     def updateMiniMapPlot(self):
-        pass
+        self.charts["miniMap"].clear()
+        print('update minimap plot:', self.center_row, self.center_col)
+        for row in range(self.center_row-4, self.center_row+4):
+            for col in range(self.center_col-2, self.center_col+2):
+                print('r', row, 'c', col)
+                spike_indicator_base = pg.QtGui.QGraphicsRectItem(row*5, col*5, 4, 0.2)
+                spike_indicator_base.setPen(pg.mkPen((0, 0, 0, 100)))
+                spike_indicator_base.setBrush(pg.mkBrush((50, 50, 200)))
+
+                elec_idx = str(map2idx(col, row))
+                spike_indicator_text = pg.TextItem(elec_idx,
+                                                   'k',
+                                                   anchor=(0,0))
+                spike_indicator_text.setPos(row*5, col*5)
+                spike_indicator_text.setParentItem(spike_indicator_base)
+
+                #times = [0, 1, 3, 5, 10, 11, 14]
+                if np.random.random() > 0.5:
+                    times = np.random.randint(0, 20, (3,), dtype='int64')
+                    for i in times:
+                        spike_indicator = pg.QtGui.QGraphicsRectItem(row*5 + i/5, col*5, 0.1, 1.5)
+                        spike_indicator.setPen(pg.mkPen((0, 0, 0, 100)))
+                        spike_indicator.setBrush(pg.mkBrush((50, 50, 200)))
+                        spike_indicator.setParentItem(spike_indicator_base)
+                        self.charts["miniMap"].addItem(spike_indicator)
+
+                self.charts["miniMap"].addItem(spike_indicator_base)
+                self.charts["miniMap"].addItem(spike_indicator_text)
+
 
     def change_win1(self):
         self.horizontalLayout_top.removeItem(self.charts["arrayMap"])

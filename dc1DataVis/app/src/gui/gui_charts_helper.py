@@ -9,12 +9,15 @@ class HoverRegion():
     vLine, hLine = None, None
     vb = None
     proxy = None
-    HoverFunc = None
+    proxy2 = None
+    HoverFunc, ClickFunc = None, None
+    last_mouse_x, last_mouse_y = None, None
 
-    def __init__(self, window_ref, HoverFunc):
+    def __init__(self, window_ref, HoverFunc, ClickFunc):
         self.window = window_ref
         self.region = pg.LinearRegionItem()
         self.HoverFunc = HoverFunc
+        self.ClickFunc = ClickFunc
 
         self.window.addItem(self.region, ignoreBounds=True)
         self.window.sigRangeChanged.connect(self.updateRegion)
@@ -32,6 +35,10 @@ class HoverRegion():
         self.proxy = pg.SignalProxy(self.window.scene().sigMouseMoved,
                                     rateLimit=60,
                                     slot=self.mouseMoved)
+        #self.proxy2 = pg.SignalProxy(self.window.scene().sigMouseClicked,
+        #                             rateLimit=60,
+        #                             slot=self.mouseClicked)
+        self.window.scene().sigMouseClicked.connect(self.mouseClicked)
 
     def update(self):
         self.region.setZValue(10)
@@ -42,14 +49,21 @@ class HoverRegion():
         self.region.setRegion(rgn)
 
     def mouseMoved(self, evt):
-        pos = evt[0]  ## using signal proxy turns original arguments into a tuple
+        pos = evt[0]  # using signal proxy turns original arguments into a tuple
         if self.window.sceneBoundingRect().contains(pos):
             mousePoint = self.vb.mapSceneToView(pos)
+            self.last_mouse_x = mousePoint.x()
+            self.last_mouse_y = mousePoint.y()
             self.HoverFunc(mousePoint.x(), mousePoint.y())
 
+    def mouseClicked(self, evt):
+        pos = (self.last_mouse_x, self.last_mouse_y)
+        #if self.window.sceneBoundingRect().contains(pos):
+            # mousePoint = self.vb.mapSceneToView(pos)
+        print('entering click func')
+        self.ClickFunc(self.last_mouse_x, self.last_mouse_y)
 
 def setupArrayMap(plot_widget):
-    plot_widget.setBackground('w')
     plot_widget.showGrid(x=True, y=True, alpha=0)
     plot_widget.setXRange(-10, 40, padding=0)
     plot_widget.setAspectLocked()
@@ -58,11 +72,33 @@ def setupArrayMap(plot_widget):
     plot_widget.setLabel('left', "Electrode No. (vertical)")
     plot_widget.setLabel('bottom', "Electrode No. (horizontal)")
 
+def setupMiniMapPlot(plot_widget, center_row=16, center_col=16):
+    plot_widget.showGrid(x=True, y=True, alpha=0)
+    plot_widget.getPlotItem().hideAxis('bottom')
+    plot_widget.getPlotItem().hideAxis('left')
+    plot_widget.enableAutoRange(axis='x', enable=True)
+    plot_widget.enableAutoRange(axis='y', enable=True)
+    plot_widget.setAspectLocked()
+
+    for row in range(center_row-5, center_row+5):
+        for col in range(center_col-3, center_col+3):
+
+            spike_indicator_base = pg.QtGui.QGraphicsRectItem(row*5, col*5, 4, 0.2)
+            spike_indicator_base.setPen(pg.mkPen((0, 0, 0, 100)))
+            spike_indicator_base.setBrush(pg.mkBrush((50, 50, 200)))
+
+            elec_idx = str(map2idx(col, row))
+            spike_indicator_text = pg.TextItem(elec_idx,
+                                               'k',
+                                               anchor=(0,0))
+            spike_indicator_text.setPos(row*5, col*5)
+            spike_indicator_text.setParentItem(spike_indicator_base)
+
+            plot_widget.addItem(spike_indicator_base)
+            plot_widget.addItem(spike_indicator_text)
+
+
 def setupSpikeTrace(plot1, plot2, plot3, plot4):
-    plot1.setBackground('w')
-    plot2.setBackground('w')
-    plot3.setBackground('w')
-    plot4.setBackground('w')
     plot1.setLabel('left', "# XXX")
     plot2.setLabel('left', "# XXX")
     plot3.setLabel('left', "# XXX")
@@ -72,8 +108,8 @@ def setupSpikeRatePlot(plot_widget):
     plot_widget.setLabel('top', "Channel Noise")
     plot_widget.setLabel('left', "Count")
     plot_widget.setLabel('bottom', "Std Dev")
+
     plot_widget.setLimits(xMin=0, yMin=0)
-    plot_widget.setBackground('w')
 
     # init debug plot - make interesting distribution of values
     vals = np.hstack([np.random.normal(size=500), np.random.normal(size=260, loc=4)])
@@ -86,7 +122,7 @@ def setupSpikeRatePlot(plot_widget):
     plot_widget.addItem(curve)
 
 def setupNoiseHistogram(plot_widget):
-    plot_widget.setBackground('w')
+
     plot_widget.showGrid(x=True, y=True, alpha=0)
 
     plot_widget.enableAutoRange(axis='x', enable=True)
@@ -97,3 +133,19 @@ def setupNoiseHistogram(plot_widget):
     plot_widget.setLabel('left', "Spiking Frequency")
     plot_widget.setLabel('bottom', "Time (s)")
 
+def map2idx(ch_row: int, ch_col: int):
+    """ Given a channel's row and col, return channel's index
+
+    Args:
+        ch_row: row index of channel in array (up to 32)
+        ch_col: column index of channel in array (up to 32)
+
+    Returns: numerical index of array
+    """
+    if ch_row > 31 or ch_row <0:
+        print('Row out of range')
+    elif ch_col >31 or ch_col<0:
+        print('Col out of range')
+    else:
+        ch_idx = int(ch_row*32 + ch_col)
+    return ch_idx
