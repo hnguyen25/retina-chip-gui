@@ -18,7 +18,7 @@
 - set spike threshold value from the beginning of session
 - choose file directory on startup
 - Set up github + github pages
-- 
+
 ### Individual Channel Analysis:
 - for looking at plots for individual channels
 - Convenient lookup of channels by number/row/col
