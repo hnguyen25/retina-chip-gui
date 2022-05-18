@@ -1,0 +1,13 @@
+{
+  "base_url": "/",
+  "hostname": "localhost",
+  "password": false,
+  "pid": 29490,
+  "port": 8889,
+  "root_dir": "/Users/huy/dc1DataVis",
+  "secure": false,
+  "sock": "",
+  "token": "85fd64b1370d4291677992506f66965570ae36af7cc60854",
+  "url": "http://localhost:8889/",
+  "version": "1.13.5"
+}

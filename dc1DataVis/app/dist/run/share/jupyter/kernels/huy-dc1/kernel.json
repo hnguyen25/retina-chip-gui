@@ -1,0 +1,14 @@
+{
+ "argv": [
+  "/Users/huy/opt/anaconda3/envs/huy-dc1/bin/python",
+  "-m",
+  "ipykernel_launcher",
+  "-f",
+  "{connection_file}"
+ ],
+ "display_name": "huy-dc1",
+ "language": "python",
+ "metadata": {
+  "debugger": true
+ }
+}

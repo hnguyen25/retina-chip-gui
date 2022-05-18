@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Startup</class>
+ <widget class="QDialog" name="Startup">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>486</width>
+    <height>382</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Choose Session Parameters...</string>
+  </property>
+  <widget class="QDialogButtonBox" name="DialogButtonBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>340</y>
+     <width>461</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="chooseVisStyle">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>30</y>
+     <width>231</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Default</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Spike Search</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Noise</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Diagnostic</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Full-bandwidth recording</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Compressed recording</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>30</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Visualization style</string>
+   </property>
+   <property name="buddy">
+    <cstring>chooseVisStyle</cstring>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>110</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Data file directory</string>
+   </property>
+   <property name="buddy">
+    <cstring>chooseFilePath</cstring>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="chooseFilePath">
+   <property name="geometry">
+    <rect>
+     <x>212</x>
+     <y>110</y>
+     <width>111</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>File path...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="LabelFilePath">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>150</y>
+     <width>231</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>(File path not chosen...)</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>210</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>No. of channels at once</string>
+   </property>
+   <property name="buddy">
+    <cstring>chooseNumChannels</cstring>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="chooseNumChannels">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>220</y>
+     <width>231</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>1</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>2</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>4</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>8</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>16</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>32</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>250</y>
+     <width>161</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Filter type</string>
+   </property>
+   <property name="buddy">
+    <cstring>chooseFilter</cstring>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="chooseFilter">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>260</y>
+     <width>231</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Hierlemann</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Modified HIerlemann</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Highpass</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>H0 Bandpass</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Auto</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Fast Bandpass</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Faster Bandpass</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Litke</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>None</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>300</y>
+     <width>161</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Spike detection threshold</string>
+   </property>
+   <property name="buddy">
+    <cstring>chooseSpikeThreshold</cstring>
+   </property>
+  </widget>
+  <widget class="QSlider" name="chooseSpikeThreshold">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>310</y>
+     <width>191</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="LabelSpikeThreshold">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>300</y>
+     <width>41</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>1</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>70</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Real-time?</string>
+   </property>
+   <property name="buddy">
+    <cstring>chooseRealTime</cstring>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="chooseRealTime">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>70</y>
+     <width>231</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Yes, load first .mat chunk</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Yes, load latest .mat chunk</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>No, load raw .mat file</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>No, load pre-processed .npz file</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>No, load filtered .npz file</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>170</y>
+     <width>171</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Autosave processed data?</string>
+   </property>
+   <property name="buddy">
+    <cstring>chooseAutoSave</cstring>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="chooseAutoSave">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>180</y>
+     <width>231</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Yes, save preprocessed data to .npz</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Yes, save filtered data to .npz</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>No</string>
+    </property>
+   </item>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>chooseVisStyle</tabstop>
+  <tabstop>chooseRealTime</tabstop>
+  <tabstop>chooseFilePath</tabstop>
+  <tabstop>chooseAutoSave</tabstop>
+  <tabstop>chooseNumChannels</tabstop>
+  <tabstop>chooseFilter</tabstop>
+  <tabstop>chooseSpikeThreshold</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>DialogButtonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Startup</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>340</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DialogButtonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Startup</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>340</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
