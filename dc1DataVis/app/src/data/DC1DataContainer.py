@@ -227,8 +227,6 @@ class DC1DataContainer():
             incom_spike_std = np.nan_to_num(incom_spike_std, nan=0)
 
 
-
-
         pre_spike_avg = np.copy(self.array_stats["spike_avg"])
         pre_spike_std = np.copy(self.array_stats["spike_std"])
         pre_spike_cnt = np.copy(self.array_stats["spike_cnt"])

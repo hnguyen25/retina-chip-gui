@@ -19,9 +19,6 @@ none = no filtering of data (~0 min)
 """
 
 
-
-
-
 def applyFilterToChannelData(channel_data, filtType='Hierlemann'):
     """
 
