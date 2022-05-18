@@ -104,6 +104,10 @@ def setupSpikeTrace(plot1, plot2, plot3, plot4):
     plot3.setLabel('left', "# XXX")
     plot4.setLabel('left', "# XXX")
 
+def setupOneSpikeTrace(plot_widget):
+    plot_widget.setLabel('left', '# XXX')
+    plot_widget.setLabel('bottom', 'time')
+
 def setupSpikeRatePlot(plot_widget):
     plot_widget.setLabel('top', "Channel Noise")
     plot_widget.setLabel('left', "Count")

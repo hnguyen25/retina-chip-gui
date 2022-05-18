@@ -105,11 +105,51 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                             self.channelTrace4)
 
         elif self.settings["visStyle"] == "Spike Search":
-            uic.loadUi("./src/gui/default_vis.ui", self)
+            uic.loadUi("./src/gui/spikefinding_vis.ui", self)
+            self.charts["ResetButton"] = self.ResetButton
+            self.charts["nextFigButton"] = self.nextFigButton
+            self.charts["yScaleButton"] = self.yScaleButton
+            self.charts["backButton"] = self.BackButton
+            self.charts["nextButton"] = self.Next
+            self.charts["atTimeWindowButton"] = self.atTimeWindowButton
+
+            self.charts["spikeTraces"] = [[], [], [], [], [], []]
+            for i in range(1, 7):
+                for j in range(1, 7):
+                    chart_name = "r" + str(i) + "c" + str(j)
+                    self.charts[chart_name] = eval("self." + chart_name)
+                    setupOneSpikeTrace(self.charts[chart_name])
+
+
+        elif self.settings["visStyle"] == "Noise":
+            uic.loadUi("./src/gui/noise_check_vis.ui", self)
+            self.charts["arrayMap"] = self.arrayMap
+            setupArrayMap(self.charts["arrayMap"])
+            self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,
+                                                       self.setMiniMapLoc)
+
+            self.charts["noiseHistogram"] = self.noiseHistogramPlot
+            setupNoiseHistogram(self.charts["noiseHistogram"])
+
+            self.charts["noiseMatrixPlot"] = self.noiseMatrixPlot
+
+            self.charts["channelTraceVerticalLayout"] = self.channelTraceLayout
+            self.charts["channelTrace1"] = self.channelTrace1
+            self.charts["channelTrace2"] = self.channelTrace2
+            self.charts["channelTrace3"] = self.channelTrace3
+            self.charts["channelTrace4"] = self.channelTrace4
+            setupSpikeTrace(self.channelTrace1,
+                            self.channelTrace2,
+                            self.channelTrace3,
+                            self.channelTrace4)
+
         else:
+            sys.exit()
             print("else")
 
         self.setupInteractivity()
+
+        # just sets background to white TODO make this cleaner
         self.toggleDarkMode()
         self.toggleDarkMode()
 
