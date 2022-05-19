@@ -26,6 +26,11 @@ class DC1DataContainer():
     # each element in filtered_data is filtered data for one channel
     filtered_data = []
 
+    spike_data = {
+        'times': np.zeros((32, 32)),
+        'amplitude': np.zeros((32, 32))
+    }
+
     # array_statistics: overall array stats
     array_stats = {
         "size": np.zeros((32, 32, 0)),  # For each dot, size by # of samples
@@ -210,14 +215,16 @@ class DC1DataContainer():
         incom_spike_std = np.zeros((32, 32))
         mask2 = np.copy(data_real)
 
-        print("spike threhsold", self.spikeThreshold)
         for x in range(len(chan_ind)):
             self.array_stats["noise_std"] = self.array_stats["noise_std"]
             incom_spike_cnt[chan_elec[x, 0], chan_elec[x, 1]] = np.count_nonzero(
                 mask[chan_elec[x, 0], chan_elec[x, 1], :] >= self.array_stats["noise_mean"][chan_elec[x, 0], chan_elec[x, 1]] + self.spikeThreshold *
                 self.array_stats["noise_std"][chan_elec[x, 0], chan_elec[x, 1]])
+
             mask2[chan_elec[x, 0], chan_elec[x, 1], mask2[chan_elec[x, 0], chan_elec[x, 1], :] <= self.array_stats["noise_mean"][
                 chan_elec[x, 0], chan_elec[x, 1]] + self.spikeThreshold * self.array_stats["noise_std"][chan_elec[x, 0], chan_elec[x, 1]]] = np.nan
+
+        self.array_stats["incom_spike_cnt"] = incom_spike_cnt
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)

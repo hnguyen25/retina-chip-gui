@@ -29,25 +29,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     """ Inherited from PyQt main window class. Contains all the functions necessary
     to start and run GUI elements.
     """
-    # MODES
-    mode_profiling = True
-    mode_multithreading = True
-    first_time_plotting = True
-    is_dark_mode = False
+    ### MODES ###
+    mode_profiling = True   # if on, measures how long different aspects of the GUI takes
+    mode_multithreading = True  # if on, enables multiprocessing capability. may be easier to debug if off.
+    is_dark_mode = False  # appearance of GUI background
 
-    # Program State
-    settings = {}
-    loading_dict = {}
-    LoadedData = None  # Raw data stream from chip, only double/triple/etc. counts removed
-    profile_data = None
-    charts, chart_update_function_mapping = None, None
-    external_windows = []
-    basedir = None
+    ### PROGRAM STATE ###
+    first_time_plotting = True  # toggles to false when all the charts are setup for the first time
+    settings = {}  # session parameters created through user input from the startup pane
+    loading_dict = {}  # contains details of the datarun currently being analyzed
+    LoadedData = None  # contains all neural data loaded from specified datarun
+    profile_data = None  # contains information about how long different gui functions took to run
+    charts = {}  # keys=name of every possible chart, value=reference to chart in GUI, None if not in it
+    chart_update_function_mapping = {}  # keys=names of charts, value=related functions to update respective charts
+    external_windows = []  # reference to windows that have been generated outside of this MainWindow
+    basedir = None  # base directory of where the program is loaded up, acquired from run.py script
 
-    # Misc
+    ### MISCELLANEOUS ###
     p = None
-    center_row, center_col = 16, 16  # for Mini Map
-    arrayMap_colorbar = None
+    center_row, center_col = 16, 16  # center of the minimap, this can be set by user on mouse click on the array map
+    arrayMap_colorbar = None  # reference to the colorbar embedded with the array map chart
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -74,17 +75,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         if self.mode_multithreading: print('GUI is multithreading')
 
-    def setSettings(self, settings):
-        self.settings = settings
-    def setBaseDir(self, basedir):
-        self.basedir = basedir
+    def setSettings(self, settings): self.settings = settings
+    def setBaseDir(self, basedir): self.basedir = basedir
 
     def setupLayout(self):
-        print("Session settings: " + str(self.settings))
+        """ Runs initial setup to load all the charts and their basic information for a given layout
+
+        Returns:
+            Nothing
+
+        """
+        print("SESSION SETTINGS | " + str(self.settings))
 
         # Load layout based on QtDesigner .ui file
         if self.settings["visStyle"] == "Default":
             uic.loadUi("./src/gui/default_vis.ui", self)
+
             self.charts["arrayMap"] = self.arrayMap
             setupArrayMap(self.charts["arrayMap"])
             self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,
@@ -110,6 +116,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         elif self.settings["visStyle"] == "Spike Search":
             uic.loadUi("./src/gui/spikefinding_vis.ui", self)
+
             self.charts["ResetButton"] = self.ResetButton
             self.charts["nextFigButton"] = self.nextFigButton
             self.charts["yScaleButton"] = self.yScaleButton
@@ -127,6 +134,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         elif self.settings["visStyle"] == "Noise":
             uic.loadUi("./src/gui/noise_check_vis.ui", self)
+
             self.charts["arrayMap"] = self.arrayMap
             setupArrayMap(self.charts["arrayMap"])
             self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,
@@ -158,6 +166,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.toggleDarkMode()
 
     def showArrayLocOnStatusBar(self, x, y):
+        """ Given x, y mouse location on a chart -> display on the status bar on the bottom of the GUI
+
+        Args:
+            x: x value on window as detected by mouse on hover
+            y: y value on window as detected by mouse on hover
+        """
         int_x = int(x)
         int_y = int(y)
 
@@ -168,8 +182,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             )
 
     def setMiniMapLoc(self, x, y):
-        print("setMiniMapLoc")
-        print(x, y)
+        """ Given an x, y coord as clicked on from the array map,
+        reset the center of the electrode minimap to that location.
+
+        Args:
+            x: x value on window as detected by mouse on click
+            y: x value on window as detected by mouse on click
+        """
         self.center_row = int(x)
         if self.center_row < 6:
             self.center_row = 6
@@ -185,6 +204,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.updateMiniMapPlot()
 
     def setupInteractivity(self):
+        """ Connects all the different buttons with their respective actions. Also set up multithreading."""
         self.LoadedData = DC1DataContainer()  # class for holding and manipulating data
         print("setupinteractivity", self.settings["spikeThreshold"])
         self.LoadedData.setSpikeThreshold(self.settings["spikeThreshold"])
@@ -192,18 +212,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.threadpool = QThreadPool()
         print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
-        # >>>> MENU BAR <<<<<
-        # TODO hook up interactivity for all menu bar buttons
-        # >> FILE BUTTON
         self.action_npz.triggered.connect(self.onActionLoadNPZ)
         self.action_mat.triggered.connect(self.onActionLoadMAT)
         self.actionUpdateSession.triggered.connect(self.onLoadRealtimeStream)
 
-        self.actionIndividualChannelInfo.triggered.connect(self.viewNewIndividalChannelInformation)
+        self.actionIndividualChannelInfo.triggered.connect(self.viewNewIndividualChannelInformation)
         self.actionListElectrodesInfo.triggered.connect(self.viewChannelListInformation)
         self.actionAnalysisParameters.triggered.connect(self.viewGUIPreferences)
 
-    def viewNewIndividalChannelInformation(self):
+    def viewNewIndividualChannelInformation(self):
+        """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
+        for analyzing individual channels on DC1. """
+
         from ..gui.gui_individualchannel import IndividualChannelInformation
         new_window = IndividualChannelInformation()
         new_window.label = QLabel("Individual Channel Analysis")
@@ -213,6 +233,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.external_windows.append(new_window)
 
     def viewChannelListInformation(self):
+        """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant data
+        for sorting all the electrodes on the array. """
         from ..gui.gui_electrodelist import ElectrodeListInformation
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
@@ -475,7 +497,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         print("Current profiling statistics:")
         for key in self.profile_data.keys():
             avg_time = np.round(np.mean(self.profile_data[key]), 3)
-            print(key, avg_time)
+            #print(key, avg_time)
         print("------------------------------")
 
     def updateArrayMapPlot(self):
@@ -647,7 +669,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         print('update minimap plot:', self.center_row, self.center_col)
         for row in range(self.center_row-4, self.center_row+4):
             for col in range(self.center_col-2, self.center_col+2):
-                print('r', row, 'c', col)
+                #print('r', row, 'c', col)
                 spike_indicator_base = pg.QtGui.QGraphicsRectItem(row*5, col*5, 4, 0.2)
                 spike_indicator_base.setPen(pg.mkPen((0, 0, 0, 100)))
                 spike_indicator_base.setBrush(pg.mkBrush((50, 50, 200)))
@@ -659,6 +681,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 spike_indicator_text.setPos(row*5, col*5)
                 spike_indicator_text.setParentItem(spike_indicator_base)
 
+                if self.LoadedData.array_stats["incom_spike_cnt"][col, row] > 0:
+                    print('yes CR', 'r', row, 'col', col, 'spike cnt', self.LoadedData.array_stats["incom_spike_cnt"][col, row])
+
+                """
                 #times = [0, 1, 3, 5, 10, 11, 14]
                 if np.random.random() > 0.5:
                     times = np.random.randint(0, 20, (3,), dtype='int64')
@@ -668,7 +694,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                         spike_indicator.setBrush(pg.mkBrush((50, 50, 200)))
                         spike_indicator.setParentItem(spike_indicator_base)
                         self.charts["miniMap"].addItem(spike_indicator)
-
+                """
                 self.charts["miniMap"].addItem(spike_indicator_base)
                 self.charts["miniMap"].addItem(spike_indicator_text)
-
