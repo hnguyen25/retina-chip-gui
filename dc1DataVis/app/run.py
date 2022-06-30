@@ -16,9 +16,13 @@ import multiprocessing as mp
 
 from src.gui.default_vis import Ui_mainWindow # layout
 
+
+
 if __name__ == "__main__":
     mp.set_start_method('spawn') # multiprocessing setting
+    os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1" # fix Windows scaling issue
     app = QtWidgets.QApplication(sys.argv)
+    app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling) # fix Windows scaling issue
     gui_preferences = GUIPreferences(basedir) # startup pane to set runtime preferences
 
     if gui_preferences.exec():  # run startup dialog before anything
