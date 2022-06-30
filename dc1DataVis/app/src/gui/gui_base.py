@@ -53,6 +53,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
+        ### WINDOW REFERENCES ###
         self.charts = {
             "arrayMap": None, "miniMap": None, "spikeRatePlot": None, "noiseHistogram": None,
             "channelTraceVerticalLayout": None, "channelTrace1": None, "channelTrace2": None,
@@ -66,13 +67,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             "channelTrace3": self.updateChannelTracePlot, "channelTrace4": self.updateChannelTracePlot
         }
 
+        ### MODES ###
         if self.mode_profiling:
             self.profile_data = {
                 'appendRawData': [], 'filterData': [], 'calculateArrayStats': [], 'arrayMap': [],
                 'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [], 'miniMap': [],
                 'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
             }
-
         if self.mode_multithreading: print('GUI is multithreading')
 
     def setSettings(self, settings): self.settings = settings
@@ -683,6 +684,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
                 if self.LoadedData.array_stats["incom_spike_cnt"][col, row] > 0:
                     print('yes CR', 'r', row, 'col', col, 'spike cnt', self.LoadedData.array_stats["incom_spike_cnt"][col, row])
+
+
+
 
                 """
                 #times = [0, 1, 3, 5, 10, 11, 14]

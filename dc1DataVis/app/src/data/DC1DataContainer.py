@@ -174,7 +174,6 @@ class DC1DataContainer():
         self.array_stats['num_sam'][:, :, 0] = np.count_nonzero(data_real, axis=2)
         incom_cnt = self.array_stats['num_sam'][:, :, 0]
 
-
         # AX1,AX3,AX4) Finding average ADC of samples per electrode
         mask = np.copy(data_real)
         mask[mask == 0] = np.nan
@@ -217,14 +216,16 @@ class DC1DataContainer():
 
         for x in range(len(chan_ind)):
             self.array_stats["noise_std"] = self.array_stats["noise_std"]
-            incom_spike_cnt[chan_elec[x, 0], chan_elec[x, 1]] = np.count_nonzero(
-                mask[chan_elec[x, 0], chan_elec[x, 1], :] >= self.array_stats["noise_mean"][chan_elec[x, 0], chan_elec[x, 1]] + self.spikeThreshold *
-                self.array_stats["noise_std"][chan_elec[x, 0], chan_elec[x, 1]])
-
-            mask2[chan_elec[x, 0], chan_elec[x, 1], mask2[chan_elec[x, 0], chan_elec[x, 1], :] <= self.array_stats["noise_mean"][
-                chan_elec[x, 0], chan_elec[x, 1]] + self.spikeThreshold * self.array_stats["noise_std"][chan_elec[x, 0], chan_elec[x, 1]]] = np.nan
-
+            row = chan_elec[x, 0]
+            col = chan_elec[x, 1]
+            above_threshold = self.array_stats["noise_mean"][row, col] + \
+                              self.spikeThreshold * self.array_stats["noise_std"][row, col]
+            above_threshold_activity = (mask[row, col, :] >= above_threshold)
+            incom_spike_cnt[row, col] = np.count_nonzero(above_threshold_activity)
+            mask2[row, col, mask2[row, col, :] <= above_threshold] = np.nan
         self.array_stats["incom_spike_cnt"] = incom_spike_cnt
+
+        #self.array_stats["incom_spike_times"] = incom_spike_times
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
@@ -232,7 +233,6 @@ class DC1DataContainer():
             incom_spike_avg = np.nan_to_num(incom_spike_avg, nan=0)
             incom_spike_std = np.nanstd(mask2, axis=2)
             incom_spike_std = np.nan_to_num(incom_spike_std, nan=0)
-
 
         pre_spike_avg = np.copy(self.array_stats["spike_avg"])
         pre_spike_std = np.copy(self.array_stats["spike_std"])
