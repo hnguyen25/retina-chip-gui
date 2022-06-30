@@ -13,41 +13,6 @@
   <property name="windowTitle">
    <string>Individual Channel Information</string>
   </property>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>30</y>
-     <width>821</width>
-     <height>561</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>-1</number>
-      </property>
-      <item>
-       <widget class="PlotWidget" name="AmplitudeHistPlot" native="true"/>
-      </item>
-      <item>
-       <widget class="PlotWidget" name="SpikeRatePlot" native="true"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <widget class="QWidget" name="ElectrodeTraceZoomed" native="true"/>
-      </item>
-      <item>
-       <widget class="QWidget" name="ElectrodeTraceAll" native="true"/>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
   <widget class="QTextEdit" name="InputElectrodeNumber">
    <property name="geometry">
     <rect>
@@ -138,6 +103,34 @@
    <property name="text">
     <string>Extra information</string>
    </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>11</x>
+     <y>40</y>
+     <width>641</width>
+     <height>361</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="PlotWidget" name="AmplitudeHistPlot" native="true"/>
+    </item>
+    <item row="0" column="1">
+     <widget class="PlotWidget" name="ChannelTracePlot" native="true"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="PlotWidget" name="SpikeRateHistPlot" native="true"/>
+    </item>
+    <item row="1" column="1">
+     <widget class="PlotWidget" name="SpikeRatePlot" native="true">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <customwidgets>

@@ -108,6 +108,8 @@ def setupOneSpikeTrace(plot_widget):
     plot_widget.setLabel('left', '# XXX')
     plot_widget.setLabel('bottom', 'time')
 
+
+# TODO: fix the swap on the next two functions
 def setupSpikeRatePlot(plot_widget):
     plot_widget.setLabel('top', "Channel Noise")
     plot_widget.setLabel('left', "Count")

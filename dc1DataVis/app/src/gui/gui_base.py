@@ -230,7 +230,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         new_window.label = QLabel("Individual Channel Analysis")
         new_window.setSessionParent(self)
         new_window.show()
-        new_window.exec()
+        #new_window.exec()
         self.external_windows.append(new_window)
 
     def viewChannelListInformation(self):
@@ -241,7 +241,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
         new_window.show()
-        new_window.exec()
+        #new_window.exec()
         self.external_windows.append(new_window)
 
     def viewGUIPreferences(self):
@@ -491,7 +491,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 end = time.time()
                 self.profile_data[chart].append(end-start)
 
-        if self.mode_profiling: self.printProfilingData()
+        if self.mode_profiling:
+            self.printProfilingData()
 
     def printProfilingData(self):
         print("------------------------------")
@@ -642,10 +643,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             y = self.LoadedData.filtered_data[chan_idx]['data']
             plt.clear()
             plt.plot(x, y, pen='b')
-            plt.setLabel('left', '#' + str(self.LoadedData.filtered_data[chan_idx]['channel_idx']))
+            plt.setLabel('left', '#' + str(self.LoadedData.filtered_data[chan_idx]['channel_idx'])) # TODO: is this right?
             plt.enableAutoRange(axis='y')
             plt.setAutoVisible(y=True)
 
+
+# TODO: fix swap on next two funcs
     def updateSpikeRatePlot(self):
         self.charts["spikeRatePlot"].clear()
         vals = self.LoadedData.array_stats['noise_std']
