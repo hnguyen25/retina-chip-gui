@@ -38,6 +38,10 @@ if __name__ == "__main__":
         window.show()
         app.exec_()
 
+        #QtCore.QTimer.singleShot(0, window.close) # <---
+        #sys.exit(app.exec_())
+
+
     else: # if dialog canceled then close app
         print('startup-no')
         sys.exit()

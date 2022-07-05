@@ -3,35 +3,70 @@ import time
 from ..data.preprocessing import *
 from ..data.filters import *
 
-piece_no = 1
-time_win = 190  # The amount of time (ms) you want to view in each frame
-max_dot = 300  # Saturation point for dot size
-
 class DC1DataContainer():
     """
-    Container for holding all different types of data.
+    Container for holding recording data for the DC1 retina chip. Each container is designed to hold all
+    the relevant information extracted from data collected from a SINGLE recording, of any particular type.
+
+    This container holds three main data objects (in addition to calculated statistics based on this data):
+    (1) raw data -> (2) recorded_data -> (3) filtered_data
+    raw_data: the data as-is extracted directly from the .mat files
+    recorded_data: the data within raw_data with minimal pre-processing necessary to fix hardware related
+        issues (i.e. double counts), as well as managed into a more helpful format
+    filtered_data: the data which has been filtered, can be rerun multiple times with different filter types
+
+    TODO combine with identify_relevant channels
     """
-    # raw_data --> recorded_data --> filtered_data
-    # raw_data: data loader from .mat files
+
+    # data processing settings
+    data_processing_settings = {
+        "filter": None,
+        "spikeThreshold": 3  # How many standard deviations above noise to find spikes
+    }
+
+    # metadata information
+    recording_info = {
+        "recording_full_path": "",
+        "recording_data": "",
+        "recording_piece": "",
+        "recording_type": ""
+    }
+
+    recording_type_dict = {
+        "full_bandwidth_1_channel": {"num_channels_at_once": 1,
+                                     "compression": False},
+        "full_bandwidth_2_channels": {"num_channels_at_once": 2,
+                                      "compression": False},
+        "full_bandwidth_4_channels": {"num_channels_at_once": 4,
+                                      "compression": False},
+        "full_bandwidth_8_channels": {"num_channels_at_once": 8,
+                                      "compression": False},
+        "full_bandwidth_16_channels": {"num_channels_at_once": 16,
+                                       "compression": False},
+        "full_bandwidth_32_channels": {"num_channels_at_once": 32,
+                                       "compression": False}
+    }
+
+    # (1) RAW DATA // data loader from .mat files
     raw_data, counts, times = None, None, None
     count_track, time_track = None, None
     container_length = None
 
-    # recorded_data: nonzero data
+    # (2) RECORDED_DATA // processed, nonzero data
     # each element in recorded_data is data for one channel recorded
     recorded_data = []
     count_track_processed, time_track_processed = None, None
 
-    # filtered_data: recorded_data gone through a filter
+    # (3) FILTERED_DATA // recorded_data gone through a filter
     # each element in filtered_data is filtered data for one channel
     filtered_data = []
 
+    # calculated statistics
     spike_data = {
-        'times': np.zeros((32, 32)),
+        'times': np.zeros((32, 32)), # np.array with dims 32 x 32 x num_bins
         'amplitude': np.zeros((32, 32))
     }
 
-    # array_statistics: overall array stats
     array_stats = {
         "size": np.zeros((32, 32, 0)),  # For each dot, size by # of samples
         "num_sam": np.zeros((32, 32, 1)),  # Temp variable to allow sample counting
@@ -45,15 +80,13 @@ class DC1DataContainer():
         "spike_cnt": np.zeros((32, 32)),
         "size": None,
         "times": None,
-
         "array spike rate times": [], # x
         "array spike rate": [] # y
     }
 
-    spikeThreshold = 3 # How many standard deviations above noise to find spikes
+    def __init__(self, recording_info={},
+                       data_processing_settings={}):
 
-    # TODO combine with identity_relevant_channels
-    def __init__(self):
         self.time_track = 0
         self.count_track = 0
         self.count_track_processed = 0
@@ -65,7 +98,7 @@ class DC1DataContainer():
         self.container_length = 1000
 
     def setSpikeThreshold(self, threshold):
-        self.spikeThreshold = threshold
+        self.data_processing_settings["spikeThreshold"] = threshold
 
     def extend_data_containers(self, mode='double'):
         """Change data containers dynamically to accommodate longer time windows of data
@@ -138,7 +171,6 @@ class DC1DataContainer():
 
         # TODO this shouldn't call update_filtered_data -> should be async, and threaded
 
-
     def update_filtered_data(self, num_threads=4, filtType='modHierlemann'):
         # subtract recorded_data by filtered_data
         len_recorded_data = len(self.recorded_data)
@@ -168,8 +200,8 @@ class DC1DataContainer():
             N:
 
         Returns:
-
         """
+
         # AX1,AX3,AX4) Sample Counting (Note: Appends are an artifact from previous real time codes)
         self.array_stats['num_sam'][:, :, 0] = np.count_nonzero(data_real, axis=2)
         incom_cnt = self.array_stats['num_sam'][:, :, 0]
@@ -214,15 +246,18 @@ class DC1DataContainer():
         incom_spike_std = np.zeros((32, 32))
         mask2 = np.copy(data_real)
 
+        # TODO LITKE SPIKE COUNT START HERE
         for x in range(len(chan_ind)):
-            self.array_stats["noise_std"] = self.array_stats["noise_std"]
+            # self.array_stats["noise_std"] = self.array_stats["noise_std"]
             row = chan_elec[x, 0]
             col = chan_elec[x, 1]
             above_threshold = self.array_stats["noise_mean"][row, col] + \
-                              self.spikeThreshold * self.array_stats["noise_std"][row, col]
+                              self.data_processing_settings["spikeThreshold"] * self.array_stats["noise_std"][row, col]
             above_threshold_activity = (mask[row, col, :] >= above_threshold)
+            print('x', x, '\nabove_threshold', above_threshold_activity, '\nshape', above_threshold_activity.shape)
             incom_spike_cnt[row, col] = np.count_nonzero(above_threshold_activity)
             mask2[row, col, mask2[row, col, :] <= above_threshold] = np.nan
+            print('incom_spike_cnt', incom_spike_cnt[row, col])
         self.array_stats["incom_spike_cnt"] = incom_spike_cnt
 
         #self.array_stats["incom_spike_times"] = incom_spike_times
@@ -258,5 +293,10 @@ class DC1DataContainer():
         #print("avg spike rate:", self.array_stats["array spike rate"])
         #print("spike rate times: ", self.array_stats["times"])
 
+    def calculate_incoming_data_statistics(self):
+        pass
+
+    def update_overall_data_statistics(self):
+        pass
 
 

@@ -34,9 +34,6 @@ class IndividualChannelInformation(QWidget):
         #self.chan_charts_update_mapping = {'ChannelTracePlot': self.updateChannelTrace(), 'SpikeRateHistPlot': self.updateSpikeRateHist(),
                                            #'AmplitudeHistPlotPlot': self.updateAmplitudeHist(), 'SpikeRatePlot': self.updateSpikeRate()}
 
-
-
-
     def setSessionParent(self, session_parent):
         self.session_parent = session_parent
         self.setupCharts()
