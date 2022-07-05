@@ -99,7 +99,7 @@ class Ui_Startup(object):
         self.DialogButtonBox.setObjectName("DialogButtonBox")
         self.gridLayout.addWidget(self.DialogButtonBox, 8, 0, 1, 3)
         self.LabelFilePath = QtWidgets.QLabel(Startup)
-        self.LabelFilePath.setMaximumSize(QtCore.QSize(16777215, 10))
+        self.LabelFilePath.setMaximumSize(QtCore.QSize(16777215, 30))
         self.LabelFilePath.setObjectName("LabelFilePath")
         self.gridLayout.addWidget(self.LabelFilePath, 3, 1, 1, 1)
         self.label.setBuddy(self.chooseVisStyle)
