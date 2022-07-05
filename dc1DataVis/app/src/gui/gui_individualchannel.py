@@ -9,8 +9,9 @@ import pyqtgraph as pg
 import time
 
 # TODO:
-# 1. updating method
-# 2. data structure for stats
+# 1. Mirror input to one text entry to other two, make update method correct
+# 2. Dataframe/computation plan for non-trace plots
+
 class IndividualChannelInformation(QWidget):
 
     session_parent = None
@@ -24,7 +25,8 @@ class IndividualChannelInformation(QWidget):
         super().__init__(*args, **kwargs)
         uic.loadUi("./src/gui/IndividualChannelWindow.ui", self)
 
-        self.InputElectrodeNumber.textChanged.connect(self.setElecNumber)
+        self.UpdateInput.clicked.connect(self.setElecNumber)
+        #self.InputElectrodeNumber.textChanged.connect(self.setElecNumber)
         self.InputElectrodeRow.textChanged.connect(self.setElecRow)
         self.InputElectrodeCol.textChanged.connect(self.setElecCol)
 
@@ -33,6 +35,9 @@ class IndividualChannelInformation(QWidget):
 
         #self.chan_charts_update_mapping = {'ChannelTracePlot': self.updateChannelTrace(), 'SpikeRateHistPlot': self.updateSpikeRateHist(),
                                            #'AmplitudeHistPlotPlot': self.updateAmplitudeHist(), 'SpikeRatePlot': self.updateSpikeRate()}
+
+
+
 
     def setSessionParent(self, session_parent):
         self.session_parent = session_parent
@@ -119,7 +124,7 @@ class IndividualChannelInformation(QWidget):
 
     def setElecNumber(self):
         input = self.InputElectrodeNumber.toPlainText()
-        print(input)
+        print(input) # debugging
 
         if input.isnumeric():
             if 0 <= int(input) < 1024 and int(input) != self.current_elec:
@@ -131,7 +136,7 @@ class IndividualChannelInformation(QWidget):
                 self.InputElectrodeNumber.setText(str(self.current_elec))
 
         elif input == "":
-            print("elif triggered")
+            print("elif triggered") # debugging
             self.current_elec = 0
             self.current_col = 0
             self.current_row = 0
@@ -181,7 +186,7 @@ class IndividualChannelInformation(QWidget):
         self.LabelElectrodeInfo.setText(">>> ELEC #" + str(int(self.current_elec)) +
                                         " | R" + str(int(self.current_row)) +
                                         " C" + str(int(self.current_col)) + " <<<")
-        self.update() # TODO: check
+        self.update()
 
     def map2idx(self, ch_row: int, ch_col: int):
         """ Given a channel's row and col, return channel's index
@@ -215,7 +220,3 @@ class IndividualChannelInformation(QWidget):
             ch_row = int(ch_idx / 32)
             ch_col = int(ch_idx - ch_row * 32)
         return ch_row, ch_col
-
-
-
-
