@@ -25,10 +25,8 @@ class IndividualChannelInformation(QWidget):
         super().__init__(*args, **kwargs)
         uic.loadUi("./src/gui/IndividualChannelWindow.ui", self)
 
-        self.UpdateInput.clicked.connect(self.setElecNumber)
-        #self.InputElectrodeNumber.textChanged.connect(self.setElecNumber)
-        self.InputElectrodeRow.textChanged.connect(self.setElecRow)
-        self.InputElectrodeCol.textChanged.connect(self.setElecCol)
+        self.updateElectrodeNum.clicked.connect(self.setElecNum)
+        self.updateRC.clicked.connect(self.setRC)
 
         self.chan_charts = {'ChannelTracePlot': None , 'SpikeRateHistPlot': None,
                             'AmplitudeHistPlot': None, 'SpikeRatePlot': None}
@@ -69,13 +67,6 @@ class IndividualChannelInformation(QWidget):
     # Note: do not change name from update
     def update(self):
         print("Update individual channels()")
-        # for chart in self.chan_charts.keys():
-        #     chart_type = type(self.chan_charts[chart])
-        #     if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>": # TODO: make sure this works
-        #         start = time.time()
-        #         self.chan_charts_update_mapping[chart]()
-        #         end = time.time()
-
         self.updateAmplitudeHist()
         self.updateSpikeRate()
         self.updateChannelTrace()
@@ -119,68 +110,46 @@ class IndividualChannelInformation(QWidget):
         self.ChannelTracePlot.enableAutoRange(axis='y')
         self.ChannelTracePlot.setAutoVisible(y=True)
 
-
-# TODO handle recursive loops
-
-    def setElecNumber(self):
+    def setRC(self):
+        """ Set the row and column entries and textboxes given an electrode number """
         input = self.InputElectrodeNumber.toPlainText()
-        print(input) # debugging
-
         if input.isnumeric():
             if 0 <= int(input) < 1024 and int(input) != self.current_elec:
                 self.current_elec = int(input)
                 self.current_row, self.current_col = self.idx2map(self.current_elec)
+                self.InputElectrodeRow.setText(str(self.current_row))
+                self.InputElectrodeCol.setText(str(self.current_col))
                 self.updateElectrodeInfo()
             else:
                 pass
                 self.InputElectrodeNumber.setText(str(self.current_elec))
-
-        elif input == "":
-            print("elif triggered") # debugging
-            self.current_elec = 0
-            self.current_col = 0
-            self.current_row = 0
-            self.InputElectrodeNumber.setText("0")
-            self.updateElectrodeInfo()
         else:
             pass
             self.InputElectrodeNumber.setText(str(self.current_elec))
 
-    def setElecRow(self):
-        input = self.InputElectrodeRow.toPlainText()
-        if input.isnumeric():
-            if 0 <= int(input) < 32 and int(input) != self.current_row:
-                self.current_row = int(input)
-                self.current_elec = self.map2idx(self.current_row, self.current_col)
-                self.updateElectrodeInfo()
-            else:
-                pass
-                self.InputElectrodeRow.setText(str(self.current_row))
-        elif input == "":
+    def setElecNum(self):
+        """ Given a row and column value, set the electrode number textbox and display plots"""
+
+        row = self.InputElectrodeRow.toPlainText()
+        col = self.InputElectrodeCol.toPlainText()
+        if row == "":
             self.current_row = 0
             self.InputElectrodeRow.setText("0")
-            self.updateElectrodeInfo()
-        else:
-            pass
-            self.InputElectrodeRow.setText(str(self.current_row))
-
-    def setElecCol(self):
-        input = self.InputElectrodeCol.toPlainText()
-        if input.isnumeric():
-            if 0 <= int(input) < 32 and int(input) != self.current_col:
-                self.current_col = int(input)
-                self.current_elec = self.map2idx(self.current_row, self.current_col)
-                self.updateElectrodeInfo()
-            else:
-                pass
-                self.InputElectrodeCol.setText(str(self.current_col))
-        elif input == "":
+        if col == "":
             self.current_col = 0
             self.InputElectrodeCol.setText("0")
+        if row.isnumeric() and col.isnumeric():
+            row = int(row)
+            col = int(col)
+
+            if 0 <= row < 32 and row != self.current_row:
+                self.current_row = row
+
+            if 0 <= col < 32 and col != self.current_col:
+                self.current_col = col
+            self.current_elec = self.map2idx(self.current_row, self.current_col)
             self.updateElectrodeInfo()
-        else:
-            pass
-            self.InputElectrodeCol.setText(str(self.current_col))
+        self.InputElectrodeNumber.setText(str(self.current_elec))
 
     def updateElectrodeInfo(self):
         self.LabelElectrodeInfo.setText(">>> ELEC #" + str(int(self.current_elec)) +
@@ -188,7 +157,7 @@ class IndividualChannelInformation(QWidget):
                                         " C" + str(int(self.current_col)) + " <<<")
         self.update()
 
-    def map2idx(self, ch_row: int, ch_col: int):
+    def map2idx(self, ch_row: int, ch_col: int) -> object:
         """ Given a channel's row and col, return channel's index
 
         Args:
