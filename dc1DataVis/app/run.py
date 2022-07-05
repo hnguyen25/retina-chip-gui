@@ -23,6 +23,8 @@ if __name__ == "__main__":
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1" # fix Windows scaling issue
     app = QtWidgets.QApplication(sys.argv)
     app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling) # fix Windows scaling issue
+    QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, )  # use highdpi icons
+    app.setStyleSheet("QWidget { font: 14px;}")
     gui_preferences = GUIPreferences(basedir) # startup pane to set runtime preferences
 
     if gui_preferences.exec():  # run startup dialog before anything
