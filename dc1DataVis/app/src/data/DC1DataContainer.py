@@ -254,10 +254,10 @@ class DC1DataContainer():
             above_threshold = self.array_stats["noise_mean"][row, col] + \
                               self.data_processing_settings["spikeThreshold"] * self.array_stats["noise_std"][row, col]
             above_threshold_activity = (mask[row, col, :] >= above_threshold)
-            print('x', x, '\nabove_threshold', above_threshold_activity, '\nshape', above_threshold_activity.shape)
+           # print('x', x, '\nabove_threshold', above_threshold_activity, '\nshape', above_threshold_activity.shape)
             incom_spike_cnt[row, col] = np.count_nonzero(above_threshold_activity)
             mask2[row, col, mask2[row, col, :] <= above_threshold] = np.nan
-            print('incom_spike_cnt', incom_spike_cnt[row, col])
+            #print('incom_spike_cnt', incom_spike_cnt[row, col])
         self.array_stats["incom_spike_cnt"] = incom_spike_cnt
 
         #self.array_stats["incom_spike_times"] = incom_spike_times
