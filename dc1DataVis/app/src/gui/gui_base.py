@@ -230,7 +230,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         new_window.label = QLabel("Individual Channel Analysis")
         new_window.setSessionParent(self)
         new_window.show()
-        #new_window.exec()
         self.external_windows.append(new_window)
 
     def viewChannelListInformation(self):
@@ -241,7 +240,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
         new_window.show()
-        #new_window.exec()
         self.external_windows.append(new_window)
 
     def viewGUIPreferences(self):

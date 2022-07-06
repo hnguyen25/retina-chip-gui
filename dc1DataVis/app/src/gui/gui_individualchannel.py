@@ -9,8 +9,7 @@ import pyqtgraph as pg
 import time
 
 # TODO:
-# 1. Mirror input to one text entry to other two, make update method correct
-# 2. Dataframe/computation plan for non-trace plots
+# 1. Dataframe/computation plan for non-trace plots
 
 class IndividualChannelInformation(QWidget):
 
@@ -72,8 +71,6 @@ class IndividualChannelInformation(QWidget):
         self.updateChannelTrace()
         self.updateSpikeRateHist()
 
-
-
     def updateAmplitudeHist(self):
         vals = self.session_parent.LoadedData.array_stats['noise_std']
         vals = vals[np.nonzero(vals)]
@@ -96,7 +93,7 @@ class IndividualChannelInformation(QWidget):
         # self.SpikeRateHistPlot.addItem(curve)
 
     def updateSpikeRate(self):
-        pass
+        print(len(self.session_parent.LoadedData.filtered_data))
 
     def updateChannelTrace(self):
 
@@ -111,7 +108,11 @@ class IndividualChannelInformation(QWidget):
         self.ChannelTracePlot.setAutoVisible(y=True)
 
     def setRC(self):
-        """ Set the row and column entries and textboxes given an electrode number """
+        """ Set the row and column entries and textboxes given an electrode number.
+
+        Connected to "Update Row and Column" button
+
+         """
         input = self.InputElectrodeNumber.toPlainText()
         if input.isnumeric():
             if 0 <= int(input) < 1024 and int(input) != self.current_elec:
