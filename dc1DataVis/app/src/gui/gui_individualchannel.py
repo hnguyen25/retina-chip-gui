@@ -9,7 +9,7 @@ import pyqtgraph as pg
 import time
 
 # TODO:
-# 1. Dataframe/computation plan for non-trace plots
+# 1. computation plan for non-trace plots
 
 class IndividualChannelInformation(QWidget):
 
@@ -17,6 +17,9 @@ class IndividualChannelInformation(QWidget):
     current_elec = 0
     current_row = 0
     current_col = 0
+    electrode_times = []
+    electrode_data = []
+
     chan_charts = {} # dictionary for all different individual channel charts
     chan_charts_update_mapping = {} # dictionary for mapping charts to their update functions
 
@@ -66,10 +69,23 @@ class IndividualChannelInformation(QWidget):
     # Note: do not change name from update
     def update(self):
         print("Update individual channels()")
+        self.updateElectrodeData()
         self.updateAmplitudeHist()
         self.updateSpikeRate()
         self.updateChannelTrace()
         self.updateSpikeRateHist()
+
+    def updateElectrodeData(self):
+        len_filtered_data = len(self.session_parent.LoadedData.filtered_data)
+        for i in range(len_filtered_data):
+            if self.session_parent.LoadedData.filtered_data[len_filtered_data-(i+1)]['channel_idx'] == self.current_elec:
+                self.electrode_times = self.session_parent.LoadedData.filtered_data[len_filtered_data-(i+1)]['times']
+                self.electrode_data = self.session_parent.LoadedData.filtered_data[len_filtered_data-(i+1)]['data']
+                break
+            elif len_filtered_data == (i+1):
+                print("No data from this electrode yet")
+                self.electrode_times = [0,0,0]
+                self.electrode_data = [0,0,0]
 
     def updateAmplitudeHist(self):
         vals = self.session_parent.LoadedData.array_stats['noise_std']
@@ -93,17 +109,11 @@ class IndividualChannelInformation(QWidget):
         # self.SpikeRateHistPlot.addItem(curve)
 
     def updateSpikeRate(self):
-        print(len(self.session_parent.LoadedData.filtered_data))
-
+        pass
     def updateChannelTrace(self):
-
-        x = self.session_parent.LoadedData.filtered_data[self.current_elec]['times']
-        y = self.session_parent.LoadedData.filtered_data[self.current_elec]['data']
-
         self.ChannelTracePlot.clear()
-
-        self.ChannelTracePlot.plot(x, y, pen='b')
-        self.ChannelTracePlot.setLabel('left', '#' + str(self.session_parent.LoadedData.filtered_data[self.current_elec]['channel_idx']))
+        self.ChannelTracePlot.plot(self.electrode_times, self.electrode_data, pen='b')
+        self.ChannelTracePlot.setLabel('left', '#' + str(self.current_elec))
         self.ChannelTracePlot.enableAutoRange(axis='y')
         self.ChannelTracePlot.setAutoVisible(y=True)
 
@@ -129,7 +139,10 @@ class IndividualChannelInformation(QWidget):
             self.InputElectrodeNumber.setText(str(self.current_elec))
 
     def setElecNum(self):
-        """ Given a row and column value, set the electrode number textbox and display plots"""
+        """ Given a row and column value, set the electrode number textbox and display plots
+
+        Connected to the
+        """
 
         row = self.InputElectrodeRow.toPlainText()
         col = self.InputElectrodeCol.toPlainText()
