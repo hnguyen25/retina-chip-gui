@@ -45,13 +45,6 @@ class IndividualChannelInformation(QWidget):
 
     def setupCharts(self):
         self.AmplitudeHistPlot.setBackground('w')
-        vals = self.session_parent.LoadedData.array_stats['noise_std']
-        vals = vals[np.nonzero(vals)]
-        # get nonzero vals because zeros have not had noise calculation done yet
-
-        y, x = np.histogram(vals, bins=np.linspace(0, 20, 40))
-        curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
-        self.AmplitudeHistPlot.addItem(curve)
 
         self.SpikeRatePlot.setBackground('w')
 
@@ -75,6 +68,7 @@ class IndividualChannelInformation(QWidget):
         self.updateChannelTrace()
         self.updateSpikeRateHist()
 
+    # TODO: need to figure out how to combine multiple recordings for single electrode
     def updateElectrodeData(self):
         len_filtered_data = len(self.session_parent.LoadedData.filtered_data)
         for i in range(len_filtered_data):
@@ -88,9 +82,10 @@ class IndividualChannelInformation(QWidget):
                 self.electrode_data = [0,0,0]
 
     def updateAmplitudeHist(self):
-        vals = self.session_parent.LoadedData.array_stats['noise_std']
+        vals = self.electrode_data
         vals = vals[np.nonzero(vals)]
         # get nonzero vals because zeros have not had noise calculation done yet
+        self.AmplitudeHistPlot.clear()
 
         y, x = np.histogram(vals, bins=np.linspace(0, 20, 40))
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))

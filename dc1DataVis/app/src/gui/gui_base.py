@@ -646,9 +646,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             plt.setAutoVisible(y=True)
 
 
-# TODO: fix swap on next two funcs
-    def updateSpikeRatePlot(self):
-        self.charts["spikeRatePlot"].clear()
+    def updateNoiseHistogramPlot(self):
+        self.charts["noiseHistogram"].clear()
         vals = self.LoadedData.array_stats['noise_std']
         vals = vals[np.nonzero(vals)]
         # get nonzero vals because zeros have not had noise calculation done yet
@@ -657,8 +656,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0,0,255,80))
         self.charts["spikeRatePlot"].addItem(curve)
 
-    def updateNoiseHistogramPlot(self):
-        self.charts["noiseHistogram"].clear()
+    def updateSpikeRatePlot(self):
+        self.charts["spikeRatePlot"].clear()
         if self.LoadedData is not None:
             avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
             x = np.cumsum(avg_spike_rate_times)
