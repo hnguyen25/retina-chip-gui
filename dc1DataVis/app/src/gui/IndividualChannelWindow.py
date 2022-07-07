@@ -61,14 +61,13 @@ class Ui_IndividualChannelInfo(object):
         self.horizontalLayout_2.addWidget(self.InputElectrodeNumber)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.horizontalLayout_3.addLayout(self.verticalLayout)
-        self.LabelElectrodeInfo = QtWidgets.QLabel(IndividualChannelInfo)
-        self.LabelElectrodeInfo.setMaximumSize(QtCore.QSize(167, 167))
-        self.LabelElectrodeInfo.setObjectName("LabelElectrodeInfo")
-        self.horizontalLayout_3.addWidget(self.LabelElectrodeInfo)
         self.totalSamples = QtWidgets.QLabel(IndividualChannelInfo)
-        self.totalSamples.setMaximumSize(QtCore.QSize(167, 167))
+        self.totalSamples.setMaximumSize(QtCore.QSize(200, 167))
         self.totalSamples.setObjectName("totalSamples")
         self.horizontalLayout_3.addWidget(self.totalSamples)
+        self.timeRecorded = QtWidgets.QLabel(IndividualChannelInfo)
+        self.timeRecorded.setObjectName("timeRecorded")
+        self.horizontalLayout_3.addWidget(self.timeRecorded)
         self.gridLayout_2.addLayout(self.horizontalLayout_3, 0, 0, 1, 1)
         self.gridLayout = QtWidgets.QGridLayout()
         self.gridLayout.setObjectName("gridLayout")
@@ -120,6 +119,6 @@ class Ui_IndividualChannelInfo(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Segoe UI\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
-        self.LabelElectrodeInfo.setText(_translate("IndividualChannelInfo", "Extra information:"))
-        self.totalSamples.setText(_translate("IndividualChannelInfo", "TextLabel"))
+        self.totalSamples.setText(_translate("IndividualChannelInfo", "totalSamples"))
+        self.timeRecorded.setText(_translate("IndividualChannelInfo", "timeRecorded"))
 from pyqtgraph import PlotWidget

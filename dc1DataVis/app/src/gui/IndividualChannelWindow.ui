@@ -157,24 +157,28 @@ p, li { white-space: pre-wrap; }
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="totalSamples">
-       <property name="maximumSize">
-        <size>
-         <width>200</width>
-         <height>167</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>totalSamples</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="totalSamples">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>167</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>totalSamples</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="timeRecorded">
+         <property name="text">
+          <string>timeRecorded</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

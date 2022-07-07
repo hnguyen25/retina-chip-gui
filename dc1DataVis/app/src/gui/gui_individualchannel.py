@@ -48,7 +48,6 @@ class IndividualChannelInformation(QWidget):
         self.SpikeRateHistPlot.setBackground('w')
 
         self.ChannelTracePlot.setBackground('w')
-        #self.LabelElectrodeInfo
 
 # TODO: print profiling data?
 
@@ -61,22 +60,24 @@ class IndividualChannelInformation(QWidget):
         self.updateChannelTrace()
         self.updateSpikeRateHist()
         self.totalSamples.setText("Total number of samples: " + str(len(self.electrode_data)))
+        self.timeRecorded.setText("Total time recording electrode: "
+                                  + str(round((len(self.electrode_data)) * 0.05,2))
+                                  + "ms")
 
-
-    # TODO: need to figure out how to combine multiple recordings for single electrode
     def updateElectrodeData(self):
         match = False
         len_filtered_data = len(self.session_parent.LoadedData.filtered_data)
+
+        self.electrode_data.clear()
+        self.electrode_times.clear()
+
         for i in range(len_filtered_data):
             if self.session_parent.LoadedData.filtered_data[i]['channel_idx'] == self.current_elec:
-                self.electrode_times = self.session_parent.LoadedData.filtered_data[i]['times']
-                self.electrode_data = self.session_parent.LoadedData.filtered_data[i]['data']
+                self.electrode_times.extend(self.session_parent.LoadedData.filtered_data[i]['times'])
+                self.electrode_data.extend(self.session_parent.LoadedData.filtered_data[i]['data'])
                 match = True
-                print(self.electrode_data)
         if not match:
             print("No data from this electrode yet")
-            self.electrode_times = [0,0,0]
-            self.electrode_data = [0,0,0]
 
     def updateAmplitudeHist(self):
         vals = self.electrode_data
