@@ -157,26 +157,20 @@ p, li { white-space: pre-wrap; }
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="LabelElectrodeInfo">
+      <widget class="QLabel" name="totalSamples">
        <property name="maximumSize">
         <size>
-         <width>167</width>
+         <width>200</width>
          <height>167</height>
         </size>
        </property>
        <property name="text">
-        <string>Extra information:</string>
+        <string>totalSamples</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="totalSamples">
-       <property name="maximumSize">
-        <size>
-         <width>167</width>
-         <height>167</height>
-        </size>
-       </property>
+      <widget class="QLabel" name="label_4">
        <property name="text">
         <string>TextLabel</string>
        </property>

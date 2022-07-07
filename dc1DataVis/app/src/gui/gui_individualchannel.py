@@ -9,7 +9,9 @@ import pyqtgraph as pg
 import time
 
 # TODO:
-# 1. computation plan for non-trace plots
+# 1. computation plan for non-trace plots (merging multiple)
+# 2. profiling data
+# 3. additional info
 
 class IndividualChannelInformation(QWidget):
 
@@ -17,6 +19,7 @@ class IndividualChannelInformation(QWidget):
     current_elec = 0
     current_row = 0
     current_col = 0
+    has_data = None
     electrode_times = []
     electrode_data = []
 
@@ -33,12 +36,6 @@ class IndividualChannelInformation(QWidget):
         self.chan_charts = {'ChannelTracePlot': None , 'SpikeRateHistPlot': None,
                             'AmplitudeHistPlot': None, 'SpikeRatePlot': None}
 
-        #self.chan_charts_update_mapping = {'ChannelTracePlot': self.updateChannelTrace(), 'SpikeRateHistPlot': self.updateSpikeRateHist(),
-                                           #'AmplitudeHistPlotPlot': self.updateAmplitudeHist(), 'SpikeRatePlot': self.updateSpikeRate()}
-
-
-
-
     def setSessionParent(self, session_parent):
         self.session_parent = session_parent
         self.setupCharts()
@@ -51,11 +48,7 @@ class IndividualChannelInformation(QWidget):
         self.SpikeRateHistPlot.setBackground('w')
 
         self.ChannelTracePlot.setBackground('w')
-
-
-        #self.ElectrodeTraceZoomed
-        #self.ElectrodeTraceAll
-        self.LabelElectrodeInfo
+        #self.LabelElectrodeInfo
 
 # TODO: print profiling data?
 
@@ -67,42 +60,35 @@ class IndividualChannelInformation(QWidget):
         self.updateSpikeRate()
         self.updateChannelTrace()
         self.updateSpikeRateHist()
+        self.totalSamples.setText("Total number of samples: " + str(len(self.electrode_data)))
+
 
     # TODO: need to figure out how to combine multiple recordings for single electrode
     def updateElectrodeData(self):
+        match = False
         len_filtered_data = len(self.session_parent.LoadedData.filtered_data)
         for i in range(len_filtered_data):
-            if self.session_parent.LoadedData.filtered_data[len_filtered_data-(i+1)]['channel_idx'] == self.current_elec:
-                self.electrode_times = self.session_parent.LoadedData.filtered_data[len_filtered_data-(i+1)]['times']
-                self.electrode_data = self.session_parent.LoadedData.filtered_data[len_filtered_data-(i+1)]['data']
-                break
-            elif len_filtered_data == (i+1):
-                print("No data from this electrode yet")
-                self.electrode_times = [0,0,0]
-                self.electrode_data = [0,0,0]
+            if self.session_parent.LoadedData.filtered_data[i]['channel_idx'] == self.current_elec:
+                self.electrode_times = self.session_parent.LoadedData.filtered_data[i]['times']
+                self.electrode_data = self.session_parent.LoadedData.filtered_data[i]['data']
+                match = True
+                print(self.electrode_data)
+        if not match:
+            print("No data from this electrode yet")
+            self.electrode_times = [0,0,0]
+            self.electrode_data = [0,0,0]
 
     def updateAmplitudeHist(self):
         vals = self.electrode_data
-        vals = vals[np.nonzero(vals)]
+        #vals = vals[np.nonzero(vals)]
         # get nonzero vals because zeros have not had noise calculation done yet
         self.AmplitudeHistPlot.clear()
-
         y, x = np.histogram(vals, bins=np.linspace(0, 20, 40))
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         self.AmplitudeHistPlot.addItem(curve)
 
-
     def updateSpikeRateHist(self):
-        self.SpikeRateHistPlot.clear()
-        # vals = self.session_parent.LoadedData.array_stats['spike_std'][self.current_row][self.current_col]
-        # vals = vals[np.nonzero(vals)]
-        # # TODO: is this necessary ?
-        #
-        # y, x = np.histogram(vals, bins=np.linspace(0, 20, 40))
-        # curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
-        #
-        # self.SpikeRateHistPlot.addItem(curve)
-
+        pass
     def updateSpikeRate(self):
         pass
     def updateChannelTrace(self):
@@ -125,7 +111,7 @@ class IndividualChannelInformation(QWidget):
                 self.current_row, self.current_col = self.idx2map(self.current_elec)
                 self.InputElectrodeRow.setText(str(self.current_row))
                 self.InputElectrodeCol.setText(str(self.current_col))
-                self.updateElectrodeInfo()
+                self.update()
             else:
                 pass
                 self.InputElectrodeNumber.setText(str(self.current_elec))
@@ -157,14 +143,8 @@ class IndividualChannelInformation(QWidget):
             if 0 <= col < 32 and col != self.current_col:
                 self.current_col = col
             self.current_elec = self.map2idx(self.current_row, self.current_col)
-            self.updateElectrodeInfo()
+            self.update()
         self.InputElectrodeNumber.setText(str(self.current_elec))
-
-    def updateElectrodeInfo(self):
-        self.LabelElectrodeInfo.setText(">>> ELEC #" + str(int(self.current_elec)) +
-                                        " | R" + str(int(self.current_row)) +
-                                        " C" + str(int(self.current_col)) + " <<<")
-        self.update()
 
     def map2idx(self, ch_row: int, ch_col: int) -> object:
         """ Given a channel's row and col, return channel's index
