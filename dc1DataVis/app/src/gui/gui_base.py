@@ -125,7 +125,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.charts["nextButton"] = self.Next
             self.charts["atTimeWindowButton"] = self.atTimeWindowButton
 
-            self.charts["spikeTraces"] = [[], [], [], [], [], []]
+            self.charts["spikeTraces"] = [[], [], [], [], [], []] #TODO: this appears to be unused?
             for i in range(1, 7):
                 for j in range(1, 7):
                     chart_name = "r" + str(i) + "c" + str(j)
@@ -230,7 +230,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         new_window.label = QLabel("Individual Channel Analysis")
         new_window.setSessionParent(self)
         new_window.show()
-        #new_window.exec()
         self.external_windows.append(new_window)
 
     def viewChannelListInformation(self):
@@ -241,7 +240,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
         new_window.show()
-        #new_window.exec()
         self.external_windows.append(new_window)
 
     def viewGUIPreferences(self):
@@ -638,7 +636,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         # Generate subplots
         for m, plt in enumerate(trace_plots):
-            chan_idx = len_data + (m-4)
+            chan_idx = len_data + (m-4) # TODO : should 4 be a variable here?
             x = self.LoadedData.filtered_data[chan_idx]['times']
             y = self.LoadedData.filtered_data[chan_idx]['data']
             plt.clear()
@@ -648,9 +646,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             plt.setAutoVisible(y=True)
 
 
-# TODO: fix swap on next two funcs
-    def updateSpikeRatePlot(self):
-        self.charts["spikeRatePlot"].clear()
+    def updateNoiseHistogramPlot(self):
+        self.charts["noiseHistogram"].clear()
         vals = self.LoadedData.array_stats['noise_std']
         vals = vals[np.nonzero(vals)]
         # get nonzero vals because zeros have not had noise calculation done yet
@@ -659,8 +656,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0,0,255,80))
         self.charts["spikeRatePlot"].addItem(curve)
 
-    def updateNoiseHistogramPlot(self):
-        self.charts["noiseHistogram"].clear()
+    def updateSpikeRatePlot(self):
+        self.charts["spikeRatePlot"].clear()
         if self.LoadedData is not None:
             avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
             x = np.cumsum(avg_spike_rate_times)

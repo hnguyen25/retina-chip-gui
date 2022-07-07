@@ -255,6 +255,7 @@ class DC1DataContainer():
         cnt_div = pre_cnt + incom_cnt
         cnt_div[cnt_div == 0] = np.nan
 
+        # Update noise mean, std using previous values and new values
         self.array_stats["noise_mean"] = np.nan_to_num((pre_cnt * pre_mean + incom_cnt * incom_mean) / (cnt_div), nan=0)
         self.array_stats["noise_std"] = np.sqrt(
             np.nan_to_num((pre_cnt * (pre_std ** 2 + (pre_mean - self.array_stats["noise_mean"]) ** 2) + incom_cnt * (
@@ -275,7 +276,7 @@ class DC1DataContainer():
         incom_spike_std = np.zeros((32, 32))
         mask2 = np.copy(data_real)
 
-        # TODO LITKE SPIKE COUNT START HERE
+        #TODO:  LITKE SPIKE COUNT START HERE
         for x in range(len(chan_ind)):
             # self.array_stats["noise_std"] = self.array_stats["noise_std"]
             row = chan_elec[x, 0]
@@ -283,6 +284,7 @@ class DC1DataContainer():
             above_threshold = self.array_stats["noise_mean"][row, col] + \
                               self.data_processing_settings["spikeThreshold"] * self.array_stats["noise_std"][row, col]
             above_threshold_activity = (mask[row, col, :] >= above_threshold)
+
             incom_spike_cnt[row, col] = np.count_nonzero(above_threshold_activity)
             mask2[row, col, mask2[row, col, :] <= above_threshold] = np.nan
         self.array_stats["incom_spike_cnt"] = incom_spike_cnt
