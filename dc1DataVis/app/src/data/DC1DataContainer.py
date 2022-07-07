@@ -2,6 +2,7 @@ import numpy as np
 import time
 from ..data.preprocessing import *
 from ..data.filters import *
+import warnings
 
 class DC1DataContainer():
     """
@@ -220,24 +221,21 @@ class DC1DataContainer():
                 len_filtered_data += 1
 
     def update_array_stats(self, data_real, N):
-        """
-
-        Args:
-            data_real:
-            N:
-
-        Returns:
-        """
-
-        # AX1,AX3,AX4) Sample Counting (Note: Appends are an artifact from previous real time codes)
-        self.array_stats['num_sam'][:, :, 0] = np.count_nonzero(data_real, axis=2)
-        incom_cnt = self.array_stats['num_sam'][:, :, 0]
-
         # AX1,AX3,AX4) Finding average ADC of samples per electrode
         mask = np.copy(data_real)
         mask[mask == 0] = np.nan
 
-        import warnings
+        incom_cnt, incom_mean, incom_std = self.calculate_incoming_noise_statistics(data_real, mask)
+        self.update_array_noise_statistics(incom_cnt, incom_mean, incom_std)
+
+        incom_spike_cnt, incom_spike_avg, incom_spike_std = self.calculate_incoming_spike_statistics(data_real, mask)
+        self.update_spike_statistics(incom_spike_cnt, incom_spike_avg, incom_spike_std, N)
+
+    def calculate_incoming_noise_statistics(self, data_real, mask):
+        # AX1,AX3,AX4) Sample Counting (Note: Appends are an artifact from previous real time codes)
+        self.array_stats['num_sam'][:, :, 0] = np.count_nonzero(data_real, axis=2)
+        incom_cnt = self.array_stats['num_sam'][:, :, 0]
+
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             self.array_stats['avg_val'][:, :, 0] = np.nanmean(mask, axis=2)
@@ -247,7 +245,9 @@ class DC1DataContainer():
         # AX3,AX4) Finding standard deviation ADC of samples per electrode
         incom_std = np.nanstd(mask, axis=2)
         incom_std = np.nan_to_num(incom_std, nan=0)
+        return incom_cnt, incom_mean, incom_std
 
+    def update_array_noise_statistics(self, incom_cnt, incom_mean, incom_std):
         # AX3,AX4) Building standard deviation of samples per electrode as buffers come in
         pre_mean = np.copy(self.array_stats["noise_mean"])
         pre_std = np.copy(self.array_stats["noise_std"])
@@ -256,10 +256,12 @@ class DC1DataContainer():
         cnt_div[cnt_div == 0] = np.nan
 
         self.array_stats["noise_mean"] = np.nan_to_num((pre_cnt * pre_mean + incom_cnt * incom_mean) / (cnt_div), nan=0)
-        self.array_stats["noise_std"] = np.sqrt(np.nan_to_num((pre_cnt * (pre_std ** 2 + (pre_mean - self.array_stats["noise_mean"]) ** 2) + incom_cnt * (
+        self.array_stats["noise_std"] = np.sqrt(
+            np.nan_to_num((pre_cnt * (pre_std ** 2 + (pre_mean - self.array_stats["noise_mean"]) ** 2) + incom_cnt * (
                     incom_std ** 2 + (incom_mean - self.array_stats["noise_mean"]) ** 2)) / (cnt_div), nan=0))
         self.array_stats["noise_cnt"] = np.nan_to_num(pre_cnt + incom_cnt, nan=0)
 
+    def calculate_incoming_spike_statistics(self, data_real, mask):
         # NEW AX1)
         chan_cnt = np.count_nonzero(self.array_stats['num_sam'])
         chan_elec = np.zeros((chan_cnt, 2))
@@ -281,21 +283,20 @@ class DC1DataContainer():
             above_threshold = self.array_stats["noise_mean"][row, col] + \
                               self.data_processing_settings["spikeThreshold"] * self.array_stats["noise_std"][row, col]
             above_threshold_activity = (mask[row, col, :] >= above_threshold)
-            print('x', x, '\nabove_threshold', above_threshold_activity, '\nshape', above_threshold_activity.shape)
             incom_spike_cnt[row, col] = np.count_nonzero(above_threshold_activity)
             mask2[row, col, mask2[row, col, :] <= above_threshold] = np.nan
-            print('incom_spike_cnt', incom_spike_cnt[row, col])
         self.array_stats["incom_spike_cnt"] = incom_spike_cnt
 
-        #self.array_stats["incom_spike_times"] = incom_spike_times
-
+        # self.array_stats["incom_spike_times"] = incom_spike_times
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
             incom_spike_avg = np.nanmean(mask2, axis=2)
             incom_spike_avg = np.nan_to_num(incom_spike_avg, nan=0)
             incom_spike_std = np.nanstd(mask2, axis=2)
             incom_spike_std = np.nan_to_num(incom_spike_std, nan=0)
+        return incom_spike_cnt, incom_spike_avg, incom_spike_std
 
+    def update_spike_statistics(self, incom_spike_cnt, incom_spike_avg, incom_spike_std, N):
         pre_spike_avg = np.copy(self.array_stats["spike_avg"])
         pre_spike_std = np.copy(self.array_stats["spike_std"])
         pre_spike_cnt = np.copy(self.array_stats["spike_cnt"])
@@ -303,27 +304,25 @@ class DC1DataContainer():
         new_spike_cnt = pre_spike_cnt + incom_spike_cnt
         new_spike_cnt[new_spike_cnt == 0] = np.nan
 
-        self.array_stats["spike_avg"] = np.nan_to_num((pre_spike_cnt * pre_spike_avg + incom_spike_cnt * incom_spike_avg) / (new_spike_cnt),
-                                  nan=0)
+        self.array_stats["spike_avg"] = np.nan_to_num(
+            (pre_spike_cnt * pre_spike_avg + incom_spike_cnt * incom_spike_avg) / (new_spike_cnt),
+            nan=0)
         self.array_stats["spike_std"] = np.sqrt(np.nan_to_num((pre_spike_cnt * (
-                    pre_spike_std ** 2 + (pre_spike_avg - self.array_stats["spike_avg"]) ** 2) + incom_spike_cnt * (
-                                                       incom_spike_std ** 2 + (incom_spike_avg - self.array_stats["spike_avg"]) ** 2)) / (
-                                              new_spike_cnt), nan=0))
+                pre_spike_std ** 2 + (pre_spike_avg - self.array_stats["spike_avg"]) ** 2) + incom_spike_cnt * (
+                                                                       incom_spike_std ** 2 + (
+                                                                       incom_spike_avg - self.array_stats[
+                                                                   "spike_avg"]) ** 2)) / (
+                                                                  new_spike_cnt), nan=0))
         self.array_stats["spike_cnt"] = np.nan_to_num(new_spike_cnt, nan=0)
 
         # AX2) Determine the Time of Each Sample
         total_time = N * 0.05  # Sampling rate 1/0.05 ms
         self.array_stats["times"] = np.linspace(0, total_time, N)
 
-        self.array_stats["array spike rate times"].append(total_time/1000)
+        self.array_stats["array spike rate times"].append(total_time / 1000)
         self.array_stats["array spike rate"].append(np.sum(incom_spike_avg))
-        #print("avg spike rate:", self.array_stats["array spike rate"])
-        #print("spike rate times: ", self.array_stats["times"])
+        # print("avg spike rate:", self.array_stats["array spike rate"])
+        # print("spike rate times: ", self.array_stats["times"])
 
-    def calculate_incoming_data_statistics(self):
-        pass
-
-    def update_overall_data_statistics(self):
-        pass
-
+        return incom_spike_cnt, incom_spike_avg, incom_spike_std
 
