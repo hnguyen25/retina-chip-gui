@@ -9,9 +9,8 @@ import pyqtgraph as pg
 import time
 
 # TODO:
-# 1. computation plan for non-trace plots (merging multiple)
-# 2. profiling data
-# 3. additional info
+# 1. Spikes and spike rate
+# 2. Channel noise over time?
 
 class IndividualChannelInformation(QWidget):
 
@@ -63,6 +62,7 @@ class IndividualChannelInformation(QWidget):
         self.timeRecorded.setText("Total time recording electrode: "
                                   + str(round((len(self.electrode_data)) * 0.05,2))
                                   + "ms")
+        #print(str(self.session_parent.LoadedData.array_stats["spike_cnt"][self.current_row][self.current_col]))
 
     def updateElectrodeData(self):
         match = False
@@ -140,9 +140,16 @@ class IndividualChannelInformation(QWidget):
 
             if 0 <= row < 32 and row != self.current_row:
                 self.current_row = row
+            else:
+                pass
+                self.InputElectrodeRow.setText(str(self.current_row))
 
             if 0 <= col < 32 and col != self.current_col:
                 self.current_col = col
+            else:
+                pass
+                self.InputElectrodeCol.setText(str(self.current_col))
+
             self.current_elec = self.map2idx(self.current_row, self.current_col)
             self.update()
         self.InputElectrodeNumber.setText(str(self.current_elec))
