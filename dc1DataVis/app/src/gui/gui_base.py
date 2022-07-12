@@ -17,6 +17,7 @@ import sys, os
 from ..data.data_loading import *
 from ..data.preprocessing import *
 from ..data.filters import *
+from ..data.spikeDetection import *
 from ..data.DC1DataContainer import *
 from ..analysis.PyqtGraphParams import *
 from ..gui.worker import *  # multithreading

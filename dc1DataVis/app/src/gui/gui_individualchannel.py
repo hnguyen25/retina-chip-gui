@@ -7,6 +7,7 @@ import os
 import numpy as np
 import pyqtgraph as pg
 import time
+from ..data.spikeDetection import *
 
 # TODO:
 # 1. Spikes and spike rate
@@ -63,7 +64,7 @@ class IndividualChannelInformation(QWidget):
         self.timeRecorded.setText("Total time recording electrode: "
                                   + str(round((len(self.electrode_data)) * 0.05,2))
                                   + "ms")
-        print(str(self.session_parent.LoadedData.array_stats["spike_cnt"][self.current_row][self.current_col]))
+        #print(str(self.session_parent.LoadedData.array_stats["spike_cnt"][self.current_row][self.current_col]))
 
     def updateElectrodeData(self):
         match = False
@@ -92,7 +93,18 @@ class IndividualChannelInformation(QWidget):
     def updateSpikeRateHist(self):
         pass
     def updateSpikeRate(self):
-        pass
+        self.SpikeRatePlot.clear()
+        recordedTime = len(self.electrode_data)*0.05
+        findSpikesGMM(self.electrode_data,self.current_elec, debug = False)
+
+        # x = self.electrode_times
+        # y = self.session_parent.LoadedData.array_stats["spike_cnt"][self.current_row][self.current_col]/recordedTime
+        # print("x len: " + str(len(x)))
+        # print("y len: " + str(len(y)))
+        # line_plot = self.SpikeRatePlot.plot(x,y,pen='b', symbol='o', symbolPen='b',
+        #                      symbolBrush=0.2)
+
+
     def updateChannelTrace(self):
         self.ChannelTracePlot.clear()
         self.ChannelTracePlot.plot(self.electrode_times, self.electrode_data, pen='b')

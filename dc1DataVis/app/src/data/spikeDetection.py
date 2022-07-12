@@ -75,7 +75,7 @@ def findSpikesGMM(electrode_data, channel_idx, debug = False):
               "| spike std: " + str(spikeStdGMM) +
               "| noise mean: " + str(noiseMeanGMM) +
               "| noise std: " + str(noiseStdGMM))
-        
+
     return spikeMeanGMM, spikeStdGMM, noiseMeanGMM, noiseStdGMM
 
 
