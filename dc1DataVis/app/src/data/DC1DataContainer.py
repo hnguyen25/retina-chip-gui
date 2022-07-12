@@ -204,8 +204,8 @@ class DC1DataContainer():
         # TODO this shouldn't call update_filtered_data -> should be async, and threaded
 
     def calculate_realtime_spike_info_for_channel_in_buffer(self, channel_data):
-        print('real time spike info calculations')
-        print('channel idx', channel_data['channel_idx'])
+        #print('real time spike info calculations')
+        #print('channel idx', channel_data['channel_idx'])
 
         row, col = idx2map(channel_data['channel_idx'])
 
@@ -214,9 +214,9 @@ class DC1DataContainer():
         noise_std = self.array_stats["noise_std"][row, col] # TODO put this in a loop after array_stats
         above_threshold = noise_mean + self.data_processing_settings["spikeThreshold"] * noise_std
         above_threshold_activity = (channel_data['data'] >= above_threshold)
-        print('above_threshold', above_threshold)
-        print('above_threshold_activity', above_threshold_activity)
-        print('m', noise_mean, 's', noise_std)
+        #print('above_threshold', above_threshold)
+        #print('above_threshold_activity', above_threshold_activity)
+        #print('m', noise_mean, 's', noise_std)
         incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
 
         incom_spike_times = channel_data['times'][incom_spike_idx]
