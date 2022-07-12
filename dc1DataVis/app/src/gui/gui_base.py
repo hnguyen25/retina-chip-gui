@@ -49,6 +49,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     p = None
     center_row, center_col = 16, 16  # center of the minimap, this can be set by user on mouse click on the array map
     arrayMap_colorbar = None  # reference to the colorbar embedded with the array map chart
+    arrayMapHoverCoords = None
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -176,11 +177,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         int_x = int(x)
         int_y = int(y)
 
+        self.arrayMapHoverCoords = (int_x, int_y)
+
+        '''
         if -1 <= int_x < 31 and 0 <= int_y < 32:
-            self.statusBar().showMessage(
-                "Array Map Spike Average @ " + str(int_y) + ", " + str(int_x) +
-                ": " + str(self.LoadedData.array_stats['spike_cnt'][int_y][int_x + 1])
-            )
+            spike_cnt = self.LoadedData.array_stats['spike_cnt'][int_y][int_x + 1]
+
+            tooltip_text = "Electrode Channel # " + "(Row: ", str(int_y), ", Col: ", str(int_x) + ")\n" + \
+                "Spike Count: " + str(spike_cnt) + "\n" + \
+                "Spike Amplitude: " + "[INSERT HERE]"
+
+            self.charts["arrayMap"].setTooltip(tooltip_text)
+
+
+            #self.statusBar().showMessage(
+            #    "Array Map Spike Average @ " + str(int_y) + ", " + str(int_x) +
+            #    ": " + str(self.LoadedData.array_stats['spike_cnt'][int_y][int_x + 1])
+        '''
 
     def setMiniMapLoc(self, x, y):
         """ Given an x, y coord as clicked on from the array map,
@@ -503,6 +516,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     def updateArrayMapPlot(self):
         self.charts["arrayMap"].clear()
+
+        x, y = self.arrayMapHoverCoords
+        print('x,y', x, y)
+        if -1 <= x < 31 and 0 <= y < 32:
+            print('inside!')
+            import math
+            spike_cnt = self.LoadedData.array_stats['spike_cnt'][y][x + 1]
+            spike_amp = self.LoadedData.array_stats['spike_avg'][y][x + 1]
+            channel_idx = map2idx(x, y)
+
+            tooltip_text = "<html>" + "Electrode Channel #" + str(channel_idx) + "<br>" + \
+                           "Row " + str(y) + ", Column " + str(x) + ")<br>" + \
+                           "Spike Count: " + str(round(spike_cnt)) + "<br>" + \
+                           "Spike Amplitude: " + str(round(spike_amp, 3)) + "<\html>"
+
+            self.charts["arrayMap"].setToolTip(str(tooltip_text))
+
         if self.first_time_plotting is False:
             colors = self.LoadedData.array_stats['spike_avg']
             data = colors.T  # for old pixel-based data
@@ -668,7 +698,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     def updateMiniMapPlot(self):
         self.charts["miniMap"].clear()
-        print('update minimap plot:', self.center_row, self.center_col)
+
         for row in range(self.center_row-4, self.center_row+4):
             for col in range(self.center_col-2, self.center_col+2):
                 #print('r', row, 'c', col)
@@ -686,7 +716,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 if self.LoadedData.array_stats["incom_spike_cnt"][col, row] > 0:
                     print('yes CR', 'r', row, 'col', col, 'spike cnt', self.LoadedData.array_stats["incom_spike_cnt"][col, row])
 
-
+                self.charts["miniMap"].addItem(spike_indicator_base)
+                self.charts["miniMap"].addItem(spike_indicator_text)
                 '''
                 #times = [0, 1, 3, 5, 10, 11, 14]
                 if np.random.random() > 0.5:
@@ -701,3 +732,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 self.charts["miniMap"].addItem(spike_indicator_base)
                 self.charts["miniMap"].addItem(spike_indicator_text)
                 '''
+        LAST_N_BUFFER_DATA = 50
+        to_search = self.LoadedData.preprocessed_data[-LAST_N_BUFFER_DATA:]
+        spikes_within_view = []
+        for data_packet in to_search:
+            chan_idx = data_packet['channel_idx']
+            r, c = idx2map(chan_idx)
+            if (self.center_row - 4 <= r) & (r < self.center_row + 4) & \
+                    (self.center_col - 2 <= c) & (c < self.center_row + 2):
+                spikes_within_view.append(data_packet)
+
+        for data_packet in spikes_within_view:
+            chan_idx = data_packet['channel_idx']
+            row, col = idx2map(chan_idx)
+            spikeBins = data_packet['spikeBins']
+            spikeBinsMaxAmp = data_packet['spikeBinsMaxAmp']
+
+            spikeLocs = np.argwhere(spikeBins == True)
+            for i in spikeLocs:
+                spike_indicator = pg.QtGui.QGraphicsRectItem(row * 5 + i / 5, col * 5, 0.1, spikeBinsMaxAmp/100)
+                spike_indicator.setPen(pg.mkPen((0, 0, 0, 100)))
+                spike_indicator.setBrush(pg.mkBrush((50, 50, 200)))
+                spike_indicator.setParentItem(spike_indicator_base)
+                self.charts["miniMap"].addItem(spike_indicator)
