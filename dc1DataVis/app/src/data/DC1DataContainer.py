@@ -28,7 +28,7 @@ class DC1DataContainer():
     # data processing settings
     data_processing_settings = {
         "filter": None, # for use in filtered_data, see full list in filters.py
-        "spikeThreshold": 3  # How many standard deviations above noise to find spikes
+        "spikeThreshold": 5  # How many standard deviations above noise to find spikes
     }
 
     # metadata information
@@ -149,7 +149,8 @@ class DC1DataContainer():
         self.DATA_CONTAINER_MAX_SAMPLES *= 2
 
     def append_raw_data(self, data_real, cnt_real, N, sampling_period=0.05):
-        """ appends raw data in buffer to end of data container, append nonzero data to recorded_data
+        """
+        appends raw data in buffer to end of data container, append nonzero data to recorded_data
 
         Args:
             data_real:
@@ -284,6 +285,17 @@ class DC1DataContainer():
             above_threshold = self.array_stats["noise_mean"][row, col] + \
                               self.data_processing_settings["spikeThreshold"] * self.array_stats["noise_std"][row, col]
             above_threshold_activity = (mask[row, col, :] >= above_threshold)
+
+
+            above_threshold_activity[0] = False # often true just bc of filtering artifact and not spiking, so just set to zero
+
+            incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
+            incom_spike_amplitude = data_real[row,col][incom_spike_idx]
+
+            print('mask', mask)
+            print('spike times', incom_spike_idx, 'incom_spike_amp', incom_spike_amplitude)
+            print("")
+
 
             incom_spike_cnt[row, col] = np.count_nonzero(above_threshold_activity)
             mask2[row, col, mask2[row, col, :] <= above_threshold] = np.nan
