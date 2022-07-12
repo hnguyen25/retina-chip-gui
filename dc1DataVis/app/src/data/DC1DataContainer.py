@@ -28,7 +28,8 @@ class DC1DataContainer():
     # data processing settings
     data_processing_settings = {
         "filter": None, # for use in filtered_data, see full list in filters.py
-        "spikeThreshold": 5  # How many standard deviations above noise to find spikes
+        "spikeThreshold": 5,  # How many standard deviations above noise to find spikes
+        "binSize": 0.05
     }
 
     # metadata information
@@ -170,7 +171,7 @@ class DC1DataContainer():
         # Determine time estimate and sample counts for the total combined buffers
         # ===============================
         # (note this does not take into account communication delays - hence an estimate)
-        end_time = N * sampling_period  # 20kHz sampling rate, means time_recording (ms) = num_sam*0.05ms
+        end_time = N * sampling_period  # 20kHz sampling rate, means time_recording (ms) = num_sam * 0.05ms
 
         # For the first buffer, we assume the first sample comes in at time 0
         if self.time_track == 0:
@@ -194,11 +195,72 @@ class DC1DataContainer():
                 'data': data_real[x, y, start_idx:N], # TODO make this accurate
                 'times': self.times[self.count_track + start_idx:self.count_track+N]
             }
+            channel_data = self.calculate_realtime_spike_info_for_channel_in_buffer(channel_data)
             self.preprocessed_data.append(channel_data)
+
         self.time_track += end_time
         self.count_track += N
 
         # TODO this shouldn't call update_filtered_data -> should be async, and threaded
+
+    def calculate_realtime_spike_info_for_channel_in_buffer(self, channel_data):
+        print('real time spike info calculations')
+        print('channel idx', channel_data['channel_idx'])
+
+        row, col = idx2map(channel_data['channel_idx'])
+
+        # TODO switch to GMM noise mean and std
+        noise_mean = self.array_stats["noise_mean"][row, col]
+        noise_std = self.array_stats["noise_std"][row, col] # TODO put this in a loop after array_stats
+        above_threshold = noise_mean + self.data_processing_settings["spikeThreshold"] * noise_std
+        above_threshold_activity = (channel_data['data'] >= above_threshold)
+        print('above_threshold', above_threshold)
+        print('above_threshold_activity', above_threshold_activity)
+        print('m', noise_mean, 's', noise_std)
+        incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
+
+        incom_spike_times = channel_data['times'][incom_spike_idx]
+        incom_spike_amplitude = channel_data['data'][incom_spike_idx]
+
+        channel_data["incom_spike_times"] = incom_spike_times
+        channel_data["incom_spike_amp"] = incom_spike_amplitude
+
+        # TODO vectorize binning, this is not the most efficient way of doing this
+        import math
+
+        start_time = channel_data['times'][0]
+        end_time = channel_data['times'][-1]
+        buf_recording_len = end_time - start_time
+        binSize = self.data_processing_settings["binSize"]
+        channel_data["num_bins_in_buffer"] = math.floor(buf_recording_len / binSize)
+
+        # initialize an array of spike bins, with no spikes detected
+        channel_data["spikeBins"] = np.zeros(channel_data["num_bins_in_buffer"], dtype=bool)
+        channel_data["spikeBinsMaxAmp"] = np.zeros(channel_data["num_bins_in_buffer"], dtype=float)
+
+        for bin in range(int(buf_recording_len / binSize)):
+            bin_start = start_time + bin * binSize
+            bin_end = start_time + (bin + 1) * binSize
+
+            spikes_within_bin = (bin_start <= channel_data["incom_spike_times"]) & (channel_data["incom_spike_times"] < bin_end)
+
+            if np.count_nonzero(spikes_within_bin) != 0:
+                channel_data["spikeBins"][bin] = True
+                spiking_amps = channel_data['incom_spike_amp'][spikes_within_bin]
+                channel_data["spikeBinsMaxAmp"][bin] = np.max(spiking_amps)
+
+        return channel_data
+
+
+        #above_threshold_activity[0] = False  # often true just bc of filtering artifact and not spiking, so just set to zero
+
+
+
+
+
+
+
+
 
     def update_filtered_data(self, num_threads=4, filtType='modHierlemann'):
         # subtract recorded_data by filtered_data
@@ -218,19 +280,22 @@ class DC1DataContainer():
                     'data': filtered_data,  # TODO make this accurate
                     'times': self.preprocessed_data[to_filter_idx]['times']
                 }
+
                 self.filtered_data.append(filtered_data)
                 len_filtered_data += 1
 
     def update_array_stats(self, data_real, N):
         # AX1,AX3,AX4) Finding average ADC of samples per electrode
+
+        # only some of the channels are actually recording, check for all which are false
         mask = np.copy(data_real)
         mask[mask == 0] = np.nan
 
         incom_cnt, incom_mean, incom_std = self.calculate_incoming_noise_statistics(data_real, mask)
         self.update_array_noise_statistics(incom_cnt, incom_mean, incom_std)
 
-        incom_spike_cnt, incom_spike_avg, incom_spike_std = self.calculate_incoming_spike_statistics(data_real, mask)
-        self.update_spike_statistics(incom_spike_cnt, incom_spike_avg, incom_spike_std, N)
+        incom_spike_cnt, incom_spike_avg, incom_spike_std = self.calculate_incoming_array_spike_statistics(data_real, mask)
+        self.update_array_spike_statistics(incom_spike_cnt, incom_spike_avg, incom_spike_std, N)
 
     def calculate_incoming_noise_statistics(self, data_real, mask):
         # AX1,AX3,AX4) Sample Counting (Note: Appends are an artifact from previous real time codes)
@@ -263,8 +328,9 @@ class DC1DataContainer():
                     incom_std ** 2 + (incom_mean - self.array_stats["noise_mean"]) ** 2)) / (cnt_div), nan=0))
         self.array_stats["noise_cnt"] = np.nan_to_num(pre_cnt + incom_cnt, nan=0)
 
-    def calculate_incoming_spike_statistics(self, data_real, mask):
-        # NEW AX1)
+    def calculate_incoming_array_spike_statistics(self, data_real, mask):
+
+
         chan_cnt = np.count_nonzero(self.array_stats['num_sam'])
         chan_elec = np.zeros((chan_cnt, 2))
         chan_ind = np.argsort(self.array_stats['num_sam'].flatten())[-chan_cnt:]
@@ -277,28 +343,17 @@ class DC1DataContainer():
         incom_spike_std = np.zeros((32, 32))
         mask2 = np.copy(data_real)
 
-        #TODO:  LITKE SPIKE COUNT START HERE
         for x in range(len(chan_ind)):
-            # self.array_stats["noise_std"] = self.array_stats["noise_std"]
             row = chan_elec[x, 0]
             col = chan_elec[x, 1]
             above_threshold = self.array_stats["noise_mean"][row, col] + \
                               self.data_processing_settings["spikeThreshold"] * self.array_stats["noise_std"][row, col]
             above_threshold_activity = (mask[row, col, :] >= above_threshold)
 
-
-            above_threshold_activity[0] = False # often true just bc of filtering artifact and not spiking, so just set to zero
-
-            incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
-            incom_spike_amplitude = data_real[row,col][incom_spike_idx]
-
-            print('mask', mask)
-            print('spike times', incom_spike_idx, 'incom_spike_amp', incom_spike_amplitude)
-            print("")
-
-
             incom_spike_cnt[row, col] = np.count_nonzero(above_threshold_activity)
             mask2[row, col, mask2[row, col, :] <= above_threshold] = np.nan
+
+
         self.array_stats["incom_spike_cnt"] = incom_spike_cnt
 
         # self.array_stats["incom_spike_times"] = incom_spike_times
@@ -310,7 +365,7 @@ class DC1DataContainer():
             incom_spike_std = np.nan_to_num(incom_spike_std, nan=0)
         return incom_spike_cnt, incom_spike_avg, incom_spike_std
 
-    def update_spike_statistics(self, incom_spike_cnt, incom_spike_avg, incom_spike_std, N):
+    def update_array_spike_statistics(self, incom_spike_cnt, incom_spike_avg, incom_spike_std, N):
         pre_spike_avg = np.copy(self.array_stats["spike_avg"])
         pre_spike_std = np.copy(self.array_stats["spike_std"])
         pre_spike_cnt = np.copy(self.array_stats["spike_cnt"])
@@ -335,8 +390,6 @@ class DC1DataContainer():
 
         self.array_stats["array spike rate times"].append(total_time / 1000)
         self.array_stats["array spike rate"].append(np.sum(incom_spike_avg))
-        # print("avg spike rate:", self.array_stats["array spike rate"])
-        # print("spike rate times: ", self.array_stats["times"])
 
         return incom_spike_cnt, incom_spike_avg, incom_spike_std
 

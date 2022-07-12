@@ -406,6 +406,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 data_real, cnt_real, N = removeMultipleCounts(dataRaw)
 
                 start = time.time()
+                self.LoadedData.update_array_stats(data_real, N)
+                end = time.time()
+                if self.mode_profiling:
+                    self.profile_data['calculateArrayStats'] = end - start
+
+                start = time.time()
                 self.LoadedData.append_raw_data(data_real, cnt_real, N)
                 end = time.time()
                 if self.mode_profiling:
@@ -417,11 +423,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 if self.mode_profiling:
                     self.profile_data['filterData'] = end - start
 
-                start = time.time()
-                self.LoadedData.update_array_stats(data_real, N)
-                end = time.time()
-                if self.mode_profiling:
-                    self.profile_data['calculateArrayStats'] = end - start
 
                 # we need to call the main GUI thread to update graphs (can't do with non GUI-thread)
                 gui_callback.emit()
@@ -504,7 +505,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.charts["arrayMap"].clear()
         if self.first_time_plotting is False:
             colors = self.LoadedData.array_stats['spike_avg']
-            data = colors.T # for old pixel-based data
+            data = colors.T  # for old pixel-based data
 
             max_dot = 100
             # AX1) Size by Number of Samples
@@ -686,9 +687,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     print('yes CR', 'r', row, 'col', col, 'spike cnt', self.LoadedData.array_stats["incom_spike_cnt"][col, row])
 
 
-
-
-                """
+                '''
                 #times = [0, 1, 3, 5, 10, 11, 14]
                 if np.random.random() > 0.5:
                     times = np.random.randint(0, 20, (3,), dtype='int64')
@@ -698,6 +697,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                         spike_indicator.setBrush(pg.mkBrush((50, 50, 200)))
                         spike_indicator.setParentItem(spike_indicator_base)
                         self.charts["miniMap"].addItem(spike_indicator)
-                """
+
                 self.charts["miniMap"].addItem(spike_indicator_base)
                 self.charts["miniMap"].addItem(spike_indicator_text)
+                '''
