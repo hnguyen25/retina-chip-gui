@@ -12,7 +12,6 @@ from ..data.spikeDetection import *
 # TODO:
 # 1. Spikes and spike rate
 # 2. Autoadjust trace plots
-# 3. Plot labels
 
 class IndividualChannelInformation(QWidget):
 
@@ -34,8 +33,9 @@ class IndividualChannelInformation(QWidget):
         self.updateElectrodeNum.clicked.connect(self.setElecNum)
         self.updateRC.clicked.connect(self.setRC)
 
-        self.chan_charts = {'ChannelTracePlot': None , 'SpikeRateHistPlot': None,
-                            'AmplitudeHistPlot': None, 'SpikeRatePlot': None}
+        self.chan_charts = {'ChannelTracePlot': None,
+                            'AmplitudeHistPlot': None,
+                            'SpikeRatePlot': None}
 
     def setSessionParent(self, session_parent):
         self.session_parent = session_parent
@@ -43,12 +43,18 @@ class IndividualChannelInformation(QWidget):
 
     def setupCharts(self):
         self.AmplitudeHistPlot.setBackground('w')
+        self.AmplitudeHistPlot.setLabel('left', 'Number of data points')
+        self.AmplitudeHistPlot.setLabel('bottom', 'Standard Deviations')
 
         self.SpikeRatePlot.setBackground('w')
+        self.SpikeRatePlot.setLabel('left', 'Spikes per second')
 
-        self.SpikeRateHistPlot.setBackground('w')
 
         self.ChannelTracePlot.setBackground('w')
+        self.ChannelTracePlot.setLabel('bottom','Time (sec)')
+        self.ChannelTracePlot.setLabel('left', 'Counts')
+        self.ChannelTracePlot.enableAutoRange
+
 
 # TODO: print profiling data?
 
@@ -59,7 +65,6 @@ class IndividualChannelInformation(QWidget):
         self.updateAmplitudeHist()
         self.updateSpikeRate()
         self.updateChannelTrace()
-        self.updateSpikeRateHist()
         self.totalSamples.setText("Total number of samples: " + str(len(self.electrode_data)))
         self.timeRecorded.setText("Total time recording electrode: "
                                   + str(round((len(self.electrode_data)) * 0.05,2))
@@ -83,6 +88,8 @@ class IndividualChannelInformation(QWidget):
 
     def updateAmplitudeHist(self):
         vals = self.electrode_data
+        std = np.std(vals)
+        vals = abs(vals/std)
         #vals = vals[np.nonzero(vals)]
         # get nonzero vals because zeros have not had noise calculation done yet
         self.AmplitudeHistPlot.clear()
@@ -90,8 +97,6 @@ class IndividualChannelInformation(QWidget):
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         self.AmplitudeHistPlot.addItem(curve)
 
-    def updateSpikeRateHist(self):
-        pass
     def updateSpikeRate(self):
         self.SpikeRatePlot.clear()
         recordedTime = len(self.electrode_data)*0.05
@@ -108,9 +113,9 @@ class IndividualChannelInformation(QWidget):
     def updateChannelTrace(self):
         self.ChannelTracePlot.clear()
         self.ChannelTracePlot.plot(self.electrode_times, self.electrode_data, pen='b')
-        self.ChannelTracePlot.setLabel('left', '#' + str(self.current_elec))
         self.ChannelTracePlot.enableAutoRange(axis='y')
         self.ChannelTracePlot.setAutoVisible(y=True)
+        self.ChannelTracePlot.setLabel('top', '#' + str(self.current_elec))
 
     def setRC(self):
         """ Set the row and column entries and textboxes given an electrode number.
