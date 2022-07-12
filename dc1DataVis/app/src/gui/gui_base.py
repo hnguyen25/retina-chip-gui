@@ -176,10 +176,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         int_x = int(x)
         int_y = int(y)
 
-        if -1 <= int_x < 31 and -1 <= int_y < 31:
+        if -1 <= int_x < 31 and 0 <= int_y < 32:
             self.statusBar().showMessage(
                 "Array Map Spike Average @ " + str(int_y) + ", " + str(int_x) +
-                ": " + str(self.LoadedData.array_stats['spike_avg'][int_y + 1][int_x + 1])
+                ": " + str(self.LoadedData.array_stats['spike_cnt'][int_y][int_x + 1])
             )
 
     def setMiniMapLoc(self, x, y):

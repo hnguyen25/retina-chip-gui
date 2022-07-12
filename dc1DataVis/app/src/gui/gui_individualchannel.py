@@ -10,7 +10,8 @@ import time
 
 # TODO:
 # 1. Spikes and spike rate
-# 2. Channel noise over time?
+# 2. Autoadjust trace plots
+# 3. Plot labels
 
 class IndividualChannelInformation(QWidget):
 
@@ -62,7 +63,7 @@ class IndividualChannelInformation(QWidget):
         self.timeRecorded.setText("Total time recording electrode: "
                                   + str(round((len(self.electrode_data)) * 0.05,2))
                                   + "ms")
-        #print(str(self.session_parent.LoadedData.array_stats["spike_cnt"][self.current_row][self.current_col]))
+        print(str(self.session_parent.LoadedData.array_stats["spike_cnt"][self.current_row][self.current_col]))
 
     def updateElectrodeData(self):
         match = False
