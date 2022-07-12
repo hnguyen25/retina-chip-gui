@@ -28,22 +28,25 @@ from ..gui.gui_charts_helper import *
 
 from sklearn.mixture import GaussianMixture
 
-
-spikeMeanGMM = 0
-noiseMeanGMM = 0
-spikeStdGMM = 0
-noiseStdGMM = 0
-
-def findSpikesGMM(filtered_data, chan_idx):
+def findSpikesGMM(electrode_data, channel_idx, debug = False):
     """
-    @param filtered_data: Data to apply GMM to
-    (self.LoadedData.filtered_data in gui_base.py)
+    @param electrode_data: Data to apply GMM to
+    (i.e. self.electrode_data in individual channels file)
+
     @param chan_idx: Index of electrode channel
+
+    @param debug: Prints data if True
+
     @return: spikeMeanGMM, spikeStdGMM, noiseMeanGMM, noiseStdGMM
     """
 
+    spikeMeanGMM = 0
+    noiseMeanGMM = 0
+    spikeStdGMM = 0
+    noiseStdGMM = 0
+
     # Get data and perform GM
-    y = filtered_data[chan_idx]['data']
+    y = electrode_data
     gmSam = np.reshape(y,(len(y),1))
     gm = GaussianMixture(n_components = 2).fit(gmSam)
 
@@ -66,7 +69,13 @@ def findSpikesGMM(filtered_data, chan_idx):
 
     spikeStdGMM = stanDevs[spikesIdx]
     noiseStdGMM = stanDevs[noiseIdx]
-
+    if debug:
+        print("Channel for GMM: " + str(channel_idx))
+        print("spike mean: "  + str(spikeMeanGMM) +
+              "| spike std: " + str(spikeStdGMM) +
+              "| noise mean: " + str(noiseMeanGMM) +
+              "| noise std: " + str(noiseStdGMM))
+        
     return spikeMeanGMM, spikeStdGMM, noiseMeanGMM, noiseStdGMM
 
 
