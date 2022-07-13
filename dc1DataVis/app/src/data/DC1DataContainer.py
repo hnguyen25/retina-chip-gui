@@ -215,7 +215,7 @@ class DC1DataContainer():
         channel_data["incom_spike_times"] = incom_spike_times
         channel_data["incom_spike_amp"] = incom_spike_amplitude
 
-        spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER = self.binSpikeTimes(channel_data, incom_spike_times, incom_spike_amplitude)
+        spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER = self.binSpikeTimes(channel_data['times'], incom_spike_times, incom_spike_amplitude)
         channel_data["spikeBins"] = spikeBins
         channel_data["spikeBinsMaxAmp"] = spikeBinsMaxAmp
         channel_data["num_bins_in_buffer"] = NUM_BINS_IN_BUFFER
