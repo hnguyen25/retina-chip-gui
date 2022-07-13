@@ -115,9 +115,9 @@ def setupSpikeTrace(list_of_plots):
     for plot in list_of_plots:
         plot.setLabel('left', '# ???')
         plot.getAxis('left').setTextPen(themes[CURRENT_THEME]['dark1'])
-        plot.getPlotItem().hideAxis('bottom')
-        #plot.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['dark1'])
-        #plot.setLabel('bottom', 'Time (s)')
+        #plot.getPlotItem().hideAxis('bottom')
+        plot.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['dark1'])
+        plot.setLabel('bottom', 'Time (ms)')
 
 
 def setupOneSpikeTrace(plot_widget):

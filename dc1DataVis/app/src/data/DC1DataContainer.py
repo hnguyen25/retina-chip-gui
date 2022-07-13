@@ -29,7 +29,7 @@ class DC1DataContainer():
     data_processing_settings = {
         "filter": None, # for use in filtered_data, see full list in filters.py
         "spikeThreshold": 5,  # How many standard deviations above noise to find spikes
-        "binSize": 1,
+        "binSize": 1, # 1ms
         "simultaneousChannelsRecordedPerPacket": 4
     }
 
@@ -222,8 +222,11 @@ class DC1DataContainer():
 
         return channel_data
 
-    def getAboveThresholdActivity(self, data, times, channel_noise_mean, channel_noise_std, spike_threshold):
-        above_threshold = channel_noise_mean + spike_threshold * channel_noise_std
+    def getAboveThresholdActivity(self, data, times, channel_noise_mean, channel_noise_std, spike_threshold, filtered=True):
+        if filtered:
+            above_threshold = 0 + spike_threshold * channel_noise_std # filtered data -> makes mean 0
+        else:
+            above_threshold = channel_noise_mean + spike_threshold * channel_noise_std
         above_threshold_activity = (data >= above_threshold)
         incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
 
@@ -240,6 +243,7 @@ class DC1DataContainer():
         binSize = self.data_processing_settings["binSize"]
         import math
         NUM_BINS_IN_BUFFER = math.floor(buf_recording_len / binSize)
+        print('buf_recording_len', buf_recording_len)
 
         # initialize an array of spike bins, with no spikes detected
         spikeBins = np.zeros(NUM_BINS_IN_BUFFER, dtype=bool)
@@ -258,13 +262,6 @@ class DC1DataContainer():
                 spikeBinsMaxAmp[bin_idx] = np.max(spiking_amps)
 
         return spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER
-
-
-
-
-
-
-
 
 
     def update_filtered_data(self, num_threads=4, filtType='modHierlemann'):

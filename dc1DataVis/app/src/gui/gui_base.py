@@ -6,7 +6,7 @@ Note: To regenerate gui_layout.py, in terminal do
 pyuic5 layout.ui -o gui_layout.py
 """
 import numpy as np
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5 import uic
 import pyqtgraph as pg
@@ -74,6 +74,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     chart_update_function_mapping = {}  # keys=names of charts, value=related functions to update respective charts
     external_windows = []  # reference to windows that have been generated outside of this MainWindow
     basedir = None  # base directory of where the program is loaded up, acquired from run.py script
+
+    # list of length DC1DataContainer.data_processing_settings["simultaneousChannelsRecordedPerPacket"] with data and
+    # information to plot every channel in the latest data packet processed
+    # list contains a dictionary for every channel, with keys
+    # 'x': all times in packet
+    # 'y': all electrode amp values in packets, correlated with x
+    # 'curr_x': times in current window shown directly in GUI
+    # 'curr_y': respective amplitude values of curr_x
+    # 'chan_idx': the channel idx being plotted
+    trace_channels_info = []
 
     ### MISCELLANEOUS ###
     p = None
@@ -173,7 +183,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                                                        self.setMiniMapLoc)
 
             self.charts["noiseHistogram"] = self.noiseHistogramPlot
-            setupNoiseHistogram(self.charts["noiseHistogram"])
+            setupNoiseHistogramPlot(self.charts["noiseHistogram"])
 
             self.charts["noiseMatrixPlot"] = self.noiseMatrixPlot
 
@@ -185,6 +195,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
         self.setupInteractivity()
+
+        # for continuously scanning through trace plot data
+        self.timer = QtCore.QTimer()
+        self.timer.setInterval(25)
+        self.timer.timeout.connect(self.continouslyUpdateTracePlotData)
+        self.timer.start()
 
         # just sets background to white TODO make this cleaner
         self.toggleDarkMode()
@@ -679,7 +695,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.charts["arrayMap"].addItem(scatter)  # adding scatter plot to the plot window
 
     def updateChannelTracePlot(self, trace_plots):
+        """
+        This function updates the data for the trace plots when a new packet arrives. The plots are updated even faster
+        through 'continuouslyUpdateTracePlots()', which scans through the packet slowly to visualize data as realtime.
+        Args:
+            trace_plots:
+
+        Returns:
+
+        """
+
+
         len_data = len(self.LoadedData.filtered_data)
+
+        self.trace_channels_info = []
         # Generate subplots
         for m, plt in enumerate(trace_plots):
             plt.clear()
@@ -698,10 +727,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             else:
                 plt.setYRange(- 3 * noise_std, 3 * noise_std, padding=0)
 
-            plt.plot(x, y, pen=pg.mkPen(themes[CURRENT_THEME]['blue1']))
-            plt.setLabel('left', '#' + str(self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']))
-            plt.getAxis("left").setTextPen(themes[CURRENT_THEME]['dark1'])
-
             begin_time = x[0]
             end_time = x[-1]
             tooltip_text = '<html>Trace signal of electrode #' + str(chan_idx) + \
@@ -710,7 +735,54 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                            '<\html>'
 
             plt.setToolTip(tooltip_text)
-            #plt.enableAutoRange(axis='y')
+
+            LEN_BUFFER = len(self.LoadedData.filtered_data[idx_of_channel_order]['data'])
+            NUM_TIME_IN_WINDOW = 2000
+            if NUM_TIME_IN_WINDOW > LEN_BUFFER:
+                NUM_TIME_IN_WINDOW = LEN_BUFFER
+
+            print('LEN_BUFFER', LEN_BUFFER)
+            plot_dict = {'linked_plot': plt,
+                         'chan_idx': chan_idx,
+                         'x': self.LoadedData.filtered_data[idx_of_channel_order]['times'],
+                         'y': self.LoadedData.filtered_data[idx_of_channel_order]['data'],
+                         'len_buffer': LEN_BUFFER,
+                         'NUM_TIME_IN_WINDOW': NUM_TIME_IN_WINDOW,
+                         'len_time_in': NUM_TIME_IN_WINDOW,  # start from num_time_in_window
+                         'curr_x': None,
+                         'curr_y': None,
+                         'noise_mean': self.LoadedData.array_stats['noise_mean'][row, col],
+                         'noise_std': self.LoadedData.array_stats['noise_std'][row, col],
+                         'tooltip_text': tooltip_text,
+                         'pause': False
+            }
+
+            plot_dict['curr_x'] = list(x[0:NUM_TIME_IN_WINDOW])
+            plot_dict['curr_y'] = list(y[0:NUM_TIME_IN_WINDOW])
+            plot_dict['test'] = plt.plot(plot_dict['curr_x'] , plot_dict['curr_y'], pen=pg.mkPen(themes[CURRENT_THEME]['blue1']))
+            self.trace_channels_info.append(plot_dict)
+
+            plt.setLabel('left', '#' + str(self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']))
+            plt.getAxis("left").setTextPen(themes[CURRENT_THEME]['dark1'])
+
+    def continouslyUpdateTracePlotData(self):
+        NUM_UPDATES = 8
+
+        time_in = self.trace_channels_info[0]['len_time_in']
+        length_of_buffer = self.trace_channels_info[0]['len_buffer']
+        print('time in', time_in, 'len_of_buffer', length_of_buffer)
+
+        if (time_in + NUM_UPDATES < length_of_buffer):
+            for i in range(NUM_UPDATES):
+                for plot_dict in self.trace_channels_info:
+                    plot_dict['curr_x'] = plot_dict['curr_x'][1:]
+                    plot_dict['curr_y'] = plot_dict['curr_y'][1:]
+                    plot_dict['len_time_in'] += 1
+
+                    plot_dict['curr_x'].append(plot_dict['x'][plot_dict['len_time_in']])
+                    plot_dict['curr_y'].append(plot_dict['y'][plot_dict['len_time_in']])
+                    plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
+
 
     def updateNoiseHistogramPlot(self):
         self.charts["noiseHistogram"].clear()
@@ -736,8 +808,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     def updateMiniMapPlot(self):
         self.charts["miniMap"].clear()
-        BAR_LENGTH = 4
-        
+        BAR_LENGTH = 8
+
         for row in range(self.center_row-4, self.center_row+4):
             for col in range(self.center_col-2, self.center_col+2):
 
