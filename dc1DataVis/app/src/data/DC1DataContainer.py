@@ -29,7 +29,8 @@ class DC1DataContainer():
     data_processing_settings = {
         "filter": None, # for use in filtered_data, see full list in filters.py
         "spikeThreshold": 5,  # How many standard deviations above noise to find spikes
-        "binSize": 0.05
+        "binSize": 1,
+        "simultaneousChannelsRecordedPerPacket": 4
     }
 
     # metadata information
@@ -204,8 +205,6 @@ class DC1DataContainer():
         # TODO this shouldn't call update_filtered_data -> should be async, and threaded
 
     def calculate_realtime_spike_info_for_channel_in_buffer(self, channel_data):
-        print('real time spike info calculations')
-        print('channel idx', channel_data['channel_idx'])
 
         row, col = idx2map(channel_data['channel_idx'])
 
@@ -214,9 +213,9 @@ class DC1DataContainer():
         noise_std = self.array_stats["noise_std"][row, col] # TODO put this in a loop after array_stats
         above_threshold = noise_mean + self.data_processing_settings["spikeThreshold"] * noise_std
         above_threshold_activity = (channel_data['data'] >= above_threshold)
-        print('above_threshold', above_threshold)
-        print('above_threshold_activity', above_threshold_activity)
-        print('m', noise_mean, 's', noise_std)
+        #print('above_threshold', above_threshold)
+        #print('above_threshold_activity', above_threshold_activity)
+        #print('m', noise_mean, 's', noise_std)
         incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
 
         incom_spike_times = channel_data['times'][incom_spike_idx]
@@ -293,24 +292,23 @@ class DC1DataContainer():
 
         incom_cnt, incom_mean, incom_std = self.calculate_incoming_noise_statistics(data_real, mask)
         self.update_array_noise_statistics(incom_cnt, incom_mean, incom_std)
-
         incom_spike_cnt, incom_spike_avg, incom_spike_std = self.calculate_incoming_array_spike_statistics(data_real, mask)
         self.update_array_spike_statistics(incom_spike_cnt, incom_spike_avg, incom_spike_std, N)
 
     def calculate_incoming_noise_statistics(self, data_real, mask):
         # AX1,AX3,AX4) Sample Counting (Note: Appends are an artifact from previous real time codes)
-        self.array_stats['num_sam'][:, :, 0] = np.count_nonzero(data_real, axis=2)
-        incom_cnt = self.array_stats['num_sam'][:, :, 0]
-
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
-            self.array_stats['avg_val'][:, :, 0] = np.nanmean(mask, axis=2)
-        avg_val = np.nan_to_num(self.array_stats['avg_val'], nan=0)
-        incom_mean = avg_val[:, :, 0]
+            self.array_stats['num_sam'][:, :, 0] = np.count_nonzero(data_real, axis=2)
+            incom_cnt = self.array_stats['num_sam'][:, :, 0]
 
-        # AX3,AX4) Finding standard deviation ADC of samples per electrode
-        incom_std = np.nanstd(mask, axis=2)
-        incom_std = np.nan_to_num(incom_std, nan=0)
+            self.array_stats['avg_val'][:, :, 0] = np.nanmean(mask, axis=2)
+            avg_val = np.nan_to_num(self.array_stats['avg_val'], nan=0)
+            incom_mean = avg_val[:, :, 0]
+
+            # AX3,AX4) Finding standard deviation ADC of samples per electrode
+            incom_std = np.nanstd(mask, axis=2)
+            incom_std = np.nan_to_num(incom_std, nan=0)
         return incom_cnt, incom_mean, incom_std
 
     def update_array_noise_statistics(self, incom_cnt, incom_mean, incom_std):
@@ -327,6 +325,8 @@ class DC1DataContainer():
             np.nan_to_num((pre_cnt * (pre_std ** 2 + (pre_mean - self.array_stats["noise_mean"]) ** 2) + incom_cnt * (
                     incom_std ** 2 + (incom_mean - self.array_stats["noise_mean"]) ** 2)) / (cnt_div), nan=0))
         self.array_stats["noise_cnt"] = np.nan_to_num(pre_cnt + incom_cnt, nan=0)
+
+
 
     def calculate_incoming_array_spike_statistics(self, data_real, mask):
 

@@ -312,7 +312,7 @@ class Ui_mainWindow(object):
 
     def retranslateUi(self, mainWindow):
         _translate = QtCore.QCoreApplication.translate
-        mainWindow.setWindowTitle(_translate("mainWindow", "DC1 Visualization"))
+        mainWindow.setWindowTitle(_translate("mainWindow", "Stanford Artificial Retina Project | Retina Chip v1.0 Experimental Visualization"))
         self.menuFile.setTitle(_translate("mainWindow", "File"))
         self.menuLoad_offline_data.setTitle(_translate("mainWindow", "Load offline data..."))
         self.menuSave_as.setTitle(_translate("mainWindow", "Save as..."))

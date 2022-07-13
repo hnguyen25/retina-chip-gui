@@ -1,4 +1,3 @@
-
 def openSessionParams():
     session_dialog = QDialog()
     uic.loadUi("./src/gui/startup.ui", session_dialog)
