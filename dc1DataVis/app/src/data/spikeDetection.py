@@ -25,12 +25,10 @@ from ..gui.worker import *  # multithreading
 from ..gui.default_vis import Ui_mainWindow # layout
 from ..gui.gui_guipreferences import *
 from ..gui.gui_charts_helper import *
-import time
 
 from sklearn.mixture import GaussianMixture
 
-# TODO: make function not go when no data
-def findSpikesGMM(electrode_data, channel_idx, timing = False, debug = False):
+def findSpikesGMM(electrode_data, channel_idx, debug = False):
     """
     @param electrode_data: Data to apply GMM to
     (i.e. self.electrode_data in individual channels file)
@@ -41,7 +39,6 @@ def findSpikesGMM(electrode_data, channel_idx, timing = False, debug = False):
 
     @return: spikeMeanGMM, spikeStdGMM, noiseMeanGMM, noiseStdGMM
     """
-    start = time.time()
 
     spikeMeanGMM = 0
     noiseMeanGMM = 0
@@ -72,12 +69,6 @@ def findSpikesGMM(electrode_data, channel_idx, timing = False, debug = False):
 
     spikeStdGMM = stanDevs[spikesIdx]
     noiseStdGMM = stanDevs[noiseIdx]
-
-    end = time.time()
-
-    if timing:
-        print("Time for GMM: " + str(end-start))
-
     if debug:
         print("Channel for GMM: " + str(channel_idx))
         print("spike mean: "  + str(spikeMeanGMM) +
