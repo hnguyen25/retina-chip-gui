@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>825</width>
-    <height>587</height>
+    <width>835</width>
+    <height>606</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -195,30 +195,20 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="PlotWidget" name="ChannelTracePlot" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>402</width>
-         <height>247</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="PlotWidget" name="SpikeRateHistPlot" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>402</width>
-         <height>247</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
       <widget class="PlotWidget" name="SpikeRatePlot" native="true">
        <property name="enabled">
         <bool>true</bool>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>402</width>
+         <height>247</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="PlotWidget" name="ChannelTracePlot" native="true">
        <property name="minimumSize">
         <size>
          <width>402</width>

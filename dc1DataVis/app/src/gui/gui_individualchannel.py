@@ -11,6 +11,7 @@ from ..data.spikeDetection import *
 
 # TODO:
 # 1. Spikes and spike rate
+# 2. Fix hist
 
 class IndividualChannelInformation(QWidget):
 
