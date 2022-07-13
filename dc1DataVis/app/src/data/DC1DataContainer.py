@@ -207,51 +207,57 @@ class DC1DataContainer():
     def calculate_realtime_spike_info_for_channel_in_buffer(self, channel_data):
 
         row, col = idx2map(channel_data['channel_idx'])
-
-        # TODO switch to GMM noise mean and std
         noise_mean = self.array_stats["noise_mean"][row, col]
-        noise_std = self.array_stats["noise_std"][row, col] # TODO put this in a loop after array_stats
-        above_threshold = noise_mean + self.data_processing_settings["spikeThreshold"] * noise_std
-        above_threshold_activity = (channel_data['data'] >= above_threshold)
-        #print('above_threshold', above_threshold)
-        #print('above_threshold_activity', above_threshold_activity)
-        #print('m', noise_mean, 's', noise_std)
-        incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
-
-        incom_spike_times = channel_data['times'][incom_spike_idx]
-        incom_spike_amplitude = channel_data['data'][incom_spike_idx]
-
+        noise_std = self.array_stats["noise_std"][row, col]
+        incom_spike_times, incom_spike_amplitude = self.getAboveThresholdActivity(channel_data['data'], channel_data['times'],
+                                                                                  noise_mean, noise_std,
+                                                                                  self.data_processing_settings['spikeThreshold'])
         channel_data["incom_spike_times"] = incom_spike_times
         channel_data["incom_spike_amp"] = incom_spike_amplitude
 
-        # TODO vectorize binning, this is not the most efficient way of doing this
-        import math
-
-        start_time = channel_data['times'][0]
-        end_time = channel_data['times'][-1]
-        buf_recording_len = end_time - start_time
-        binSize = self.data_processing_settings["binSize"]
-        channel_data["num_bins_in_buffer"] = math.floor(buf_recording_len / binSize)
-
-        # initialize an array of spike bins, with no spikes detected
-        channel_data["spikeBins"] = np.zeros(channel_data["num_bins_in_buffer"], dtype=bool)
-        channel_data["spikeBinsMaxAmp"] = np.zeros(channel_data["num_bins_in_buffer"], dtype=float)
-
-        for bin in range(int(buf_recording_len / binSize)):
-            bin_start = start_time + bin * binSize
-            bin_end = start_time + (bin + 1) * binSize
-
-            spikes_within_bin = (bin_start <= channel_data["incom_spike_times"]) & (channel_data["incom_spike_times"] < bin_end)
-
-            if np.count_nonzero(spikes_within_bin) != 0:
-                channel_data["spikeBins"][bin] = True
-                spiking_amps = channel_data['incom_spike_amp'][spikes_within_bin]
-                channel_data["spikeBinsMaxAmp"][bin] = np.max(spiking_amps)
+        spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER = self.binSpikeTimes(channel_data, incom_spike_times, incom_spike_amplitude)
+        channel_data["spikeBins"] = spikeBins
+        channel_data["spikeBinsMaxAmp"] = spikeBinsMaxAmp
+        channel_data["num_bins_in_buffer"] = NUM_BINS_IN_BUFFER
 
         return channel_data
 
+    def getAboveThresholdActivity(self, data, times, channel_noise_mean, channel_noise_std, spike_threshold):
+        above_threshold = channel_noise_mean + spike_threshold * channel_noise_std
+        above_threshold_activity = (data >= above_threshold)
+        incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
 
-        #above_threshold_activity[0] = False  # often true just bc of filtering artifact and not spiking, so just set to zero
+        incom_spike_times = times[incom_spike_idx]
+        incom_spike_amplitude = data[incom_spike_idx]
+
+        return incom_spike_times, incom_spike_amplitude
+
+    # TODO vectorize binning, this is not the most efficient way of doing this
+    def binSpikeTimes(self, times, incom_spike_times, incom_spike_amps):
+        start_time = times[0]
+        end_time = times[-1]
+        buf_recording_len = end_time - start_time
+        binSize = self.data_processing_settings["binSize"]
+        import math
+        NUM_BINS_IN_BUFFER = math.floor(buf_recording_len / binSize)
+
+        # initialize an array of spike bins, with no spikes detected
+        spikeBins = np.zeros(NUM_BINS_IN_BUFFER, dtype=bool)
+        spikeBinsMaxAmp = np.zeros(NUM_BINS_IN_BUFFER, dtype=float)
+
+        for bin_idx in range(int(buf_recording_len / binSize)):
+            bin_start = start_time + bin_idx * binSize
+            bin_end = start_time + (bin_idx + 1) * binSize
+
+            spikes_within_bin = (bin_start <= incom_spike_times) & (
+                        incom_spike_times < bin_end)
+
+            if np.count_nonzero(spikes_within_bin) != 0:
+                spikeBins[bin_idx] = True
+                spiking_amps = incom_spike_amps[spikes_within_bin]
+                spikeBinsMaxAmp[bin_idx] = np.max(spiking_amps)
+
+        return spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER
 
 
 
