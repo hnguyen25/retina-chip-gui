@@ -29,7 +29,7 @@ class DC1DataContainer():
     data_processing_settings = {
         "filter": None, # for use in filtered_data, see full list in filters.py
         "spikeThreshold": 5,  # How many standard deviations above noise to find spikes
-        "binSize": 1, # 1ms
+        "binSize": 50, # 1ms
         "simultaneousChannelsRecordedPerPacket": 4
     }
 
@@ -243,7 +243,6 @@ class DC1DataContainer():
         binSize = self.data_processing_settings["binSize"]
         import math
         NUM_BINS_IN_BUFFER = math.floor(buf_recording_len / binSize)
-        print('buf_recording_len', buf_recording_len)
 
         # initialize an array of spike bins, with no spikes detected
         spikeBins = np.zeros(NUM_BINS_IN_BUFFER, dtype=bool)

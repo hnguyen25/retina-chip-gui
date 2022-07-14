@@ -60,7 +60,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     to start and run GUI elements.
     """
     ### MODES ###
-    mode_profiling = True   # if on, measures how long different aspects of the GUI takes
+    mode_profiling = False   # if on, measures how long different aspects of the GUI takes
     mode_multithreading = True  # if on, enables multiprocessing capability. may be easier to debug if off.
     is_dark_mode = False  # appearance of GUI background
 
@@ -102,9 +102,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         }
 
         self.chart_update_function_mapping = {
-            "arrayMap": self.updateArrayMapPlot, "miniMap": self.updateMiniMapPlot,
+            "miniMap": self.updateMiniMapPlot,
             "spikeRatePlot": self.updateSpikeRatePlot, "noiseHistogram": self.updateNoiseHistogramPlot,
-            "channelTrace1": self.updateChannelTracePlot
+            "channelTrace1": self.updateChannelTracePlot, "arrayMap": self.updateArrayMapPlot
         }
 
         '''old
@@ -154,6 +154,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
             self.charts["channelTraceVerticalLayout"] = self.channelTraceVerticalLayout
             self.charts["channelTraces"] = [self.channelTrace1, self.channelTrace2, self.channelTrace3, self.channelTrace4]
+
+            for plot in self.charts["channelTraces"]:
+                plot.scene().sigMouseClicked.connect(self.pausePlotting)
+
             setupSpikeTrace(self.charts["channelTraces"])
 
         elif self.settings["visStyle"] == "Spike Search":
@@ -217,7 +221,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         int_y = int(y)
 
         self.arrayMapHoverCoords = (int_x, int_y)
-
 
 
     def setMiniMapLoc(self, x, y):
@@ -523,17 +526,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         for window in self.external_windows:
             window.update()
 
+        # prioritize processing channel trace plot info first #TODO optimization - this is slightly inefficient
+
+        for chart in self.charts.keys():
+            chart_type = type(self.charts[chart])
+            # then it's the list of channel traces
+            if chart_type is list:
+                print(chart)
+                self.updateChannelTracePlot(self.charts[chart])
+
         for chart in self.charts.keys():
             chart_type = type(self.charts[chart])
             if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
-                start = time.time()
+                if self.mode_profiling:
+                    start = time.time()
                 self.chart_update_function_mapping[chart]()
-                end = time.time()
-                self.profile_data[chart].append(end-start)
-            # then it's the list of channel traces
-            elif chart_type is list:
-                print(chart)
-                self.updateChannelTracePlot(self.charts[chart])
+                if self.mode_profiling:
+                    end = time.time()
+                    self.profile_data[chart].append(end-start)
 
 
         if self.mode_profiling:
@@ -550,6 +560,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             print("------------------------------\n")
 
     def updateArrayMapPlot(self):
+
         self.charts["arrayMap"].clear()
 
         if self.arrayMapHoverCoords is not None:
@@ -558,7 +569,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 import math
                 spike_cnt = self.LoadedData.array_stats['spike_cnt'][y][x + 1]
                 spike_amp = self.LoadedData.array_stats['spike_avg'][y][x + 1]
-                channel_idx = map2idx(x, y)
+                channel_idx = map2idx(y, x)
 
                 tooltip_text = "<html>" + "Electrode Channel #" + str(channel_idx) + "<br>" + \
                                "Row " + str(y) + ", Column " + str(x) + "<br>" + \
@@ -571,7 +582,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             colors = self.LoadedData.array_stats['spike_avg']
             data = colors.T  # for old pixel-based data
 
-            max_dot = 100
+            max_dot = 50
             # AX1) Size by Number of Samples
             spike_cnt = self.LoadedData.array_stats['spike_cnt']
             scale1 = (max_dot - 15) / (np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0]))
@@ -593,6 +604,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.arrayMap_colorbar = self.charts["arrayMap"].addColorBar(image, colorMap=cm, label="Spike Amplitude", values=(0, 150)) #values=(0, np.max(data)))
             self.arrayMap_colorbar.sigLevelsChanged.connect(self.colorBarLevelsChanged)
         else:
+
             self.arrayMap_colorbar.setImageItem(image)
             #self.charts["arrayMap"]_colorbar.setLevels((0, np.max(data)))
 
@@ -636,13 +648,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             scatter.addPoints(spots)  # adding spots to the scatter plot
             self.charts["arrayMap"].addItem(scatter)  # adding scatter plot to the plot window
 
+            # add squares around electrodes currently being recorded from + visualized in spike trace
+            scatter2 = pg.ScatterPlotItem(pxMode=False)
+            current_recording_electrodes = []
+            for i in range(len(self.trace_channels_info)):
+                chan_idx = self.trace_channels_info[i]['chan_idx']
+                row, col = idx2map(chan_idx)
+                spot_dict = {'pos': (col, row), 'size': 1,
+                             'pen': {'color': pg.mkColor(themes[CURRENT_THEME]['blue1']), 'width': 3},
+                             'brush': QColor(255,0,255,0),
+                             'symbol': 's'}
+                current_recording_electrodes.append(spot_dict)
+            scatter2.addPoints(current_recording_electrodes)
+            self.charts["arrayMap"].addItem(scatter2)
+
+            # add a square around electrodes displayed in the minimap
+            minimap_square_indicator = pg.QtGui.QGraphicsRectItem(self.center_row - 4.5, self.center_col - 2.5, 8, 4)
+            minimap_square_indicator.setPen(pg.mkPen(themes[CURRENT_THEME]['blue3']))
+            minimap_square_indicator.setBrush(QColor(255,0,255,0))
+            self.charts["arrayMap"].addItem(minimap_square_indicator)
+
+
+
+
+
     def colorBarLevelsChanged(self):
         self.charts["arrayMap"].clear()
 
         colors = self.LoadedData.array_stats['spike_avg']
         data = colors.T # for old pixel-based data
 
-        max_dot = 100
+        max_dot = 75
         # AX1) Size by Number of Samples
         spike_cnt = self.LoadedData.array_stats['spike_cnt']
         scale1 = (max_dot - 15) / (np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0]))
@@ -702,10 +738,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             trace_plots:
 
         Returns:
-
         """
-
-
         len_data = len(self.LoadedData.filtered_data)
 
         self.trace_channels_info = []
@@ -741,7 +774,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             if NUM_TIME_IN_WINDOW > LEN_BUFFER:
                 NUM_TIME_IN_WINDOW = LEN_BUFFER
 
-            print('LEN_BUFFER', LEN_BUFFER)
             plot_dict = {'linked_plot': plt,
                          'chan_idx': chan_idx,
                          'x': self.LoadedData.filtered_data[idx_of_channel_order]['times'],
@@ -765,23 +797,30 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             plt.setLabel('left', '#' + str(self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']))
             plt.getAxis("left").setTextPen(themes[CURRENT_THEME]['dark1'])
 
+
+    def pausePlotting(self):
+        # for now, just pause all plots
+        for i in range(len(self.trace_channels_info)):
+            self.trace_channels_info[i]["pause"] = not self.trace_channels_info[i]["pause"]
+
+
     def continouslyUpdateTracePlotData(self):
         NUM_UPDATES = 8
 
-        time_in = self.trace_channels_info[0]['len_time_in']
-        length_of_buffer = self.trace_channels_info[0]['len_buffer']
-        print('time in', time_in, 'len_of_buffer', length_of_buffer)
+        if len(self.trace_channels_info) > 0:
+            time_in = self.trace_channels_info[0]['len_time_in']
+            length_of_buffer = self.trace_channels_info[0]['len_buffer']
 
-        if (time_in + NUM_UPDATES < length_of_buffer):
-            for i in range(NUM_UPDATES):
-                for plot_dict in self.trace_channels_info:
-                    plot_dict['curr_x'] = plot_dict['curr_x'][1:]
-                    plot_dict['curr_y'] = plot_dict['curr_y'][1:]
-                    plot_dict['len_time_in'] += 1
+            if (time_in + NUM_UPDATES < length_of_buffer):
+                for i in range(NUM_UPDATES):
+                    for plot_dict in self.trace_channels_info:
+                        plot_dict['curr_x'] = plot_dict['curr_x'][1:]
+                        plot_dict['curr_y'] = plot_dict['curr_y'][1:]
+                        plot_dict['len_time_in'] += 1
 
-                    plot_dict['curr_x'].append(plot_dict['x'][plot_dict['len_time_in']])
-                    plot_dict['curr_y'].append(plot_dict['y'][plot_dict['len_time_in']])
-                    plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
+                        plot_dict['curr_x'].append(plot_dict['x'][plot_dict['len_time_in']])
+                        plot_dict['curr_y'].append(plot_dict['y'][plot_dict['len_time_in']])
+                        plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
 
 
     def updateNoiseHistogramPlot(self):
@@ -808,7 +847,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     def updateMiniMapPlot(self):
         self.charts["miniMap"].clear()
-        BAR_LENGTH = 8
+        BAR_LENGTH = 4
+        MAX_SPIKES = 16 # can't draw every spike or gui will crash -> group spikes together
 
         for row in range(self.center_row-4, self.center_row+4):
             for col in range(self.center_col-2, self.center_col+2):
@@ -826,9 +866,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     spike_indicator_text.setPos(row*5, col*5)
                     spike_indicator_text.setParentItem(spike_indicator_base)
 
-                    if self.LoadedData.array_stats["incom_spike_cnt"][col, row] > 0:
-                        print('yes CR', 'r', row, 'col', col, 'spike cnt', self.LoadedData.array_stats["incom_spike_cnt"][col, row])
-
                     self.charts["miniMap"].addItem(spike_indicator_base)
                     self.charts["miniMap"].addItem(spike_indicator_text)
                     '''
@@ -845,20 +882,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     self.charts["miniMap"].addItem(spike_indicator_base)
                     self.charts["miniMap"].addItem(spike_indicator_text)
                     '''
-        LAST_N_BUFFER_DATA = 5
+        LAST_N_BUFFER_DATA = 100
         to_search = self.LoadedData.preprocessed_data[-LAST_N_BUFFER_DATA:]
         spikes_within_view = []
         for data_packet in to_search:
             chan_idx = data_packet['channel_idx']
-            r, c = idx2map(chan_idx)
+            c, r = idx2map(chan_idx)
             if (self.center_row - 4 <= r) & (r < self.center_row + 4) & \
-                    (self.center_col - 2 <= c) & (c < self.center_row + 2):
+                    (self.center_col - 2 <= c) & (c < self.center_col + 2):
                 spikes_within_view.append(data_packet)
 
         for data_packet in spikes_within_view:
 
             chan_idx = data_packet['channel_idx']
-            print('data packet for chan ', chan_idx)
             row, col = idx2map(chan_idx)
             spikeBins = data_packet['spikeBins']
             spikeBinsMaxAmp = data_packet['spikeBinsMaxAmp']
@@ -866,11 +902,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             spikeLocs = np.argwhere(spikeBins == True)
 
             num_bins = data_packet['num_bins_in_buffer']
-
-
-
             for i in spikeLocs:
-                print('drawing spike')
                 spike_loc_on_vis_bar = (i / num_bins) * BAR_LENGTH
                 spike_height_on_vis_bar = spikeBinsMaxAmp[i] / 50
                 spike_indicator = pg.QtGui.QGraphicsRectItem(col * 5 + spike_loc_on_vis_bar, row * 5, 0.1, spike_height_on_vis_bar)

@@ -87,7 +87,7 @@ class HoverRegion():
         pos = (self.last_mouse_x, self.last_mouse_y)
         #if self.window.sceneBoundingRect().contains(pos):
             # mousePoint = self.vb.mapSceneToView(pos)
-        print('entering click func')
+       # print('entering click func')
         self.ClickFunc(self.last_mouse_x, self.last_mouse_y)
 
 def setupArrayMap(plot_widget):
@@ -113,11 +113,13 @@ def setupMiniMapPlot(plot_widget, center_row=16, center_col=16):
 
 def setupSpikeTrace(list_of_plots):
     for plot in list_of_plots:
+
         plot.setLabel('left', '# ???')
         plot.getAxis('left').setTextPen(themes[CURRENT_THEME]['dark1'])
         #plot.getPlotItem().hideAxis('bottom')
         plot.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['dark1'])
         plot.setLabel('bottom', 'Time (ms)')
+
 
 
 def setupOneSpikeTrace(plot_widget):
