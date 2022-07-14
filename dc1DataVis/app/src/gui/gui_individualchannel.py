@@ -11,8 +11,7 @@ from ..data.spikeDetection import *
 from ..data.DC1DataContainer import *
 
 # TODO:
-# 1. Spikes and spike rate
-# 2. Fix hist
+#1. Fix hist
 
 class IndividualChannelInformation(QWidget):
 
@@ -57,17 +56,18 @@ class IndividualChannelInformation(QWidget):
 
         self.SpikeRatePlot.setBackground('w')
         self.SpikeRatePlot.setLabel('left', 'Spikes per second')
+        self.SpikeRatePlot.setLabel('bottom','Time (ms)')
 
 
         self.ChannelTracePlot.setBackground('w')
-        self.ChannelTracePlot.setLabel('bottom','Time (sec)')
+        self.ChannelTracePlot.setLabel('bottom','Time (ms)')
         self.ChannelTracePlot.setLabel('left', 'Counts')
         self.ChannelTracePlot.enableAutoRange
 
 
 # TODO: print profiling data?
 
-    # Note: do not change name from update
+    # Note: do NOT change name from "update"
     def update(self):
         print("Update individual channels: " + str(self.current_elec))
         self.updateElectrodeData()
@@ -79,8 +79,8 @@ class IndividualChannelInformation(QWidget):
                                   + str(self.recordedTime)
                                   + "ms")
         self.numSpikes.setText("Number of spikes: " + str(sum(self.electrode_spikes)))
-    def updateElectrodeData(self):
 
+    def updateElectrodeData(self):
         self.electrode_packets.clear()
         self.electrode_spikes.clear()
         self.electrode_spike_times.clear()
@@ -110,6 +110,7 @@ class IndividualChannelInformation(QWidget):
         self.recordedTime = round((len(self.electrode_data)) * 0.05, 2)
 
 # TODO
+
     def updateAmplitudeHist(self):
         vals = self.electrode_data
         std = np.std(vals)
@@ -119,27 +120,52 @@ class IndividualChannelInformation(QWidget):
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         self.AmplitudeHistPlot.addItem(curve)
 
-    def updateSpikeRate(self, numberOfUpdates = 10, debug=False):
+    def updateSpikeRate(self, movingAverage = True, windowSize = 5, numberOfUpdates = 10, debug=False):
         """
-        numberOfUpdates: How many times you want to update the spike rate
-        debug: Print helpful data
+        movingAverage: If false, divide up the range into numberOfUpdates bins and average to find spike rate
 
+        windowSize: Size of moving average window in milliseconds
+
+        numberOfUpdates: How many times you want to update the spike rate if not doing moving average.
+        Function divides the range of data into numberOfUpdates bins to time average spikes.
+
+        debug: Print helpful data.
         """
         self.SpikeRatePlot.clear()
         spikeList = self.electrode_spikes
         indexes = np.linspace(0, len(spikeList), numberOfUpdates+1)
         indexes = [int(i) for i in indexes]
-        num_spikes = []
-        for i in range(numberOfUpdates):
-            window = spikeList[indexes[i]:indexes[i+1]]
-            num_spikes.append(sum(window))
-        spike_rate = [1000*num_spike/(self.recordedTime/numberOfUpdates) for num_spike in num_spikes]
+        t = []
+        spike_rate = []
 
-        y = spike_rate
-        x = np.linspace(self.electrode_times[0],self.electrode_times[-1],numberOfUpdates)
-        x = [int(i) for i in x]
+        # Only run if electrode has been recorded
+        if self.recordedTime != 0:
+            # Perform moving average on spike list
+            if movingAverage:
+                moving_averages = []
+                i = 0
+                while i < len(spikeList) - windowSize + 1:
+                    window_average = round(np.sum(spikeList[i:i+windowSize]) / windowSize, 2)
+                    moving_averages.append(1000*window_average) # multiply by 1000 to go to spikes/sec
+                    i += 1
+                t = np.linspace(self.electrode_times[0],self.electrode_times[-1],len(spikeList)-windowSize+1)
+                spike_rate = moving_averages
 
-        self.SpikeRatePlot.plot(x, y, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
+            # Window mode
+            else:
+                num_spikes = []
+                for i in range(numberOfUpdates):
+                    window = spikeList[indexes[i]:indexes[i+1]]
+                    num_spikes.append(sum(window))
+                    spike_rate = [1000*num_spike/(self.recordedTime/numberOfUpdates) for num_spike in num_spikes]
+                t = np.linspace(self.electrode_times[0], self.electrode_times[-1], numberOfUpdates)
+                t = [int(i) for i in t]
+        else:
+            spike_rate = [0 for i in range(numberOfUpdates)]
+            t = [0 for i in range(numberOfUpdates)]
+
+        self.SpikeRatePlot.plot(t, spike_rate, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
+
         if debug:
             print("spike rate list: " + str(y))
             print("spike rate times list: " + str(x))
