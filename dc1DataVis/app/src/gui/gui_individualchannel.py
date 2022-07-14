@@ -8,6 +8,7 @@ import numpy as np
 import pyqtgraph as pg
 import time
 from ..data.spikeDetection import *
+from ..data.DC1DataContainer import *
 
 # TODO:
 # 1. Spikes and spike rate
@@ -19,12 +20,17 @@ class IndividualChannelInformation(QWidget):
     current_elec = 0
     current_row = 0
     current_col = 0
+    recordedTime = None
     has_data = None
-    electrode_times = []
-    electrode_data = []
 
+    # List of dictionaries containing data packets with electrode info (data, times, spikes, etc)
     electrode_packets = []
 
+    # Lists containing values stored in the associated key in electrode_packets dictionaries
+    electrode_times = []
+    electrode_data = []
+    electrode_spikes = []
+    electrode_spike_times = []
 
     chan_charts = {} # dictionary for all different individual channel charts
     chan_charts_update_mapping = {} # dictionary for mapping charts to their update functions
@@ -63,24 +69,27 @@ class IndividualChannelInformation(QWidget):
 
     # Note: do not change name from update
     def update(self):
-        print("Update individual channels()")
+        print("Update individual channels: " + str(self.current_elec))
         self.updateElectrodeData()
         self.updateAmplitudeHist()
         self.updateSpikeRate()
         self.updateChannelTrace()
         self.totalSamples.setText("Total number of samples: " + str(len(self.electrode_data)))
         self.timeRecorded.setText("Total time recording electrode: "
-                                  + str(round((len(self.electrode_data)) * 0.05,2))
+                                  + str(self.recordedTime)
                                   + "ms")
         #print(str(self.session_parent.LoadedData.array_stats["spike_cnt"][self.current_row][self.current_col]))
 
     def updateElectrodeData(self):
-        match = False
-        len_filtered_data = len(self.session_parent.LoadedData.filtered_data)
 
         self.electrode_packets.clear()
+        self.electrode_spikes.clear()
+        self.electrode_spike_times.clear()
         self.electrode_data.clear()
         self.electrode_times.clear()
+
+        match = False
+        len_filtered_data = len(self.session_parent.LoadedData.filtered_data)
 
         # Create a list of dictionaries of data packets for the selected electrode
         for i in range(len_filtered_data):
@@ -92,8 +101,14 @@ class IndividualChannelInformation(QWidget):
 
         # Get lists of times and data from each packet for the selected electrode
         for i in range(len(self.electrode_packets)):
+            self.session_parent.LoadedData.\
+                calculate_realtime_spike_info_for_channel_in_buffer(self.electrode_packets[i])
+            self.electrode_spikes.extend(self.electrode_packets[i]["spikeBins"])
+            self.electrode_spike_times.extend(self.electrode_packets[i]["incom_spike_times"])
             self.electrode_times.extend(self.electrode_packets[i]['times'])
             self.electrode_data.extend(self.electrode_packets[i]['data'])
+
+        self.recordedTime = round((len(self.electrode_data)) * 0.05, 2)
 
 # TODO
     def updateAmplitudeHist(self):
@@ -107,18 +122,38 @@ class IndividualChannelInformation(QWidget):
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         self.AmplitudeHistPlot.addItem(curve)
 
-    def updateSpikeRate(self):
-        self.SpikeRatePlot.clear()
-        recordedTime = len(self.electrode_data)*0.05
-        if self.electrode_data:
-            findSpikesGMM(self.electrode_data,self.current_elec, debug = False)
+    def updateSpikeRate(self, numberOfUpdates = 10, debug=True):
+        """
+        numberOfUpdates: How many times you want to update the spike rate
+        debug: Print helpful data
 
-        # x = self.electrode_times
-        # y = self.session_parent.LoadedData.array_stats["spike_cnt"][self.current_row][self.current_col]/recordedTime
-        # print("x len: " + str(len(x)))
-        # print("y len: " + str(len(y)))
-        # line_plot = self.SpikeRatePlot.plot(x,y,pen='b', symbol='o', symbolPen='b',
-        #                      symbolBrush=0.2)
+        """
+        self.SpikeRatePlot.clear()
+        spikeList = self.electrode_spikes
+        indexes = np.linspace(0, len(spikeList), numberOfUpdates+1)
+        indexes = [int(i) for i in indexes]
+        num_spikes = []
+        for i in range(numberOfUpdates):
+            window = spikeList[indexes[i]:indexes[i+1]]
+            num_spikes.append(sum(window))
+        spike_rate = [1000*num_spike/(self.recordedTime/numberOfUpdates) for num_spike in num_spikes]
+
+        y = spike_rate
+        x = np.linspace(self.electrode_times[0],self.electrode_times[-1],numberOfUpdates)
+        x = [int(i) for i in x]
+
+        self.SpikeRatePlot.plot(x, y, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
+        if debug:
+            print("spike rate list: " + str(y))
+            print("spike rate times list: " + str(x))
+            print("length of recording: " + str(len(self.electrode_times)) + " data points")
+            print("electrode times: " + str(self.electrode_times[0]) + "-" + str(self.electrode_times[-1]))
+            print("spikes: " + str(self.electrode_spikes))
+            print("double binned spikes: " + str(num_spikes))
+            print("number of spike bins: " + str(len(self.electrode_spikes)))
+            print("incoming spike times: " + str(self.electrode_spike_times))
+            print("noise mean: " + str(self.session_parent.LoadedData.array_stats['noise_mean'][self.current_row, self.current_col]))
+            print("noise std: " + str(self.session_parent.LoadedData.array_stats['noise_std'][self.current_row, self.current_col]))
 
     def updateChannelTrace(self):
         self.ChannelTracePlot.clear()
