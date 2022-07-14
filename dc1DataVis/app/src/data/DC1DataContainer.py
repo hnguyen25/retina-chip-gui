@@ -29,7 +29,7 @@ class DC1DataContainer():
     data_processing_settings = {
         "filter": None, # for use in filtered_data, see full list in filters.py
         "spikeThreshold": 5,  # How many standard deviations above noise to find spikes
-        "binSize": 50, # 1ms
+        "binSize": 1, # 1ms
         "simultaneousChannelsRecordedPerPacket": 4
     }
 

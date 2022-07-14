@@ -78,8 +78,7 @@ class IndividualChannelInformation(QWidget):
         self.timeRecorded.setText("Total time recording electrode: "
                                   + str(self.recordedTime)
                                   + "ms")
-        self.numSpikes.setText("Number of spikes: " + str(self.session_parent.LoadedData.array_stats
-                                                          ["spike_cnt"][self.current_row][self.current_col]))
+        self.numSpikes.setText("Number of spikes: " + str(sum(self.electrode_spikes)))
     def updateElectrodeData(self):
 
         self.electrode_packets.clear()
@@ -115,14 +114,12 @@ class IndividualChannelInformation(QWidget):
         vals = self.electrode_data
         std = np.std(vals)
         vals = abs(vals/std)
-        #vals = vals[np.nonzero(vals)]
-        # get nonzero vals because zeros have not had noise calculation done yet
         self.AmplitudeHistPlot.clear()
         y, x = np.histogram(vals, bins=np.linspace(0, 20, 40))
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         self.AmplitudeHistPlot.addItem(curve)
 
-    def updateSpikeRate(self, numberOfUpdates = 10, debug=True):
+    def updateSpikeRate(self, numberOfUpdates = 10, debug=False):
         """
         numberOfUpdates: How many times you want to update the spike rate
         debug: Print helpful data
