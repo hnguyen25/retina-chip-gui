@@ -69,6 +69,7 @@ class IndividualChannelInformation(QWidget):
 
     # Note: do NOT change name from "update"
     def update(self):
+        start = time.time()
         print("Update individual channels: " + str(self.current_elec))
         self.updateElectrodeData()
         self.updateAmplitudeHist()
@@ -79,6 +80,9 @@ class IndividualChannelInformation(QWidget):
                                   + str(self.recordedTime)
                                   + "ms")
         self.numSpikes.setText("Number of spikes: " + str(sum(self.electrode_spikes)))
+        end = time.time()
+        if self.session_parent.mode_profiling:
+            print("Individual Channel update time: " + str(np.round(end-start,2)))
 
     def updateElectrodeData(self):
         self.electrode_packets.clear()

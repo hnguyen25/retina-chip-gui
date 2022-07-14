@@ -60,9 +60,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     to start and run GUI elements.
     """
     ### MODES ###
-    mode_profiling = False   # if on, measures how long different aspects of the GUI takes
+    mode_profiling = True   # if on, measures how long different aspects of the GUI takes
     mode_multithreading = True  # if on, enables multiprocessing capability. may be easier to debug if off.
-    is_dark_mode = False  # appearance of GUI background
+    is_dark_mode = True  # appearance of GUI background
 
     ### PROGRAM STATE ###
     first_time_plotting = True  # toggles to false when all the charts are setup for the first time
@@ -761,7 +761,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             end_time = x[-1]
             tooltip_text = '<html>Trace signal of electrode #' + str(chan_idx) + \
                            '<br>Row ' + str(row) + ', Column ' + str(col) + \
-                           '<br>From time ' + str(round(begin_time, 2)) + 's to ' + str(round(end_time, 2)) + 's after this recording started.' + \
+                           '<br>From time ' + str(round(begin_time, 2)) + 's to ' + str(round(end_time, 2)) + \
+                           's after this recording started.' + \
                            '<\html>'
 
             plt.setToolTip(tooltip_text)
@@ -771,24 +772,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             if NUM_TIME_IN_WINDOW > LEN_BUFFER:
                 NUM_TIME_IN_WINDOW = LEN_BUFFER
 
-            plot_dict = {'linked_plot': plt,
-                         'chan_idx': chan_idx,
+            plot_dict = {'linked_plot': plt, 'chan_idx': chan_idx,
                          'x': self.LoadedData.filtered_data[idx_of_channel_order]['times'],
-                         'y': self.LoadedData.filtered_data[idx_of_channel_order]['data'],
-                         'len_buffer': LEN_BUFFER,
-                         'NUM_TIME_IN_WINDOW': NUM_TIME_IN_WINDOW,
-                         'len_time_in': NUM_TIME_IN_WINDOW,  # start from num_time_in_window
-                         'curr_x': None,
-                         'curr_y': None,
+                         'y': self.LoadedData.filtered_data[idx_of_channel_order]['data'], 'len_buffer': LEN_BUFFER,
+                         'NUM_TIME_IN_WINDOW': NUM_TIME_IN_WINDOW, 'len_time_in': NUM_TIME_IN_WINDOW,
+                         'curr_x': list(x[0:NUM_TIME_IN_WINDOW]), 'curr_y': list(y[0:NUM_TIME_IN_WINDOW]),
                          'noise_mean': self.LoadedData.array_stats['noise_mean'][row, col],
-                         'noise_std': self.LoadedData.array_stats['noise_std'][row, col],
-                         'tooltip_text': tooltip_text,
-                         'pause': False
-            }
+                         'noise_std': self.LoadedData.array_stats['noise_std'][row, col], 'tooltip_text': tooltip_text,
+                         'pause': False}
 
-            plot_dict['curr_x'] = list(x[0:NUM_TIME_IN_WINDOW])
-            plot_dict['curr_y'] = list(y[0:NUM_TIME_IN_WINDOW])
-            plot_dict['test'] = plt.plot(plot_dict['curr_x'] , plot_dict['curr_y'], pen=pg.mkPen(themes[CURRENT_THEME]['blue1']))
+            plot_dict['test'] = plt.plot(plot_dict['curr_x'] , plot_dict['curr_y'],
+                                         pen=pg.mkPen(themes[CURRENT_THEME]['blue1']))
             self.trace_channels_info.append(plot_dict)
 
             plt.setLabel('left', '#' + str(self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']))
@@ -808,7 +802,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             time_in = self.trace_channels_info[0]['len_time_in']
             length_of_buffer = self.trace_channels_info[0]['len_buffer']
 
-            if (time_in + NUM_UPDATES < length_of_buffer):
+            if time_in + NUM_UPDATES < length_of_buffer:
                 for i in range(NUM_UPDATES):
                     for plot_dict in self.trace_channels_info:
                         plot_dict['curr_x'] = plot_dict['curr_x'][1:]
@@ -818,7 +812,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                         plot_dict['curr_x'].append(plot_dict['x'][plot_dict['len_time_in']])
                         plot_dict['curr_y'].append(plot_dict['y'][plot_dict['len_time_in']])
                         plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
-
 
     def updateNoiseHistogramPlot(self):
         self.charts["noiseHistogram"].clear()
