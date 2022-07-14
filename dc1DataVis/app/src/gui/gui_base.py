@@ -669,9 +669,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.charts["arrayMap"].addItem(minimap_square_indicator)
 
 
-
-
-
     def colorBarLevelsChanged(self):
         self.charts["arrayMap"].clear()
 

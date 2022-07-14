@@ -227,7 +227,7 @@ class DC1DataContainer():
             above_threshold = 0 + spike_threshold * channel_noise_std # filtered data -> makes mean 0
         else:
             above_threshold = channel_noise_mean + spike_threshold * channel_noise_std
-        above_threshold_activity = (data >= above_threshold)
+        above_threshold_activity = (abs(data) >= above_threshold)
         incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
 
         incom_spike_times = times[incom_spike_idx]
@@ -390,7 +390,7 @@ class DC1DataContainer():
         total_time = N * 0.05  # Sampling rate 1/0.05 ms
         self.array_stats["times"] = np.linspace(0, total_time, N)
 
-        self.array_stats["array spike rate times"].append(total_time / 1000)
+        self.array_stats["array spike rate times"].append(total_time)
         self.array_stats["array spike rate"].append(np.sum(incom_spike_avg))
 
         return incom_spike_cnt, incom_spike_avg, incom_spike_std
