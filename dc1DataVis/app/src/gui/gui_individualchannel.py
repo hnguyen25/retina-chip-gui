@@ -78,8 +78,8 @@ class IndividualChannelInformation(QWidget):
         self.timeRecorded.setText("Total time recording electrode: "
                                   + str(self.recordedTime)
                                   + "ms")
-        #print(str(self.session_parent.LoadedData.array_stats["spike_cnt"][self.current_row][self.current_col]))
-
+        self.numSpikes.setText("Number of spikes: " + str(self.session_parent.LoadedData.array_stats
+                                                          ["spike_cnt"][self.current_row][self.current_col]))
     def updateElectrodeData(self):
 
         self.electrode_packets.clear()
