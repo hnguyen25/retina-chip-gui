@@ -89,6 +89,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     p = None
     center_row, center_col = 16, 16  # center of the minimap, this can be set by user on mouse click on the array map
     arrayMap_colorbar = None  # reference to the colorbar embedded with the array map chart
+    noiseHeatMap_colorbar = None
     arrayMapHoverCoords = None
 
     def __init__(self, *args, **kwargs):
@@ -732,13 +733,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         plot = self.charts["noiseHeatMap"]
         plot.clear()
 
-        data = self.LoadedData.array_stats["noise_std"]
+        if self.first_time_plotting is False:
+            data = self.LoadedData.array_stats["noise_std"]
+            data = data.T
+        else:
+            data = None
 
         img = pg.ImageItem(data)
         cm = pg.colormap.get('plasma', source='matplotlib')
-        bar = pg.ColorBarItem(values=(0,200), cmap = cm)
-        bar.setImageItem(img, insert_in = plot)
         plot.addItem(img)
+
+        if self.noiseHeatMap_colorbar is None:
+            self.noiseHeatMap_colorbar = self.charts["noiseHeatMap"].addColorBar(img, colorMap = cm, label = "Noise SD",
+                                                                                 values = (0,10))
+        else:
+            self.noiseHeatMap_colorbar.setImageItem(img)
+
+        self.first_time_plotting = False
 
         if debug:
             print("Data" + str(data))
