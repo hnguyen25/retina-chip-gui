@@ -104,7 +104,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.chart_update_function_mapping = {
             "miniMap": self.updateMiniMapPlot,
             "spikeRatePlot": self.updateSpikeRatePlot, "noiseHistogram": self.updateNoiseHistogramPlot,
-            "channelTrace1": self.updateChannelTracePlot, "arrayMap": self.updateArrayMapPlot
+            "channelTrace1": self.updateChannelTracePlot, "arrayMap": self.updateArrayMapPlot,
+            "noiseHeatMap": self.updateNoiseHeatMap
         }
 
         '''old
@@ -119,8 +120,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         if self.mode_profiling:
             self.profile_data = {
                 'appendRawData': [], 'filterData': [], 'calculateArrayStats': [], 'arrayMap': [],
-                'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [], 'miniMap': [],
-                'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
+                'noiseHeatMap': [], 'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [],
+                'miniMap': [], 'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
             }
         if self.mode_multithreading: print('GUI is multithreading')
 
@@ -181,12 +182,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         elif self.settings["visStyle"] == "Noise":
             uic.loadUi("./src/gui/NoiseWindow.ui", self)
 
-            self.charts["arrayMap"] = self.arrayMap
-            setupArrayMap(self.charts["arrayMap"])
-            self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,
-                                                       self.setMiniMapLoc)
+            # self.charts["arrayMap"] = self.arrayMap
+            # setupArrayMap(self.charts["arrayMap"])
+            # self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,
+            #                                            self.setMiniMapLoc)
 
-            #self.charts["noiseHeatMap"] = self.noiseHeatMap
+            self.charts["noiseHeatMap"] = self.noiseHeatMap
             self.charts["noiseHistogram"] = self.noiseHistogramPlot
             setupNoiseHistogramPlot(self.charts["noiseHistogram"])
 
@@ -726,6 +727,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         scatter.addPoints(spots)  # adding spots to the scatter plot
         self.charts["arrayMap"].addItem(scatter)  # adding scatter plot to the plot window
 
+    def updateNoiseHeatMap(self, debug = True):
+
+        plot = self.charts["noiseHeatMap"]
+        plot.clear()
+
+        data = self.LoadedData.array_stats["noise_std"]
+
+        img = pg.ImageItem(data)
+        cm = pg.colormap.get('plasma', source='matplotlib')
+        bar = pg.ColorBarItem(values=(0,200), cmap = cm)
+        bar.setImageItem(img, insert_in = plot)
+        plot.addItem(img)
+
+        if debug:
+            print("Data" + str(data))
+
     def updateChannelTracePlot(self, trace_plots):
         """
         This function updates the data for the trace plots when a new packet arrives. The plots are updated even faster
@@ -811,7 +828,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                         plot_dict['curr_x'].append(plot_dict['x'][plot_dict['len_time_in']])
                         plot_dict['curr_y'].append(plot_dict['y'][plot_dict['len_time_in']])
                         plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
-                        print(str(plot_dict['x'][plot_dict['len_time_in']]) + " " + str(i) + " " + str(len(plot_dict['x'])))
 
     def updateNoiseHistogramPlot(self):
         self.charts["noiseHistogram"].clear()
