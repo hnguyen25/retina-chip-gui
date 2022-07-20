@@ -126,7 +126,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
         elif self.settings["visStyle"] == "Noise":
-            uic.loadUi("./src/gui/noise_check_vis.ui", self)
+            uic.loadUi("./src/gui/NoiseWindow.ui", self)
             self.charts["arrayMap"] = self.arrayMap
             setupArrayMap(self.charts["arrayMap"])
             self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,

@@ -97,7 +97,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         ### WINDOW REFERENCES ###
         self.charts = {
-            "arrayMap": None, "miniMap": None, "spikeRatePlot": None, "noiseHistogram": None,
+            "arrayMap": None, "noiseHeatMap": None, "miniMap": None, "spikeRatePlot": None, "noiseHistogram": None,
             "channelTraceVerticalLayout": None, "channelTraces": []
         }
 
@@ -179,17 +179,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
         elif self.settings["visStyle"] == "Noise":
-            uic.loadUi("./src/gui/noise_check_vis.ui", self)
+            uic.loadUi("./src/gui/NoiseWindow.ui", self)
 
             self.charts["arrayMap"] = self.arrayMap
             setupArrayMap(self.charts["arrayMap"])
             self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,
                                                        self.setMiniMapLoc)
 
+            #self.charts["noiseHeatMap"] = self.noiseHeatMap
             self.charts["noiseHistogram"] = self.noiseHistogramPlot
             setupNoiseHistogramPlot(self.charts["noiseHistogram"])
-
-            self.charts["noiseMatrixPlot"] = self.noiseMatrixPlot
 
             self.charts["channelTraceVerticalLayout"] = self.channelTraceLayout
             self.charts["channelTraces"] = [self.channelTrace1, self.channelTrace2, self.channelTrace3, self.channelTrace4]
@@ -802,7 +801,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             time_in = self.trace_channels_info[0]['len_time_in']
             length_of_buffer = self.trace_channels_info[0]['len_buffer']
 
-            if time_in + NUM_UPDATES < length_of_buffer:
+            if time_in + NUM_UPDATES + 1 < length_of_buffer:
                 for i in range(NUM_UPDATES):
                     for plot_dict in self.trace_channels_info:
                         plot_dict['curr_x'] = plot_dict['curr_x'][1:]
@@ -812,6 +811,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                         plot_dict['curr_x'].append(plot_dict['x'][plot_dict['len_time_in']])
                         plot_dict['curr_y'].append(plot_dict['y'][plot_dict['len_time_in']])
                         plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
+                        print(str(plot_dict['x'][plot_dict['len_time_in']]) + " " + str(i) + " " + str(len(plot_dict['x'])))
 
     def updateNoiseHistogramPlot(self):
         self.charts["noiseHistogram"].clear()
