@@ -331,8 +331,6 @@ class DC1DataContainer():
 
 
     def calculate_incoming_array_spike_statistics(self, data_real, mask):
-
-
         chan_cnt = np.count_nonzero(self.array_stats['num_sam'])
         chan_elec = np.zeros((chan_cnt, 2))
         chan_ind = np.argsort(self.array_stats['num_sam'].flatten())[-chan_cnt:]
@@ -394,4 +392,3 @@ class DC1DataContainer():
         self.array_stats["array spike rate"].append(np.sum(incom_spike_avg))
 
         return incom_spike_cnt, incom_spike_avg, incom_spike_std
-
