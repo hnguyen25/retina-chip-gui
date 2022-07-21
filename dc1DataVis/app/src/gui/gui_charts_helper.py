@@ -131,7 +131,8 @@ def setupOneSpikeTrace(plot_widget):
 def setupNoiseHistogramPlot(plot_widget):
 
     plot_widget.setLabel('left', "Num Channels")
-    plot_widget.setLabel('bottom', "Channel Noise - Standard Deviations beyond Mean")
+    plot_widget.setLabel('bottom', "Standard Deviations")
+    plot_widget.setLabel('top', 'Channel Noise')
 
     plot_widget.setLimits(xMin=0, yMin=0)
 
@@ -153,7 +154,7 @@ def setupSpikeRatePlot(plot_widget):
     plot_widget.setLabel('left', "Spike Rate")
     plot_widget.getAxis("left").setTextPen(themes[CURRENT_THEME]['dark1'])
 
-    plot_widget.setLabel('bottom', "Time (s)")
+    plot_widget.setLabel('bottom', "Time (ms)")
     plot_widget.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['dark1'])
     plot_widget.setLimits(xMin=0, yMin=0, minXRange=5)
 

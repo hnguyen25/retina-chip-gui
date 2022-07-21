@@ -14,14 +14,14 @@
    <string>DC1 Visualization</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayoutTop">
-        <item>
-         <widget class="PlotWidget" name="arrayMap" native="true"/>
-        </item>
+       <widget class="PlotWidget" name="noiseHeatMap" native="true"/>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <layout class="QVBoxLayout" name="channelTraceLayout">
           <item>
@@ -37,13 +37,6 @@
            <widget class="PlotWidget" name="channelTrace4" native="true"/>
           </item>
          </layout>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayoutBottom">
-        <item>
-         <widget class="PlotWidget" name="noiseMatrixPlot" native="true"/>
         </item>
         <item>
          <widget class="PlotWidget" name="noiseHistogramPlot" native="true"/>
@@ -61,7 +54,7 @@
      <x>0</x>
      <y>0</y>
      <width>936</width>
-     <height>37</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
