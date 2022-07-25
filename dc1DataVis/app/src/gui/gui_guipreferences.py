@@ -8,8 +8,8 @@ from ..gui.startup import Ui_Startup # layout
 
 class GUIPreferences(QtWidgets.QDialog, Ui_Startup):
     THRESHOLD_MIN = 0.5
-    THRESHOLD_DEFAULT = 2
-    THRESHOLD_MAX = 5
+    THRESHOLD_DEFAULT = 4
+    THRESHOLD_MAX = 6
     settings = {}
 
     def __init__(self, basedir, *args, **kwargs):

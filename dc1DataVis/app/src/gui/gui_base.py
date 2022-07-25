@@ -34,8 +34,8 @@ light_theme_colors = {
     'dark3': '#434C5E',
     'dark4': '#4C566A',
     'light1': '#ECEFF4',
-    'light2': '#E5E9F0',
-    'light3': '#D8DEE9',
+    'light2': '#E5E9F0', # '#'
+    'light3': '#D8DEE9', # '#'
     'blue1': '#5E81AC',
     'blue2': '#81A1C1',
     'blue3': '#88C0D0',
@@ -59,12 +59,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     """ Inherited from PyQt main window class. Contains all the functions necessary
     to start and run GUI elements.
     """
-    ### MODES ###
-    mode_profiling = True   # if on, measures how long different aspects of the GUI takes
-    mode_multithreading = True  # if on, enables multiprocessing capability. may be easier to debug if off.
-    is_dark_mode = True  # appearance of GUI background
-
-    ### PROGRAM STATE ###
+    ### PROGRAM VARS ###
     first_time_plotting = True  # toggles to false when all the charts are setup for the first time
     settings = {}  # session parameters created through user input from the startup pane
     loading_dict = {}  # contains details of the datarun currently being analyzed
@@ -87,7 +82,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     ### MISCELLANEOUS ###
     p = None
-    center_row, center_col = 16, 16  # center of the minimap, this can be set by user on mouse click on the array map
     arrayMap_colorbar = None  # reference to the colorbar embedded with the array map chart
     noiseHeatMap_colorbar = None
     arrayMapHoverCoords = None
@@ -95,6 +89,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setWindowTitle('Stanford Artificial Retina Project | Retina Chip v1.0 Experimental Visualization')
+
+        # GUI STATE: contains variables which change over the course of the GUI visualization
+        self.gui_state = {
+            # different GUI modes
+            'is_mode_profiling': False,  # if on, measures how long different aspects of the GUI takes to compute
+            'is_mode_multithreading': False,  # if on, enables multiprocessing capability. may be easier to debug if off
+            'is_dark_mode': False,  # appearance of GUI background (light vs dark)
+
+            # GUI play/pause
+            'first_time_plotting': True,  # indicates if the first packet of data has not been processed yet,
+            # (useful to know for setting up PyQtGraph charts)
+            'is_live_plotting': True,  # indicates if the program is still continuously reading available data packets
+            'is_true_realtime': True, # indicates if the program is continuously reading the LAST available data packet
+
+            'curr_processing_buf_idx' : 0, # the latest buffer that has been processed and put into DC1DataContainer
+            'curr_viewing_buf_idx': 0, # the latest buffer that has been added to the GUI chart
+            
+            # center of the minimap, this can be set by user on mouse click on the array map
+            'cursor_row': 16,
+            'cursor_col': 16
+        }
 
         ### WINDOW REFERENCES ###
         self.charts = {
@@ -118,13 +133,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         }'''
 
         ### MODES ###
-        if self.mode_profiling:
+        if self.gui_state['is_mode_profiling']:
             self.profile_data = {
                 'appendRawData': [], 'filterData': [], 'calculateArrayStats': [], 'arrayMap': [],
                 'noiseHeatMap': [], 'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [],
                 'miniMap': [], 'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
             }
-        if self.mode_multithreading: print('GUI is multithreading')
+        if self.gui_state['is_mode_multithreading']: print('GUI is multithreading')
 
     def setSettings(self, settings): self.settings = settings
     def setBaseDir(self, basedir): self.basedir = basedir
@@ -140,6 +155,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         # Load layout based on QtDesigner .ui file
         if self.settings["visStyle"] == "Default":
             uic.loadUi("./src/gui/default_vis.ui", self)
+
+            self.RewindButton = QPushButton("⏪")
+            self.RewindButton.setToolTip('REWIND plotting to the very first recording')
+            self.RewindButton.setStyleSheet("background-color: white")
+
+            self.TogglePlayButton = QPushButton("⏸︎")
+            self.TogglePlayButton.setToolTip('PAUSE plotting on the current packet')
+            self.TogglePlayButton.setStyleSheet("background-color: white")
+
+            self.FastForwardButton = QPushButton("⏩")
+            self.FastForwardButton.setToolTip('FAST FORWARD plotting to the latest processed packet')
+            self.FastForwardButton.setStyleSheet("background-color: white")
+
+            self.statusBar().addPermanentWidget(self.RewindButton)
+            self.statusBar().addPermanentWidget(self.TogglePlayButton)
+            self.statusBar().addPermanentWidget(self.FastForwardButton)
 
             self.charts["arrayMap"] = self.arrayMap
             setupArrayMap(self.charts["arrayMap"])
@@ -179,7 +210,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     self.charts[chart_name] = eval("self." + chart_name)
                     setupOneSpikeTrace(self.charts[chart_name])
 
-
         elif self.settings["visStyle"] == "Noise":
             uic.loadUi("./src/gui/NoiseWindow.ui", self)
 
@@ -197,7 +227,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             setupSpikeTrace(self.charts["channelTraces"])
         else:
             sys.exit()
-
 
         self.setupInteractivity()
 
@@ -232,18 +261,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             x: x value on window as detected by mouse on click
             y: x value on window as detected by mouse on click
         """
-        self.center_row = int(x)
-        if self.center_row < 6:
-            self.center_row = 6
-        elif self.center_row > 26:
-            self.center_row = 26
+        self.gui_state['cursor_row'] = int(x)
+        if self.gui_state['cursor_row'] < 6:
+            self.gui_state['cursor_row'] = 6
+        elif self.gui_state['cursor_row'] > 26:
+            self.gui_state['cursor_row'] = 26
 
-        if self.center_col < 4:
-            self.center_col = 4
-        elif self.center_col > 29:
-            self.center_col = 29
+        self.gui_state['cursor_col'] = int(y)
+        if self.gui_state['cursor_col'] < 4:
+            self.gui_state['cursor_col'] = 4
+        elif self.gui_state['cursor_col'] > 29:
+            self.gui_state['cursor_col'] = 29
 
-        self.center_col = int(y)
+
         self.updateMiniMapPlot()
 
     def setupInteractivity(self):
@@ -252,12 +282,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.LoadedData.setSpikeThreshold(self.settings["spikeThreshold"])
         # Set up PyQt multithreading
         self.threadpool = QThreadPool()
-        if self.mode_multithreading:
+        if self.gui_state['is_mode_multithreading']:
             print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
-
-        self.action_npz.triggered.connect(self.onActionLoadNPZ)
-        self.action_mat.triggered.connect(self.onActionLoadMAT)
-        self.actionUpdateSession.triggered.connect(self.onLoadRealtimeStream)
 
         self.actionIndividualChannelInfo.triggered.connect(self.viewNewIndividualChannelInformation)
         self.actionListElectrodesInfo.triggered.connect(self.viewChannelListInformation)
@@ -293,13 +319,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.external_windows.append(new_window)
 
     def toggleDarkMode(self):
-        self.is_dark_mode = not self.is_dark_mode
+        self.gui_state['is_dark_mode'] = not self.gui_state['is_dark_mode'] # toggle
 
-
-        if self.is_dark_mode is True:
+        if self.gui_state['is_dark_mode'] is True:
             color = 'k'
-
-
         else:
             color = 'w'
             self.setStyleSheet("background-color: " + themes[CURRENT_THEME]['light3'])
@@ -437,13 +460,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
             # If the next numbered file doesn't exist, just wait
             if os.path.exists(next_file) is False:
-                progress_callback.emit("Waiting for next buffer file to load in: " + next_file)
-
+                status_bar_message = "Waiting... {Piece: " + loadingDict['datapiece'] + ",  Run: " + loadingDict[
+                    'datarun'] + '}' \
+                                 " | Received Packets: " + str(loadingDict['num_of_buf']) + \
+                                     " | Processing Packet #" + str(last_file_idx) + \
+                                     " | Viewing Packet #" + str(last_file_idx)
+                progress_callback.emit(status_bar_message)
                 continue
             else:  # next file does exist, so process it
                 last_file_idx += 1 # update idx
-                print("NEW FILE: ", last_file_idx)
-                progress_callback.emit("Loading latest buffer file idx " + str(last_file_idx))
+
+                status_bar_message = "Real-Time {Piece: " + loadingDict['datapiece'] + ",  Run: " + loadingDict['datarun'] + '}'\
+                                     " | Received Packets: " + str(loadingDict['num_of_buf']) + \
+                                     " | Processing Packet #" + str(last_file_idx) + \
+                                     " | Viewing Packet #" + str(last_file_idx)
+
+                #progress_callback.emit("Loading latest buffer file idx " + str(last_file_idx))
+                progress_callback.emit(status_bar_message)
 
                 # In the off chance the file has been written, but not saved by the TCP socket yet, pause
                 time.sleep(0.5)
@@ -457,19 +490,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 start = time.time()
                 self.LoadedData.update_array_stats(data_real, N)
                 end = time.time()
-                if self.mode_profiling:
+                if self.gui_state['is_mode_profiling']:
                     self.profile_data['calculateArrayStats'] = end - start
 
                 start = time.time()
                 self.LoadedData.append_raw_data(data_real, cnt_real, N)
                 end = time.time()
-                if self.mode_profiling:
+                if self.gui_state['is_mode_profiling']:
                     self.profile_data['appendRawData'] = end - start
 
                 start = time.time()
                 self.LoadedData.update_filtered_data()
                 end = time.time()
-                if self.mode_profiling:
+                if self.gui_state['is_mode_profiling']:
                     self.profile_data['filterData'] = end - start
 
                 # we need to call the main GUI thread to update graphs (can't do with non GUI-thread)
@@ -489,7 +522,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.loading_dict = loadingDict
 
         # loading data freezes GUI -> multithread
-        if self.mode_multithreading:
+        if self.gui_state['is_mode_multithreading']:
             worker = Worker(self.loadDataFromFileMat, path, loadingDict)
             #worker.signals.result.connect(self.updateGUIWithNewData)
             self.threadpool.start(worker)
@@ -515,7 +548,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         print('applying filter...')
         self.filtered_data = applyFilterToAllData(self.dataAll, self.numChan, self.chMap, filtType=self.settings["filter"])
 
-        if self.mode_multithreading is False:  # if multi-threaded, then this function is already connected on completion of fn
+        if self.gui_state['is_mode_multithreading'] is False:  # if multi-threaded, then this function is already connected on completion of fn
             self.updateGUIWithNewData()
 
     def updateGUIWithNewData(self):
@@ -539,19 +572,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         for chart in self.charts.keys():
             chart_type = type(self.charts[chart])
             if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
-                if self.mode_profiling:
+                if self.gui_state['is_mode_profiling']:
                     start = time.time()
                 self.chart_update_function_mapping[chart]()
-                if self.mode_profiling:
+                if self.gui_state['is_mode_profiling']:
                     end = time.time()
                     self.profile_data[chart].append(end-start)
 
 
-        if self.mode_profiling:
+        if self.gui_state['is_mode_profiling']:
             self.printProfilingData()
 
     def printProfilingData(self):
-        if self.mode_profiling:
+        if self.gui_state['is_mode_profiling']:
             print("------------------------------")
             print("Current profiling statistics:")
             for key in self.profile_data.keys():
@@ -664,7 +697,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.charts["arrayMap"].addItem(scatter2)
 
             # add a square around electrodes displayed in the minimap
-            minimap_square_indicator = pg.QtGui.QGraphicsRectItem(self.center_row - 4.5, self.center_col - 2.5, 8, 4)
+            minimap_square_indicator = pg.QtGui.QGraphicsRectItem(self.gui_state['cursor_row'] - 4.5,
+                                                                  self.gui_state['cursor_col'] - 2.5, 8, 4)
             minimap_square_indicator.setPen(pg.mkPen(themes[CURRENT_THEME]['blue3']))
             minimap_square_indicator.setBrush(QColor(255,0,255,0))
             self.charts["arrayMap"].addItem(minimap_square_indicator)
@@ -823,6 +857,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
     def continouslyUpdateTracePlotData(self):
+
+        # TODO update for traces that are recorded one at a time, but 4 channels per packet
         NUM_UPDATES = 8
 
         if len(self.trace_channels_info) > 0:
@@ -867,8 +903,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         BAR_LENGTH = 4
         MAX_SPIKES = 16 # can't draw every spike or gui will crash -> group spikes together
 
-        for row in range(self.center_row-4, self.center_row+4):
-            for col in range(self.center_col-2, self.center_col+2):
+        for row in range(self.gui_state['cursor_row']-4, self.gui_state['cursor_row']+4):
+            for col in range(self.gui_state['cursor_col']-2, self.gui_state['cursor_col']+2):
 
                 if (row > 0) and (col > 0):
                     # print('r', row, 'c', col)
@@ -905,8 +941,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         for data_packet in to_search:
             chan_idx = data_packet['channel_idx']
             c, r = idx2map(chan_idx)
-            if (self.center_row - 4 <= r) & (r < self.center_row + 4) & \
-                    (self.center_col - 2 <= c) & (c < self.center_col + 2):
+            if (self.gui_state['cursor_row'] - 4 <= r) & (r < self.gui_state['cursor_row'] + 4) & \
+                    (self.gui_state['cursor_col'] - 2 <= c) & (c < self.gui_state['cursor_col'] + 2):
                 spikes_within_view.append(data_packet)
 
         for data_packet in spikes_within_view:
@@ -927,3 +963,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 spike_indicator.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
                 spike_indicator.setParentItem(spike_indicator_base)
                 self.charts["miniMap"].addItem(spike_indicator)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Up:
+            self.setMiniMapLoc(self.gui_state['cursor_row'] + 1, self.gui_state['cursor_col'])
+        if event.key() == Qt.Key_Down:
+            self.setMiniMapLoc(self.gui_state['cursor_row'] - 1, self.gui_state['cursor_col'])
+        if event.key() == Qt.Key_Right:
+            self.setMiniMapLoc(self.gui_state['cursor_row'], self.gui_state['cursor_col'] + 1)
+        if event.key() == Qt.Key_Left:
+            self.setMiniMapLoc(self.gui_state['cursor_row'], self.gui_state['cursor_col'] - 1)
+
+    def closeEvent(self, event):
+        quit_msg = "Are you sure you want to exit the program?"
+        reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
+                                               QtWidgets.QMessageBox.Cancel | QtWidgets.QMessageBox.Ok)
+        if reply == QtWidgets.QMessageBox.Ok:
+            event.accept()
+        else:
+            event.ignore()

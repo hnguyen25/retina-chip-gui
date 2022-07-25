@@ -47,7 +47,9 @@ def initDataLoading(path : str):
     bufDir = os.listdir(path)
     num_of_buf = len(bufDir)
     bramdepth = 65536
+
     datarun = os.path.basename(path)
+    datapiece = os.path.basename(os.path.dirname(path))
 
     # initialize variables
     dataAll = np.zeros((32, 32, int(bramdepth * num_of_buf / 2)))  # Largest possible value of dataAll, perfect recording, only double cnt
@@ -57,6 +59,7 @@ def initDataLoading(path : str):
     loadingDict = {
         "path": path,
         "datarun": datarun,
+        "datapiece": datapiece,
         "bufDir": bufDir,
         "num_of_buf": num_of_buf,
         "bramDepth": bramdepth,

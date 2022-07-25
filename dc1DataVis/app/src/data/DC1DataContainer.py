@@ -38,7 +38,8 @@ class DC1DataContainer():
         "recording_full_path": "",
         "recording_data": "",
         "recording_piece": "",
-        "recording_type": ""
+        "recording_type": "",
+        "numChannelsRecordedPerPacket": None
     }
 
     recording_type_dict = {
@@ -190,11 +191,20 @@ class DC1DataContainer():
             channel_idx = int(recorded_channels[i][0])
             start_idx = recorded_channels[i][0]
             x, y = idx2map(channel_idx)
+
+            # prune the times in the packet where nothing is recorded aka when data = 0
+            channel_data = data_real[x, y, start_idx:N]
+            channel_times = self.times[self.count_track + start_idx: self.count_track+N]
+            actual_recording_times = (channel_data != 0)
+
+            channel_times = channel_times[actual_recording_times]
+            channel_data = channel_data[actual_recording_times]
+
             channel_data = {
                 'channel_idx': channel_idx,
                 'start_idx': int(self.count_track + start_idx),  # start_idx is based only on buffer, so need to add time from previous buffers
-                'data': data_real[x, y, start_idx:N], # TODO make this accurate
-                'times': self.times[self.count_track + start_idx:self.count_track+N]
+                'data': channel_data,
+                'times': channel_times
             }
             channel_data = self.calculate_realtime_spike_info_for_channel_in_buffer(channel_data)
             self.preprocessed_data.append(channel_data)
