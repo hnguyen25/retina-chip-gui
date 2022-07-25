@@ -156,6 +156,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         if self.settings["visStyle"] == "Default":
             uic.loadUi("./src/gui/default_vis.ui", self)
 
+            ''' TODO
             self.RewindButton = QPushButton("⏪")
             self.RewindButton.setToolTip('REWIND plotting to the very first recording')
             self.RewindButton.setStyleSheet("background-color: white")
@@ -171,6 +172,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.statusBar().addPermanentWidget(self.RewindButton)
             self.statusBar().addPermanentWidget(self.TogglePlayButton)
             self.statusBar().addPermanentWidget(self.FastForwardButton)
+            '''
 
             self.charts["arrayMap"] = self.arrayMap
             setupArrayMap(self.charts["arrayMap"])
@@ -275,6 +277,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
         self.updateMiniMapPlot()
+        self.updateArrayMapPlot()
+
 
     def setupInteractivity(self):
         """ Connects all the different buttons with their respective actions. Also set up multithreading."""
@@ -375,11 +379,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
     def loadSession(self):
+        print('loadSession()')
         if self.settings["path"] == "":
             raise ValueError("Path is not specified!")
-
         if self.settings['realTime'] == "Yes, load first .mat chunk":
             self.onLoadRealtimeStream(load_from_beginning=True)
+            # update GUI
         elif self.settings['realTime'] == "Yes, load latest .mat chunk":
             self.onLoadRealtimeStream(load_from_beginning=False)
         elif self.settings['realTime'] == "No, load raw .mat file":
@@ -396,6 +401,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     # (1) Yes, load first .mat chunk & (2) Yes, load latest .mat chunk
     def onLoadRealtimeStream(self, load_from_beginning = True):
+        print('onLoadRealtimeStream()')
         self.loading_dict = initDataLoading(self.settings["path"])
 
         # TODO parallelize loading already saved .mat files
@@ -440,6 +446,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         Returns:
 
         """
+        print('realtimeLoading()')
 
         progress_callback.emit("in realtimeloading(): " + path)
 
@@ -551,6 +558,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         if self.gui_state['is_mode_multithreading'] is False:  # if multi-threaded, then this function is already connected on completion of fn
             self.updateGUIWithNewData()
 
+    '''
+    def MainGUILoop(self, REFRESH_RATE=100):
+        # REFRESH_RATE in ms
+
+        last_updated_time = time.time()
+
+        while (last_updated_time
+    '''
+
     def updateGUIWithNewData(self):
         """
 
@@ -594,7 +610,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             print("------------------------------\n")
 
     def updateArrayMapPlot(self):
-
         self.charts["arrayMap"].clear()
 
         if self.arrayMapHoverCoords is not None:
@@ -905,9 +920,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         for row in range(self.gui_state['cursor_row']-4, self.gui_state['cursor_row']+4):
             for col in range(self.gui_state['cursor_col']-2, self.gui_state['cursor_col']+2):
-
                 if (row > 0) and (col > 0):
-                    # print('r', row, 'c', col)
                     spike_indicator_base = pg.QtGui.QGraphicsRectItem(row*5, col*5, BAR_LENGTH, 0.2)
                     spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
                     spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
@@ -946,12 +959,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 spikes_within_view.append(data_packet)
 
         for data_packet in spikes_within_view:
-
             chan_idx = data_packet['channel_idx']
             row, col = idx2map(chan_idx)
             spikeBins = data_packet['spikeBins']
             spikeBinsMaxAmp = data_packet['spikeBinsMaxAmp']
-
             spikeLocs = np.argwhere(spikeBins == True)
 
             num_bins = data_packet['num_bins_in_buffer']
@@ -966,13 +977,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Up:
-            self.setMiniMapLoc(self.gui_state['cursor_row'] + 1, self.gui_state['cursor_col'])
+            self.setMiniMapLoc(self.gui_state['cursor_row'], self.gui_state['cursor_col']+1)
         if event.key() == Qt.Key_Down:
-            self.setMiniMapLoc(self.gui_state['cursor_row'] - 1, self.gui_state['cursor_col'])
+            self.setMiniMapLoc(self.gui_state['cursor_row'], self.gui_state['cursor_col']-1)
         if event.key() == Qt.Key_Right:
-            self.setMiniMapLoc(self.gui_state['cursor_row'], self.gui_state['cursor_col'] + 1)
+            self.setMiniMapLoc(self.gui_state['cursor_row']+1, self.gui_state['cursor_col'])
         if event.key() == Qt.Key_Left:
-            self.setMiniMapLoc(self.gui_state['cursor_row'], self.gui_state['cursor_col'] - 1)
+            self.setMiniMapLoc(self.gui_state['cursor_row']-1, self.gui_state['cursor_col'])
 
     def closeEvent(self, event):
         quit_msg = "Are you sure you want to exit the program?"

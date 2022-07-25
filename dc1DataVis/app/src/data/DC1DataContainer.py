@@ -28,7 +28,7 @@ class DC1DataContainer():
     # data processing settings
     data_processing_settings = {
         "filter": None, # for use in filtered_data, see full list in filters.py
-        "spikeThreshold": 5,  # How many standard deviations above noise to find spikes
+        "spikeThreshold": 4,  # How many standard deviations above noise to find spikes
         "binSize": 1, # 1ms
         "simultaneousChannelsRecordedPerPacket": 4
     }
@@ -232,14 +232,14 @@ class DC1DataContainer():
 
         return channel_data
 
-    def getAboveThresholdActivity(self, data, times, channel_noise_mean, channel_noise_std, spike_threshold, filtered=True):
+    def getAboveThresholdActivity(self, data, times, channel_noise_mean, channel_noise_std, spike_threshold, filtered=False):
         if filtered:
-            above_threshold = 0 + spike_threshold * channel_noise_std # filtered data -> makes mean 0
+            below_threshold = 0 + spike_threshold * channel_noise_std # filtered data -> makes mean 0
         else:
-            above_threshold = channel_noise_mean + spike_threshold * channel_noise_std
-        above_threshold_activity = (abs(data) >= above_threshold)
-        incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
+            below_threshold = channel_noise_mean - (spike_threshold * channel_noise_std)
 
+        above_threshold_activity = (data < below_threshold)
+        incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
         incom_spike_times = times[incom_spike_idx]
         incom_spike_amplitude = data[incom_spike_idx]
 
