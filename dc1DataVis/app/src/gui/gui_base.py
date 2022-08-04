@@ -891,16 +891,31 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                         plot_dict['curr_y'].append(plot_dict['y'][plot_dict['len_time_in']])
                         plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
 
-    def updateNoiseHistogramPlot(self):
+    def updateNoiseHistogramPlot(self, debug=False):
         self.charts["noiseHistogram"].clear()
         vals = self.LoadedData.array_stats['noise_std']
         vals = vals[np.nonzero(vals)]
         # get nonzero vals because zeros have not had noise calculation done yet
 
-        y, x = np.histogram(vals, bins=np.linspace(0,20,40))
-        curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=themes[CURRENT_THEME]['blue1'])
+        cm = pg.colormap.get('plasma', source='matplotlib')
 
-        self.charts["noiseHistogram"].addItem(curve)
+        y, x = np.histogram(vals, bins=np.linspace(0, 20, 40))
+
+        colors = cm.getColors()
+
+        scale = int(len(colors) / int(max(vals)))
+
+        for i in range(len(x) - 1):
+            bins = [x[i], x[i + 1]]
+            values = [y[i]]
+
+            curve = pg.PlotCurveItem(bins, values, stepMode=True, fillLevel=0,
+                                     brush=colors[int(x[i]) * scale])
+
+            if debug:
+                print("max val: " + str(max(vals)))
+
+            self.charts["noiseHistogram"].addItem(curve)
 
     def updateSpikeRatePlot(self):
         self.charts["spikeRatePlot"].clear()
