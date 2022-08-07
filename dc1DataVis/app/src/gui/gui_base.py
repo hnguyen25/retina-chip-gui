@@ -198,11 +198,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         elif self.settings["visStyle"] == "Spike Search":
             uic.loadUi("./src/gui/spikefinding_vis.ui", self)
 
-            self.charts["ResetButton"] = self.ResetButton
+            self.charts["ResetButton"] = self.resetButton
             self.charts["nextFigButton"] = self.nextFigButton
             self.charts["yScaleButton"] = self.yScaleButton
-            self.charts["backButton"] = self.BackButton
-            self.charts["nextButton"] = self.Next
+            self.charts["backButton"] = self.backButton
+            self.charts["nextButton"] = self.nextButton
             self.charts["atTimeWindowButton"] = self.atTimeWindowButton
 
             self.charts["spikeTraces"] = [[], [], [], [], [], []] #TODO: this appears to be unused?
@@ -239,8 +239,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.timer.start()
 
         # just sets background to white TODO make this cleaner
-        self.toggleDarkMode()
-        self.toggleDarkMode()
+        #self.toggleDarkMode()
+        #self.toggleDarkMode()
 
     def showArrayLocOnStatusBar(self, x, y):
         """ Given x, y mouse location on a chart -> display on the status bar on the bottom of the GUI
@@ -891,7 +891,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                         plot_dict['curr_y'].append(plot_dict['y'][plot_dict['len_time_in']])
                         plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
 
-    def updateNoiseHistogramPlot(self, debug=False):
+    def updateNoiseHistogramPlot(self, debug=True):
         self.charts["noiseHistogram"].clear()
         vals = self.LoadedData.array_stats['noise_std']
         vals = vals[np.nonzero(vals)]
@@ -899,21 +899,30 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         cm = pg.colormap.get('plasma', source='matplotlib')
 
-        y, x = np.histogram(vals, bins=np.linspace(0, 20, 40))
+        y, x = np.histogram(vals, bins=np.linspace(0, 15, 30))
 
         colors = cm.getColors()
 
-        scale = int(len(colors) / int(max(vals)))
+        scale = (int(len(colors) / 10))
+
+        if debug:
+            print(scale)
 
         for i in range(len(x) - 1):
             bins = [x[i], x[i + 1]]
             values = [y[i]]
 
-            curve = pg.PlotCurveItem(bins, values, stepMode=True, fillLevel=0,
-                                     brush=colors[int(x[i]) * scale])
+            color = int(scale*x[i])
+
+            if color > 255:
+                color = 255
 
             if debug:
-                print("max val: " + str(max(vals)))
+                print(x[i])
+                print(color)
+
+            curve = pg.PlotCurveItem(bins, values, stepMode=True, fillLevel=0,
+                                     brush=colors[color])
 
             self.charts["noiseHistogram"].addItem(curve)
 
