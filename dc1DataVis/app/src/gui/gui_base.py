@@ -102,10 +102,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             # (useful to know for setting up PyQtGraph charts)
             'is_live_plotting': True,  # indicates if the program is still continuously reading available data packets
             'is_true_realtime': True, # indicates if the program is continuously reading the LAST available data packet
-
             'curr_processing_buf_idx' : 0, # the latest buffer that has been processed and put into DC1DataContainer
             'curr_viewing_buf_idx': 0, # the latest buffer that has been added to the GUI chart
-            
+
             # center of the minimap, this can be set by user on mouse click on the array map
             'cursor_row': 16,
             'cursor_col': 16
@@ -123,7 +122,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             "channelTrace1": self.updateChannelTracePlot, "arrayMap": self.updateArrayMapPlot,
             "noiseHeatMap": self.updateNoiseHeatMap
         }
-
         '''old
         self.chart_update_function_mapping = {
             "arrayMap": self.updateArrayMapPlot, "miniMap": self.updateMiniMapPlot,
@@ -156,7 +154,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         if self.settings["visStyle"] == "Default":
             uic.loadUi("./src/gui/default_vis.ui", self)
 
-            ''' TODO
             self.RewindButton = QPushButton("⏪")
             self.RewindButton.setToolTip('REWIND plotting to the very first recording')
             self.RewindButton.setStyleSheet("background-color: white")
@@ -172,7 +169,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.statusBar().addPermanentWidget(self.RewindButton)
             self.statusBar().addPermanentWidget(self.TogglePlayButton)
             self.statusBar().addPermanentWidget(self.FastForwardButton)
-            '''
 
             self.charts["arrayMap"] = self.arrayMap
             setupArrayMap(self.charts["arrayMap"])
@@ -264,14 +260,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             y: x value on window as detected by mouse on click
         """
         self.gui_state['cursor_row'] = int(x)
-        if self.gui_state['cursor_row'] < 6:
-            self.gui_state['cursor_row'] = 6
+        if self.gui_state['cursor_row'] < 4:
+            self.gui_state['cursor_row'] = 4
         elif self.gui_state['cursor_row'] > 26:
             self.gui_state['cursor_row'] = 26
 
         self.gui_state['cursor_col'] = int(y)
-        if self.gui_state['cursor_col'] < 4:
-            self.gui_state['cursor_col'] = 4
+        if self.gui_state['cursor_col'] < 2:
+            self.gui_state['cursor_col'] = 2
         elif self.gui_state['cursor_col'] > 29:
             self.gui_state['cursor_col'] = 29
 
@@ -814,55 +810,58 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         """
         len_data = len(self.LoadedData.filtered_data)
 
+
         self.trace_channels_info = []
         # Generate subplots
         for m, plt in enumerate(trace_plots):
-            plt.clear()
 
-            idx_of_channel_order = len_data + (m - self.LoadedData.data_processing_settings["simultaneousChannelsRecordedPerPacket"])
-            chan_idx = self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']
-            row, col = idx2map(chan_idx)
+            if m < int(self.settings['numChannels']): #TODO stopgap actually implement num of trace plots for simult recordings
+                plt.clear()
+                idx_of_channel_order = len_data + (m - self.LoadedData.data_processing_settings["simultaneousChannelsRecordedPerPacket"])
 
-            x = self.LoadedData.filtered_data[idx_of_channel_order]['times']
-            y = self.LoadedData.filtered_data[idx_of_channel_order]['data']
-            noise_mean = self.LoadedData.array_stats['noise_mean'][row, col]
-            noise_std = self.LoadedData.array_stats['noise_std'][row, col]
+                chan_idx = self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']
+                row, col = idx2map(chan_idx)
 
-            if noise_std == 0:
-                plt.setAutoVisible(y=True)
-            else:
-                plt.setYRange(- 3 * noise_std, 3 * noise_std, padding=0)
+                x = self.LoadedData.filtered_data[idx_of_channel_order]['times']
+                y = self.LoadedData.filtered_data[idx_of_channel_order]['data']
+                noise_mean = self.LoadedData.array_stats['noise_mean'][row, col]
+                noise_std = self.LoadedData.array_stats['noise_std'][row, col]
 
-            begin_time = x[0]
-            end_time = x[-1]
-            tooltip_text = '<html>Trace signal of electrode #' + str(chan_idx) + \
-                           '<br>Row ' + str(row) + ', Column ' + str(col) + \
-                           '<br>From time ' + str(round(begin_time, 2)) + 's to ' + str(round(end_time, 2)) + \
-                           's after this recording started.' + \
-                           '<\html>'
+                if noise_std == 0:
+                    plt.setAutoVisible(y=True)
+                else:
+                    plt.setYRange(- 3 * noise_std, 3 * noise_std, padding=0)
 
-            plt.setToolTip(tooltip_text)
+                begin_time = x[0]
+                end_time = x[-1]
+                tooltip_text = '<html>Trace signal of electrode #' + str(chan_idx) + \
+                               '<br>Row ' + str(row) + ', Column ' + str(col) + \
+                               '<br>From time ' + str(round(begin_time, 2)) + 's to ' + str(round(end_time, 2)) + \
+                               's after this recording started.' + \
+                               '<\html>'
 
-            LEN_BUFFER = len(self.LoadedData.filtered_data[idx_of_channel_order]['data'])
-            NUM_TIME_IN_WINDOW = 2000
-            if NUM_TIME_IN_WINDOW > LEN_BUFFER:
-                NUM_TIME_IN_WINDOW = LEN_BUFFER
+                plt.setToolTip(tooltip_text)
 
-            plot_dict = {'linked_plot': plt, 'chan_idx': chan_idx,
-                         'x': self.LoadedData.filtered_data[idx_of_channel_order]['times'],
-                         'y': self.LoadedData.filtered_data[idx_of_channel_order]['data'], 'len_buffer': LEN_BUFFER,
-                         'NUM_TIME_IN_WINDOW': NUM_TIME_IN_WINDOW, 'len_time_in': NUM_TIME_IN_WINDOW,
-                         'curr_x': list(x[0:NUM_TIME_IN_WINDOW]), 'curr_y': list(y[0:NUM_TIME_IN_WINDOW]),
-                         'noise_mean': self.LoadedData.array_stats['noise_mean'][row, col],
-                         'noise_std': self.LoadedData.array_stats['noise_std'][row, col], 'tooltip_text': tooltip_text,
-                         'pause': False}
+                LEN_BUFFER = len(self.LoadedData.filtered_data[idx_of_channel_order]['data'])
+                NUM_TIME_IN_WINDOW = 2000
+                if NUM_TIME_IN_WINDOW > LEN_BUFFER:
+                    NUM_TIME_IN_WINDOW = LEN_BUFFER
 
-            plot_dict['test'] = plt.plot(plot_dict['curr_x'] , plot_dict['curr_y'],
-                                         pen=pg.mkPen(themes[CURRENT_THEME]['blue1']))
-            self.trace_channels_info.append(plot_dict)
+                plot_dict = {'linked_plot': plt, 'chan_idx': chan_idx,
+                             'x': self.LoadedData.filtered_data[idx_of_channel_order]['times'],
+                             'y': self.LoadedData.filtered_data[idx_of_channel_order]['data'], 'len_buffer': LEN_BUFFER,
+                             'NUM_TIME_IN_WINDOW': NUM_TIME_IN_WINDOW, 'len_time_in': NUM_TIME_IN_WINDOW,
+                             'curr_x': list(x[0:NUM_TIME_IN_WINDOW]), 'curr_y': list(y[0:NUM_TIME_IN_WINDOW]),
+                             'noise_mean': self.LoadedData.array_stats['noise_mean'][row, col],
+                             'noise_std': self.LoadedData.array_stats['noise_std'][row, col], 'tooltip_text': tooltip_text,
+                             'pause': False}
 
-            plt.setLabel('left', '#' + str(self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']))
-            plt.getAxis("left").setTextPen(themes[CURRENT_THEME]['dark1'])
+                plot_dict['test'] = plt.plot(plot_dict['curr_x'] , plot_dict['curr_y'],
+                                             pen=pg.mkPen(themes[CURRENT_THEME]['blue1']))
+                self.trace_channels_info.append(plot_dict)
+
+                plt.setLabel('left', '#' + str(self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']))
+                plt.getAxis("left").setTextPen(themes[CURRENT_THEME]['dark1'])
 
 
     def pausePlotting(self):
@@ -874,29 +873,31 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     def continouslyUpdateTracePlotData(self):
 
         # TODO update for traces that are recorded one at a time, but 4 channels per packet
-        NUM_UPDATES = 8
+        SPEED = 1
 
         if len(self.trace_channels_info) > 0:
+            NUM_SAMPS_REFRESHED = int(self.trace_channels_info[0]['len_buffer'] * (SPEED / 1000))
+
             time_in = self.trace_channels_info[0]['len_time_in']
             length_of_buffer = self.trace_channels_info[0]['len_buffer']
 
-            if time_in + NUM_UPDATES + 1 < length_of_buffer:
-                for i in range(NUM_UPDATES):
-                    for plot_dict in self.trace_channels_info:
-                        plot_dict['curr_x'] = plot_dict['curr_x'][1:]
-                        plot_dict['curr_y'] = plot_dict['curr_y'][1:]
-                        plot_dict['len_time_in'] += 1
-
-                        plot_dict['curr_x'].append(plot_dict['x'][plot_dict['len_time_in']])
-                        plot_dict['curr_y'].append(plot_dict['y'][plot_dict['len_time_in']])
-                        plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
+            if time_in + NUM_SAMPS_REFRESHED + 1 < length_of_buffer:
+                for plot_dict in self.trace_channels_info:
+                    plot_dict['len_time_in'] += NUM_SAMPS_REFRESHED
+                    refresh_time_begin = plot_dict['len_time_in'] - NUM_SAMPS_REFRESHED
+                    refresh_time_end = plot_dict['len_time_in']
+                    new_x = plot_dict['x'][refresh_time_begin:refresh_time_end]
+                    new_y = plot_dict['y'][refresh_time_begin:refresh_time_end]
+                    plot_dict['curr_x'] = np.concatenate([plot_dict['curr_x'][NUM_SAMPS_REFRESHED:], new_x])
+                    plot_dict['curr_y'] = np.concatenate([plot_dict['curr_y'][NUM_SAMPS_REFRESHED:], new_y])
+                    plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
 
     def updateNoiseHistogramPlot(self):
         self.charts["noiseHistogram"].clear()
         vals = self.LoadedData.array_stats['noise_std']
         vals = vals[np.nonzero(vals)]
-        # get nonzero vals because zeros have not had noise calculation done yet
 
+        # get nonzero vals because zeros have not had noise calculation done yet
         y, x = np.histogram(vals, bins=np.linspace(0,20,40))
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=themes[CURRENT_THEME]['blue1'])
 
@@ -920,7 +921,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         for row in range(self.gui_state['cursor_row']-4, self.gui_state['cursor_row']+4):
             for col in range(self.gui_state['cursor_col']-2, self.gui_state['cursor_col']+2):
-                if (row > 0) and (col > 0):
+                if (row > -2) and (col > -2):
                     spike_indicator_base = pg.QtGui.QGraphicsRectItem(row*5, col*5, BAR_LENGTH, 0.2)
                     spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
                     spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
