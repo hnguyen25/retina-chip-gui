@@ -81,7 +81,7 @@ class IndividualChannelInformation(QWidget):
                                   + "ms")
         self.numSpikes.setText("Number of spikes: " + str(sum(self.electrode_spikes)))
         end = time.time()
-        if self.session_parent.mode_profiling:
+        if self.session_parent.gui_state['is_mode_profiling']:
             print("Individual Channel update time: " + str(np.round(end-start,2)))
 
     def updateElectrodeData(self):
@@ -105,7 +105,7 @@ class IndividualChannelInformation(QWidget):
         # Get lists of times and data from each packet for the selected electrode
         for i in range(len(self.electrode_packets)):
             self.session_parent.LoadedData.\
-                calculate_realtime_spike_info_for_channel_in_buffer(self.electrode_packets[i])
+                calculate_realtime_spike_info_for_channel_in_buffer(self.electrode_packets[i], filtered=True)
             self.electrode_spikes.extend(self.electrode_packets[i]["spikeBins"])
             self.electrode_spike_times.extend(self.electrode_packets[i]["incom_spike_times"])
             self.electrode_times.extend(self.electrode_packets[i]['times'])

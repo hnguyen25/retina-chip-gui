@@ -917,9 +917,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             if color > 255:
                 color = 255
 
+            '''
             if debug:
                 print(x[i])
                 print(color)
+            '''
 
             curve = pg.PlotCurveItem(bins, values, stepMode=True, fillLevel=0,
                                      brush=colors[color])

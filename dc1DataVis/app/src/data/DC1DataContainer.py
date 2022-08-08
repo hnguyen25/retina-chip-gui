@@ -206,6 +206,8 @@ class DC1DataContainer():
                 'data': channel_data,
                 'times': channel_times
             }
+
+            # TODO run spike detection on filtered data
             channel_data = self.calculate_realtime_spike_info_for_channel_in_buffer(channel_data)
             self.preprocessed_data.append(channel_data)
 
@@ -214,11 +216,19 @@ class DC1DataContainer():
 
         # TODO this shouldn't call update_filtered_data -> should be async, and threaded
 
-    def calculate_realtime_spike_info_for_channel_in_buffer(self, channel_data):
-
+    def calculate_realtime_spike_info_for_channel_in_buffer(self, channel_data, filtered=False):
+        print('calculate realtime spike info func')
+        print('self.data_processing-setting', self.data_processing_settings['spikeThreshold'])
         row, col = idx2map(channel_data['channel_idx'])
-        noise_mean = self.array_stats["noise_mean"][row, col]
-        noise_std = self.array_stats["noise_std"][row, col]
+
+        if filtered is True:
+            noise_mean = 0
+            noise_std = np.std(channel_data['data'])
+            print('filtered and with new std of', noise_std)
+        else:
+            noise_mean = self.array_stats["noise_mean"][row, col]
+            noise_std = self.array_stats["noise_std"][row, col]
+
         incom_spike_times, incom_spike_amplitude = self.getAboveThresholdActivity(channel_data['data'], channel_data['times'],
                                                                                   noise_mean, noise_std,
                                                                                   self.data_processing_settings['spikeThreshold'])
@@ -229,6 +239,8 @@ class DC1DataContainer():
         channel_data["spikeBins"] = spikeBins
         channel_data["spikeBinsMaxAmp"] = spikeBinsMaxAmp
         channel_data["num_bins_in_buffer"] = NUM_BINS_IN_BUFFER
+
+        print('spikeBins', channel_data['spikeBins'])
 
         return channel_data
 
