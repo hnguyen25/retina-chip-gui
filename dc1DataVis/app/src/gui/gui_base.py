@@ -23,6 +23,7 @@ from ..analysis.PyqtGraphParams import *
 from ..gui.worker import *  # multithreading
 
 from ..gui.default_vis import Ui_mainWindow # layout
+from ..gui.gui_individualchannel import IndividualChannelInformation
 from ..gui.gui_guipreferences import *
 from ..gui.gui_charts_helper import *
 
@@ -201,7 +202,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.charts["nextButton"] = self.nextButton
             self.charts["atTimeWindowButton"] = self.atTimeWindowButton
 
-            self.charts["spikeTraces"] = [[], [], [], [], [], []] #TODO: this appears to be unused?
+            self.charts.clear()
+
+           # self.charts["spikeTraces"] = [[], [], [], [], [], []] #TODO: this appears to be unused?
             for i in range(1, 7):
                 for j in range(1, 7):
                     chart_name = "r" + str(i) + "c" + str(j)
@@ -210,11 +213,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         elif self.settings["visStyle"] == "Noise":
             uic.loadUi("./src/gui/NoiseWindow.ui", self)
-
-            # self.charts["arrayMap"] = self.arrayMap
-            # setupArrayMap(self.charts["arrayMap"])
-            # self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,
-            #                                            self.setMiniMapLoc)
 
             self.charts["noiseHeatMap"] = self.noiseHeatMap
             self.charts["noiseHistogram"] = self.noiseHistogramPlot
@@ -563,6 +561,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         while (last_updated_time
     '''
 
+    def getRC(self, string):
+        """
+        Function to extract row and col from string in form "r#c#"
+        Returns: row and column strings
+
+        """
+        newStr = string.split("c")
+        row = newStr[0].split("r")[1]
+        col = newStr[1]
+        return row, col
+
     def updateGUIWithNewData(self):
         """
 
@@ -574,22 +583,34 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         # prioritize processing channel trace plot info first #TODO optimization - this is slightly inefficient
 
-        for chart in self.charts.keys():
-            chart_type = type(self.charts[chart])
-            # then it's the list of channel traces
-            if chart_type is list:
-                print(chart)
-                self.updateChannelTracePlot(self.charts[chart])
+        # if doing spike search, don't use the normal update methods
+        if self.settings["visStyle"] == "Spike Search":
+            for elec in self.charts.keys():
+                row, col = self.getRC(elec)
+                individualChannel = IndividualChannelInformation()
+                individualChannel.setSessionParent(self)
+                IndividualChannelInformation.current_elec = map2idx(int(row), int(col))
+                individualChannel.updateElectrodeData()
+                self.charts[elec].plot(individualChannel.electrode_times,
+                                       individualChannel.electrode_data)
 
-        for chart in self.charts.keys():
-            chart_type = type(self.charts[chart])
-            if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
-                if self.gui_state['is_mode_profiling']:
-                    start = time.time()
-                self.chart_update_function_mapping[chart]()
-                if self.gui_state['is_mode_profiling']:
-                    end = time.time()
-                    self.profile_data[chart].append(end-start)
+        else:
+            for chart in self.charts.keys():
+                chart_type = type(self.charts[chart])
+                # then it's the list of channel traces
+                if chart_type is list:
+                    print(chart)
+                    self.updateChannelTracePlot(self.charts[chart])
+
+            for chart in self.charts.keys():
+                chart_type = type(self.charts[chart])
+                if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
+                    if self.gui_state['is_mode_profiling']:
+                        start = time.time()
+                    self.chart_update_function_mapping[chart]()
+                    if self.gui_state['is_mode_profiling']:
+                        end = time.time()
+                        self.profile_data[chart].append(end-start)
 
 
         if self.gui_state['is_mode_profiling']:
@@ -802,7 +823,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     def updateChannelTracePlot(self, trace_plots):
         """
         This function updates the data for the trace plots when a new packet arrives. The plots are updated even faster
-        through 'continuouslyUpdateTracePlots()', which scans through the packet slowly to visualize data as realtime.
+        through 'continuouslyUpdateTracePlotData()', which scans through the packet slowly to visualize data as realtime.
         Args:
             trace_plots:
 
