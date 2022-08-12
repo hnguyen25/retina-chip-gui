@@ -82,6 +82,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     trace_channels_info = []
 
     ### MISCELLANEOUS ###
+    pageNum = 1 # used for knowing which traces to display in spike search mode. Zero-indexed
     p = None
     arrayMap_colorbar = None  # reference to the colorbar embedded with the array map chart
     noiseHeatMap_colorbar = None
@@ -193,23 +194,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             setupSpikeTrace(self.charts["channelTraces"])
 
         elif self.settings["visStyle"] == "Spike Search":
+
             uic.loadUi("./src/gui/spikefinding_vis.ui", self)
 
-            self.charts["ResetButton"] = self.resetButton
-            self.charts["nextFigButton"] = self.nextFigButton
-            self.charts["yScaleButton"] = self.yScaleButton
-            self.charts["backButton"] = self.backButton
-            self.charts["nextButton"] = self.nextButton
-            self.charts["atTimeWindowButton"] = self.atTimeWindowButton
+
+            # self.charts["ResetButton"] = self.resetButton
+            # self.charts["nextFigButton"] = self.nextFigButton
+            # self.charts["yScaleButton"] = self.yScaleButton
+            # self.charts["backButton"] = self.backButton
+            # self.charts["nextButton"] = self.nextButton
+            # self.charts["atTimeWindowButton"] = self.atTimeWindowButton
 
             self.charts.clear()
+            self.FigureLabel.setText("Page: " + str(self.pageNum))
 
-           # self.charts["spikeTraces"] = [[], [], [], [], [], []] #TODO: this appears to be unused?
-            for i in range(1, 7):
-                for j in range(1, 7):
+
+            for i in range(0,6):
+                for j in range(0,6):
                     chart_name = "r" + str(i) + "c" + str(j)
                     self.charts[chart_name] = eval("self." + chart_name)
-                    setupOneSpikeTrace(self.charts[chart_name])
+
+            self.setupInteractivity()
+            self.updateSpikeSearchPlots()
 
         elif self.settings["visStyle"] == "Noise":
             uic.loadUi("./src/gui/NoiseWindow.ui", self)
@@ -286,6 +292,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.actionIndividualChannelInfo.triggered.connect(self.viewNewIndividualChannelInformation)
         self.actionListElectrodesInfo.triggered.connect(self.viewChannelListInformation)
         self.actionAnalysisParameters.triggered.connect(self.viewGUIPreferences)
+        if self.settings["visStyle"] == "Spike Search":
+            self.resetButton.clicked.connect(self.updateSpikeSearchPlots)
+            self.nextButton.clicked.connect(self.nextPage)
+            self.backButton.clicked.connect(self.backPage)
 
     def viewNewIndividualChannelInformation(self):
         """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
@@ -561,16 +571,86 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         while (last_updated_time
     '''
 
-    def getRC(self, string):
+    # def getRC(self, string):
+    #     """
+    #     Function to extract row and col from string in form "r#c#"
+    #     Returns: row and column strings
+    #
+    #     """
+    #     newStr = string.split("c")
+    #     row = newStr[0].split("r")[1]
+    #     col = newStr[1]
+    #     return row, col
+
+    def electrodeToPlotGrid(self, electrodeNum):
         """
-        Function to extract row and col from string in form "r#c#"
-        Returns: row and column strings
+
+        Args:
+            electrodeNum: electrode number on RC array (0-1023)
+
+        Returns: row, col (each between 0 and 5) for the 6x6 plot grid
 
         """
-        newStr = string.split("c")
-        row = newStr[0].split("r")[1]
-        col = newStr[1]
+        electrodeNum = electrodeNum - 36 * self.pageNum
+        row = int(electrodeNum/6)
+        col = int(electrodeNum - row * 6)
         return row, col
+
+
+    def getTracesToPlot(self):
+        """
+        Function to determine which electrodes to plot given what page of spike
+        search GUI user is on
+
+        Returns: 36 electrodes #s in a list
+
+        """
+        tracesToPlot = []
+        for i in range(36):
+            tracesToPlot.append(self.pageNum * 36 + i)
+        return tracesToPlot
+
+    def clearSpikeSearchPlots(self):
+
+
+    def nextPage(self):
+        if self.pageNum < 29:
+            self.pageNum += 1
+            self.FigureLabel.setText("Page: " + str(self.pageNum))
+            self.updateSpikeSearchPlots()
+
+    def backPage(self):
+        if self.pageNum > 0:
+            self.pageNum -= 1
+            self.FigureLabel.setText("Page: " + str(self.pageNum))
+            self.updateSpikeSearchPlots()
+
+    def updateSpikeSearchPlots(self):
+        """
+
+        Returns:
+
+        """
+
+        # First, clear the plots
+        self.charts["r0c3"].clear()
+
+        # Second, set up the plot figures for every electrode on the page
+        for elec in self.getTracesToPlot():
+            row, col = self.electrodeToPlotGrid(elec)
+            setupOneSpikeTrace(self.charts["r" + str(row) + "c" + str(col)],elec)
+
+        individualChannel = IndividualChannelInformation()
+        individualChannel.setSessionParent(self)
+
+        # Third, fill in plots with what data you have
+        for elec in self.getTracesToPlot():
+            individualChannel.current_elec = elec
+            individualChannel.updateElectrodeData()
+            row, col = self.electrodeToPlotGrid(elec)
+            gridToPlot = "r" + str(row) + "c" + str(col)
+            self.charts[gridToPlot].plot(individualChannel.electrode_times,
+                                   individualChannel.electrode_data)
 
     def updateGUIWithNewData(self):
         """
@@ -585,15 +665,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         # if doing spike search, don't use the normal update methods
         if self.settings["visStyle"] == "Spike Search":
-            for elec in self.charts.keys():
-                row, col = self.getRC(elec)
-                individualChannel = IndividualChannelInformation()
-                individualChannel.setSessionParent(self)
-                IndividualChannelInformation.current_elec = map2idx(int(row), int(col))
-                individualChannel.updateElectrodeData()
-                self.charts[elec].plot(individualChannel.electrode_times,
-                                       individualChannel.electrode_data)
-
+            self.updateSpikeSearchPlots()
         else:
             for chart in self.charts.keys():
                 chart_type = type(self.charts[chart])
