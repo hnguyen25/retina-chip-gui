@@ -230,7 +230,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         else:
             sys.exit()
 
-        self.setupInteractivity()
+        # Because we needed to call self.setupInteractivity separately in
+        # the case that Spike Search is called, we don't want to call it twice (causes a bug)
+        if self.settings["visStyle"] != "Spike Search":
+            self.setupInteractivity()
 
         # for continuously scanning through trace plot data
         self.timer = QtCore.QTimer()
