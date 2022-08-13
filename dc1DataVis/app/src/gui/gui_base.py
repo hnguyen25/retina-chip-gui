@@ -611,17 +611,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         return tracesToPlot
 
     def clearSpikeSearchPlots(self):
+        for chart in self.charts:
+            self.charts[chart].clear()
 
 
     def nextPage(self):
         if self.pageNum < 29:
             self.pageNum += 1
+            print("here, nextPage, pageNum: " + str(self.pageNum))
             self.FigureLabel.setText("Page: " + str(self.pageNum))
             self.updateSpikeSearchPlots()
 
     def backPage(self):
         if self.pageNum > 0:
             self.pageNum -= 1
+            print("here, backPage, pageNum: " + str(self.pageNum))
             self.FigureLabel.setText("Page: " + str(self.pageNum))
             self.updateSpikeSearchPlots()
 
@@ -633,7 +637,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         """
 
         # First, clear the plots
-        self.charts["r0c3"].clear()
+        self.clearSpikeSearchPlots()
 
         # Second, set up the plot figures for every electrode on the page
         for elec in self.getTracesToPlot():
