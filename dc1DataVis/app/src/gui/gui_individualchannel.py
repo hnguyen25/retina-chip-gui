@@ -113,7 +113,7 @@ class IndividualChannelInformation(QWidget):
 
         self.recordedTime = round((len(self.electrode_data)) * 0.05, 2)
 
-# TODO
+    # TODO
 
     def updateAmplitudeHist(self):
         vals = self.electrode_data
