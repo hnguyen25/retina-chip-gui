@@ -23,6 +23,7 @@ from ..analysis.PyqtGraphParams import *
 from ..gui.worker import *  # multithreading
 
 from ..gui.default_vis import Ui_mainWindow # layout
+from ..gui.gui_individualchannel import IndividualChannelInformation
 from ..gui.gui_guipreferences import *
 from ..gui.gui_charts_helper import *
 
@@ -81,6 +82,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     trace_channels_info = []
 
     ### MISCELLANEOUS ###
+    pageNum = 1 # used for knowing which traces to display in spike search mode. Zero-indexed
     p = None
     arrayMap_colorbar = None  # reference to the colorbar embedded with the array map chart
     noiseHeatMap_colorbar = None
@@ -192,29 +194,31 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             setupSpikeTrace(self.charts["channelTraces"])
 
         elif self.settings["visStyle"] == "Spike Search":
+
             uic.loadUi("./src/gui/spikefinding_vis.ui", self)
 
-            self.charts["ResetButton"] = self.resetButton
-            self.charts["nextFigButton"] = self.nextFigButton
-            self.charts["yScaleButton"] = self.yScaleButton
-            self.charts["backButton"] = self.backButton
-            self.charts["nextButton"] = self.nextButton
-            self.charts["atTimeWindowButton"] = self.atTimeWindowButton
 
-            self.charts["spikeTraces"] = [[], [], [], [], [], []] #TODO: this appears to be unused?
-            for i in range(1, 7):
-                for j in range(1, 7):
+            # self.charts["ResetButton"] = self.resetButton
+            # self.charts["nextFigButton"] = self.nextFigButton
+            # self.charts["yScaleButton"] = self.yScaleButton
+            # self.charts["backButton"] = self.backButton
+            # self.charts["nextButton"] = self.nextButton
+            # self.charts["atTimeWindowButton"] = self.atTimeWindowButton
+
+            self.charts.clear()
+            self.FigureLabel.setText("Page: " + str(self.pageNum))
+
+
+            for i in range(0,6):
+                for j in range(0,6):
                     chart_name = "r" + str(i) + "c" + str(j)
                     self.charts[chart_name] = eval("self." + chart_name)
-                    setupOneSpikeTrace(self.charts[chart_name])
+
+            self.setupInteractivity()
+            self.updateSpikeSearchPlots()
 
         elif self.settings["visStyle"] == "Noise":
             uic.loadUi("./src/gui/NoiseWindow.ui", self)
-
-            # self.charts["arrayMap"] = self.arrayMap
-            # setupArrayMap(self.charts["arrayMap"])
-            # self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,
-            #                                            self.setMiniMapLoc)
 
             self.charts["noiseHeatMap"] = self.noiseHeatMap
             self.charts["noiseHistogram"] = self.noiseHistogramPlot
@@ -226,7 +230,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         else:
             sys.exit()
 
-        self.setupInteractivity()
+        # Because we needed to call self.setupInteractivity separately in
+        # the case that Spike Search is called, we don't want to call it twice (causes a bug)
+        if self.settings["visStyle"] != "Spike Search":
+            self.setupInteractivity()
 
         # for continuously scanning through trace plot data
         self.timer = QtCore.QTimer()
@@ -288,6 +295,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.actionIndividualChannelInfo.triggered.connect(self.viewNewIndividualChannelInformation)
         self.actionListElectrodesInfo.triggered.connect(self.viewChannelListInformation)
         self.actionAnalysisParameters.triggered.connect(self.viewGUIPreferences)
+        if self.settings["visStyle"] == "Spike Search":
+            self.resetButton.clicked.connect(self.updateSpikeSearchPlots)
+            self.nextButton.clicked.connect(self.nextPage)
+            self.backButton.clicked.connect(self.backPage)
 
     def viewNewIndividualChannelInformation(self):
         """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
@@ -563,6 +574,91 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         while (last_updated_time
     '''
 
+    # def getRC(self, string):
+    #     """
+    #     Function to extract row and col from string in form "r#c#"
+    #     Returns: row and column strings
+    #
+    #     """
+    #     newStr = string.split("c")
+    #     row = newStr[0].split("r")[1]
+    #     col = newStr[1]
+    #     return row, col
+
+    def electrodeToPlotGrid(self, electrodeNum):
+        """
+
+        Args:
+            electrodeNum: electrode number on RC array (0-1023)
+
+        Returns: row, col (each between 0 and 5) for the 6x6 plot grid
+
+        """
+        electrodeNum = electrodeNum - 36 * self.pageNum
+        row = int(electrodeNum/6)
+        col = int(electrodeNum - row * 6)
+        return row, col
+
+
+    def getTracesToPlot(self):
+        """
+        Function to determine which electrodes to plot given what page of spike
+        search GUI user is on
+
+        Returns: 36 electrodes #s in a list
+
+        """
+        tracesToPlot = []
+        for i in range(36):
+            tracesToPlot.append(self.pageNum * 36 + i)
+        return tracesToPlot
+
+    def clearSpikeSearchPlots(self):
+        for chart in self.charts:
+            self.charts[chart].clear()
+
+
+    def nextPage(self):
+        if self.pageNum < 29:
+            self.pageNum += 1
+            print("here, nextPage, pageNum: " + str(self.pageNum))
+            self.FigureLabel.setText("Page: " + str(self.pageNum))
+            self.updateSpikeSearchPlots()
+
+    def backPage(self):
+        if self.pageNum > 0:
+            self.pageNum -= 1
+            print("here, backPage, pageNum: " + str(self.pageNum))
+            self.FigureLabel.setText("Page: " + str(self.pageNum))
+            self.updateSpikeSearchPlots()
+
+    def updateSpikeSearchPlots(self):
+        """
+
+        Returns:
+
+        """
+
+        # First, clear the plots
+        self.clearSpikeSearchPlots()
+
+        # Second, set up the plot figures for every electrode on the page
+        for elec in self.getTracesToPlot():
+            row, col = self.electrodeToPlotGrid(elec)
+            setupOneSpikeTrace(self.charts["r" + str(row) + "c" + str(col)],elec)
+
+        individualChannel = IndividualChannelInformation()
+        individualChannel.setSessionParent(self)
+
+        # Third, fill in plots with what data you have
+        for elec in self.getTracesToPlot():
+            individualChannel.current_elec = elec
+            individualChannel.updateElectrodeData()
+            row, col = self.electrodeToPlotGrid(elec)
+            gridToPlot = "r" + str(row) + "c" + str(col)
+            self.charts[gridToPlot].plot(individualChannel.electrode_times,
+                                   individualChannel.electrode_data)
+
     def updateGUIWithNewData(self):
         """
 
@@ -574,22 +670,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
         # prioritize processing channel trace plot info first #TODO optimization - this is slightly inefficient
 
-        for chart in self.charts.keys():
-            chart_type = type(self.charts[chart])
-            # then it's the list of channel traces
-            if chart_type is list:
-                print(chart)
-                self.updateChannelTracePlot(self.charts[chart])
+        # if doing spike search, don't use the normal update methods
+        if self.settings["visStyle"] == "Spike Search":
+            self.updateSpikeSearchPlots()
+        else:
+            for chart in self.charts.keys():
+                chart_type = type(self.charts[chart])
+                # then it's the list of channel traces
+                if chart_type is list:
+                    print(chart)
+                    self.updateChannelTracePlot(self.charts[chart])
 
-        for chart in self.charts.keys():
-            chart_type = type(self.charts[chart])
-            if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
-                if self.gui_state['is_mode_profiling']:
-                    start = time.time()
-                self.chart_update_function_mapping[chart]()
-                if self.gui_state['is_mode_profiling']:
-                    end = time.time()
-                    self.profile_data[chart].append(end-start)
+            for chart in self.charts.keys():
+                chart_type = type(self.charts[chart])
+                if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
+                    if self.gui_state['is_mode_profiling']:
+                        start = time.time()
+                    self.chart_update_function_mapping[chart]()
+                    if self.gui_state['is_mode_profiling']:
+                        end = time.time()
+                        self.profile_data[chart].append(end-start)
 
 
         if self.gui_state['is_mode_profiling']:
@@ -802,7 +902,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     def updateChannelTracePlot(self, trace_plots):
         """
         This function updates the data for the trace plots when a new packet arrives. The plots are updated even faster
-        through 'continuouslyUpdateTracePlots()', which scans through the packet slowly to visualize data as realtime.
+        through 'continuouslyUpdateTracePlotData()', which scans through the packet slowly to visualize data as realtime.
         Args:
             trace_plots:
 

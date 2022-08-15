@@ -122,8 +122,8 @@ def setupSpikeTrace(list_of_plots):
 
 
 
-def setupOneSpikeTrace(plot_widget):
-    plot_widget.setLabel('left', '# XXX')
+def setupOneSpikeTrace(plot_widget,label):
+    plot_widget.setLabel('left', "#" + str(label))
     plot_widget.setLabel('bottom', 'time')
 
 

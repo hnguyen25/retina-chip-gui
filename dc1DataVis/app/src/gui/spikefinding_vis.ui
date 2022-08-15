@@ -20,58 +20,58 @@
       <item>
        <layout class="QGridLayout" name="gridLayout">
         <item row="5" column="2">
-         <widget class="PlotWidget" name="r5c3" native="true"/>
-        </item>
-        <item row="2" column="3">
-         <widget class="PlotWidget" name="r2c4" native="true"/>
-        </item>
-        <item row="2" column="1">
-         <widget class="PlotWidget" name="r2c2" native="true"/>
-        </item>
-        <item row="3" column="0">
-         <widget class="PlotWidget" name="r3c1" native="true"/>
-        </item>
-        <item row="4" column="3">
-         <widget class="PlotWidget" name="r4c4" native="true"/>
-        </item>
-        <item row="5" column="1">
-         <widget class="PlotWidget" name="r5c2" native="true"/>
-        </item>
-        <item row="3" column="5">
-         <widget class="PlotWidget" name="r3c6" native="true"/>
-        </item>
-        <item row="1" column="4">
-         <widget class="PlotWidget" name="r1c5" native="true"/>
-        </item>
-        <item row="2" column="5">
-         <widget class="PlotWidget" name="r2c6" native="true"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="PlotWidget" name="r1c1" native="true"/>
-        </item>
-        <item row="5" column="4">
-         <widget class="PlotWidget" name="r5c5" native="true"/>
-        </item>
-        <item row="1" column="3">
-         <widget class="PlotWidget" name="r1c4" native="true"/>
-        </item>
-        <item row="1" column="2">
-         <widget class="PlotWidget" name="r1c3" native="true"/>
-        </item>
-        <item row="1" column="1">
-         <widget class="PlotWidget" name="r1c2" native="true"/>
-        </item>
-        <item row="3" column="1">
-         <widget class="PlotWidget" name="r3c2" native="true"/>
-        </item>
-        <item row="1" column="5">
-         <widget class="PlotWidget" name="r1c6" native="true"/>
-        </item>
-        <item row="4" column="1">
          <widget class="PlotWidget" name="r4c2" native="true"/>
         </item>
+        <item row="2" column="3">
+         <widget class="PlotWidget" name="r1c3" native="true"/>
+        </item>
+        <item row="2" column="1">
+         <widget class="PlotWidget" name="r1c1" native="true"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="PlotWidget" name="r2c0" native="true"/>
+        </item>
+        <item row="4" column="3">
+         <widget class="PlotWidget" name="r3c3" native="true"/>
+        </item>
+        <item row="5" column="1">
+         <widget class="PlotWidget" name="r4c1" native="true"/>
+        </item>
+        <item row="3" column="5">
+         <widget class="PlotWidget" name="r2c5" native="true"/>
+        </item>
+        <item row="1" column="4">
+         <widget class="PlotWidget" name="r0c4" native="true"/>
+        </item>
+        <item row="2" column="5">
+         <widget class="PlotWidget" name="r1c5" native="true"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="PlotWidget" name="r0c0" native="true"/>
+        </item>
+        <item row="5" column="4">
+         <widget class="PlotWidget" name="r4c4" native="true"/>
+        </item>
+        <item row="1" column="3">
+         <widget class="PlotWidget" name="r0c3" native="true"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="PlotWidget" name="r0c2" native="true"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="PlotWidget" name="r0c1" native="true"/>
+        </item>
+        <item row="3" column="1">
+         <widget class="PlotWidget" name="r2c1" native="true"/>
+        </item>
+        <item row="1" column="5">
+         <widget class="PlotWidget" name="r0c5" native="true"/>
+        </item>
+        <item row="4" column="1">
+         <widget class="PlotWidget" name="r3c1" native="true"/>
+        </item>
         <item row="5" column="3">
-         <widget class="PlotWidget" name="r5c4" native="true"/>
+         <widget class="PlotWidget" name="r4c3" native="true"/>
         </item>
         <item row="0" column="3">
          <layout class="QHBoxLayout" name="horizontalLayoutC4">
@@ -85,7 +85,7 @@
          </layout>
         </item>
         <item row="2" column="2">
-         <widget class="PlotWidget" name="r2c3" native="true"/>
+         <widget class="PlotWidget" name="r1c2" native="true"/>
         </item>
         <item row="0" column="4">
          <layout class="QHBoxLayout" name="horizontalLayoutC5">
@@ -105,10 +105,10 @@
          </layout>
         </item>
         <item row="5" column="0">
-         <widget class="PlotWidget" name="r5c1" native="true"/>
+         <widget class="PlotWidget" name="r4c0" native="true"/>
         </item>
         <item row="2" column="0">
-         <widget class="PlotWidget" name="r2c1" native="true"/>
+         <widget class="PlotWidget" name="r1c0" native="true"/>
         </item>
         <item row="0" column="5">
          <layout class="QHBoxLayout" name="horizontalLayoutC6">
@@ -141,10 +141,10 @@
          </layout>
         </item>
         <item row="3" column="4">
-         <widget class="PlotWidget" name="r3c5" native="true"/>
+         <widget class="PlotWidget" name="r2c4" native="true"/>
         </item>
         <item row="4" column="0">
-         <widget class="PlotWidget" name="r4c1" native="true"/>
+         <widget class="PlotWidget" name="r3c0" native="true"/>
         </item>
         <item row="0" column="2">
          <layout class="QHBoxLayout" name="horizontalLayoutC3">
@@ -158,19 +158,19 @@
          </layout>
         </item>
         <item row="2" column="4">
-         <widget class="PlotWidget" name="r2c5" native="true"/>
+         <widget class="PlotWidget" name="r1c4" native="true"/>
         </item>
         <item row="4" column="4">
-         <widget class="PlotWidget" name="r4c5" native="true"/>
+         <widget class="PlotWidget" name="r3c4" native="true"/>
         </item>
         <item row="4" column="2">
-         <widget class="PlotWidget" name="r4c3" native="true"/>
+         <widget class="PlotWidget" name="r3c2" native="true"/>
         </item>
         <item row="3" column="2">
-         <widget class="PlotWidget" name="r3c3" native="true"/>
+         <widget class="PlotWidget" name="r2c2" native="true"/>
         </item>
         <item row="4" column="5">
-         <widget class="PlotWidget" name="r4c6" native="true"/>
+         <widget class="PlotWidget" name="r3c5" native="true"/>
         </item>
         <item row="0" column="1">
          <layout class="QHBoxLayout" name="horizontalLayoutC2">
@@ -184,10 +184,10 @@
          </layout>
         </item>
         <item row="5" column="5">
-         <widget class="PlotWidget" name="r5c6" native="true"/>
+         <widget class="PlotWidget" name="r4c5" native="true"/>
         </item>
         <item row="3" column="3">
-         <widget class="PlotWidget" name="r3c4" native="true"/>
+         <widget class="PlotWidget" name="r2c3" native="true"/>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="FigureLabel">
@@ -198,27 +198,27 @@
            </size>
           </property>
           <property name="text">
-           <string>Figure 3: Ch 364-389</string>
+           <string/>
           </property>
          </widget>
         </item>
         <item row="6" column="0">
-         <widget class="PlotWidget" name="r6c1" native="true"/>
+         <widget class="PlotWidget" name="r5c0" native="true"/>
         </item>
         <item row="6" column="1">
-         <widget class="PlotWidget" name="r6c2" native="true"/>
+         <widget class="PlotWidget" name="r5c1" native="true"/>
         </item>
         <item row="6" column="2">
-         <widget class="PlotWidget" name="r6c3" native="true"/>
+         <widget class="PlotWidget" name="r5c2" native="true"/>
         </item>
         <item row="6" column="3">
-         <widget class="PlotWidget" name="r6c4" native="true"/>
+         <widget class="PlotWidget" name="r5c3" native="true"/>
         </item>
         <item row="6" column="4">
-         <widget class="PlotWidget" name="r6c5" native="true"/>
+         <widget class="PlotWidget" name="r5c4" native="true"/>
         </item>
         <item row="6" column="5">
-         <widget class="PlotWidget" name="r6c6" native="true"/>
+         <widget class="PlotWidget" name="r5c5" native="true"/>
         </item>
        </layout>
       </item>
@@ -233,7 +233,7 @@
      <x>0</x>
      <y>0</y>
      <width>936</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
