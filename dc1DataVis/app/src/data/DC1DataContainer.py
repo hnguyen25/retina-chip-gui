@@ -286,7 +286,6 @@ class DC1DataContainer():
 
         return spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER
 
-
     def update_filtered_data(self, num_threads=4, filtType='modHierlemann'):
         # subtract recorded_data by filtered_data
         len_preprocessed_data = len(self.preprocessed_data)
@@ -351,8 +350,6 @@ class DC1DataContainer():
             np.nan_to_num((pre_cnt * (pre_std ** 2 + (pre_mean - self.array_stats["noise_mean"]) ** 2) + incom_cnt * (
                     incom_std ** 2 + (incom_mean - self.array_stats["noise_mean"]) ** 2)) / (cnt_div), nan=0))
         self.array_stats["noise_cnt"] = np.nan_to_num(pre_cnt + incom_cnt, nan=0)
-
-
 
     def calculate_incoming_array_spike_statistics(self, data_real, mask):
         chan_cnt = np.count_nonzero(self.array_stats['num_sam'])
