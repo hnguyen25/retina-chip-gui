@@ -123,7 +123,7 @@ class IndividualChannelInformation(QWidget):
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         self.AmplitudeHistPlot.addItem(curve)
 
-    def updateSpikeRate(self, movingAverage = True, windowSize = 5, numberOfUpdates = 10, debug=True):
+    def updateSpikeRate(self, movingAverage = True, windowSize = 5, numberOfUpdates = 10, debug=False):
         """
         movingAverage: If false, divide up the range into numberOfUpdates bins and average to find spike rate
 

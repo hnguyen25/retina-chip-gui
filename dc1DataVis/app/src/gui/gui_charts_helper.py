@@ -123,8 +123,11 @@ def setupSpikeTrace(list_of_plots):
 
 
 def setupOneSpikeTrace(plot_widget,label):
-    styles = {'color': 'r', 'font-size': '2px'}
-    plot_widget.setLabel('top', "#" + str(label))
+    color = 'g'
+    if CURRENT_THEME == 'light':
+        color = 'k'
+        print("here")
+    plot_widget.setTitle('Ch #  ' + str(label), color = color, size = '10pt')
     plot_widget.setLabel('bottom', 'time')
 
 

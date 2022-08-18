@@ -45,10 +45,14 @@ light_theme_colors = {
     'orange': '#D08770',
     'yellow': '#EBCB8B',
     'green': '#A3BE8C',
-    'purple': '#B48EAD'
+    'purple': '#B48EAD',
+    'spikeHighlighting' : '#FFEF00',
+    'tracePlotting' : 'k'
 }
 
 dark_theme_colors = {
+    'spikeHighlighting' : '#EBCB8B',
+    'tracePlotting': '#08F7FE'
 }
 
 themes = {
@@ -209,12 +213,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.charts.clear()
             self.FigureLabel.setText("Figure: " + str(self.pageNum))
 
+            CURRENT_THEME = 'light'
 
             for i in range(0,6):
                 for j in range(0,6):
                     chart_name = "r" + str(i) + "c" + str(j)
                     self.charts[chart_name] = eval("self." + chart_name)
-
+            self.toggleDarkMode()
+            self.toggleDarkMode()
             self.setupInteractivity()
             self.updateSpikeSearchPlots()
 
@@ -245,7 +251,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         # just sets background to white TODO make this cleaner
         #self.toggleDarkMode()
         #self.toggleDarkMode()
-
     def showArrayLocOnStatusBar(self, x, y):
         """ Given x, y mouse location on a chart -> display on the status bar on the bottom of the GUI
 
@@ -651,19 +656,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         individualChannel = IndividualChannelInformation()
         individualChannel.setSessionParent(self)
 
+        pen = pg.mkPen(color = themes[CURRENT_THEME]['tracePlotting'])
+        yMin = -50
+        yMax = 20
         # Third, fill in plots with what data you have
         for elec in self.getTracesToPlot():
             individualChannel.current_elec = elec
             individualChannel.updateElectrodeData()
             row, col = self.electrodeToPlotGrid(elec)
             gridToPlot = "r" + str(row) + "c" + str(col)
-            styles = {'color': 'r', 'font-size': '2px'}
             self.charts[gridToPlot].plot(individualChannel.electrode_times,
-                                        individualChannel.electrode_data, **styles)
+                                        individualChannel.electrode_data, pen = pen)
+            self.charts[gridToPlot].setYRange(yMin, yMax, padding = 0)
             if len(individualChannel.electrode_times)>25:
                 for spike in individualChannel.electrode_spike_times:
                     lr = pg.LinearRegionItem([spike-2, spike+2])
-                    lr.setBrush(pg.mkBrush(themes[CURRENT_THEME]["yellow"]))
+                    lr.setBrush(pg.mkBrush(themes[CURRENT_THEME]["spikeHighlighting"]))
                     lr.setZValue(-5)
                     self.charts[gridToPlot].addItem(lr)
 
