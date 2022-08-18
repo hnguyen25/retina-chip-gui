@@ -195,10 +195,10 @@ class DC1DataContainer():
             # prune the times in the packet where nothing is recorded aka when data = 0
             channel_data = data_real[x, y, start_idx:N]
             channel_times = self.times[self.count_track + start_idx: self.count_track+N]
-            actual_recording_times = (channel_data != 0)
-
-            channel_times = channel_times[actual_recording_times]
-            channel_data = channel_data[actual_recording_times]
+            # actual_recording_times = (channel_data != 0)
+            #
+            # channel_times = channel_times[actual_recording_times]
+            # channel_data = channel_data[actual_recording_times]
 
             channel_data = {
                 'channel_idx': channel_idx,
@@ -246,13 +246,13 @@ class DC1DataContainer():
 
         return channel_data
 
-    def getAboveThresholdActivity(self, data, times, channel_noise_mean, channel_noise_std, spike_threshold, filtered=False):
+    def getAboveThresholdActivity(self, data, times, channel_noise_mean, channel_noise_std, spike_threshold, filtered=True):
         if filtered:
             below_threshold = 0 + spike_threshold * channel_noise_std # filtered data -> makes mean 0
         else:
             below_threshold = channel_noise_mean - (spike_threshold * channel_noise_std)
 
-        above_threshold_activity = (data < below_threshold)
+        above_threshold_activity = (abs(data) >= below_threshold)
         incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
         incom_spike_times = times[incom_spike_idx]
         incom_spike_amplitude = data[incom_spike_idx]

@@ -123,8 +123,10 @@ def setupSpikeTrace(list_of_plots):
 
 
 def setupOneSpikeTrace(plot_widget,label):
-    plot_widget.setLabel('left', "#" + str(label))
+    styles = {'color': 'r', 'font-size': '2px'}
+    plot_widget.setLabel('top', "#" + str(label))
     plot_widget.setLabel('bottom', 'time')
+
 
 
 # TODO: fix the swap on the next two functions

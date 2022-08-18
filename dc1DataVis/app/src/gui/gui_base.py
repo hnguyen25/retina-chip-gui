@@ -82,7 +82,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     trace_channels_info = []
 
     ### MISCELLANEOUS ###
-    pageNum = 1 # used for knowing which traces to display in spike search mode. Zero-indexed
+    pageNum = 0 # used for knowing which traces to display in spike search mode. Zero-indexed
+    tracesToPlot = []
     p = None
     arrayMap_colorbar = None  # reference to the colorbar embedded with the array map chart
     noiseHeatMap_colorbar = None
@@ -206,7 +207,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             # self.charts["atTimeWindowButton"] = self.atTimeWindowButton
 
             self.charts.clear()
-            self.FigureLabel.setText("Page: " + str(self.pageNum))
+            self.FigureLabel.setText("Figure: " + str(self.pageNum))
 
 
             for i in range(0,6):
@@ -608,10 +609,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         Returns: 36 electrodes #s in a list
 
         """
-        tracesToPlot = []
+        self.tracesToPlot.clear()
         for i in range(36):
-            tracesToPlot.append(self.pageNum * 36 + i)
-        return tracesToPlot
+            self.tracesToPlot.append(self.pageNum * 36 + i)
+            self.FigureLabel.setText("Figure " + str(self.pageNum)
+                                     + ": Ch " + str(self.tracesToPlot[0]) + " to Ch " + str(self.tracesToPlot[-1]))
+        return self.tracesToPlot
 
     def clearSpikeSearchPlots(self):
         for chart in self.charts:
@@ -621,14 +624,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     def nextPage(self):
         if self.pageNum < 29:
             self.pageNum += 1
-            print("here, nextPage, pageNum: " + str(self.pageNum))
             self.FigureLabel.setText("Page: " + str(self.pageNum))
             self.updateSpikeSearchPlots()
 
     def backPage(self):
         if self.pageNum > 0:
             self.pageNum -= 1
-            print("here, backPage, pageNum: " + str(self.pageNum))
             self.FigureLabel.setText("Page: " + str(self.pageNum))
             self.updateSpikeSearchPlots()
 
@@ -656,8 +657,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             individualChannel.updateElectrodeData()
             row, col = self.electrodeToPlotGrid(elec)
             gridToPlot = "r" + str(row) + "c" + str(col)
+            styles = {'color': 'r', 'font-size': '2px'}
             self.charts[gridToPlot].plot(individualChannel.electrode_times,
-                                   individualChannel.electrode_data)
+                                        individualChannel.electrode_data, **styles)
+            if len(individualChannel.electrode_times)>25:
+                for spike in individualChannel.electrode_spike_times:
+                    lr = pg.LinearRegionItem([spike-2, spike+2])
+                    lr.setBrush(pg.mkBrush(themes[CURRENT_THEME]["yellow"]))
+                    lr.setZValue(-5)
+                    self.charts[gridToPlot].addItem(lr)
 
     def updateGUIWithNewData(self):
         """

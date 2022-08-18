@@ -84,7 +84,7 @@ class IndividualChannelInformation(QWidget):
         if self.session_parent.gui_state['is_mode_profiling']:
             print("Individual Channel update time: " + str(np.round(end-start,2)))
 
-    def updateElectrodeData(self):
+    def updateElectrodeData(self, debug = False):
         self.electrode_packets.clear()
         self.electrode_spikes.clear()
         self.electrode_spike_times.clear()
@@ -99,8 +99,9 @@ class IndividualChannelInformation(QWidget):
             if self.session_parent.LoadedData.filtered_data[i]['channel_idx'] == self.current_elec:
                 self.electrode_packets.append(self.session_parent.LoadedData.filtered_data[i])
                 match = True
-        if not match:
-            print("No data from this electrode yet")
+        if debug:
+            if not match:
+                print("No data from this electrode yet")
 
         # Get lists of times and data from each packet for the selected electrode
         for i in range(len(self.electrode_packets)):
@@ -122,7 +123,7 @@ class IndividualChannelInformation(QWidget):
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         self.AmplitudeHistPlot.addItem(curve)
 
-    def updateSpikeRate(self, movingAverage = True, windowSize = 5, numberOfUpdates = 10, debug=False):
+    def updateSpikeRate(self, movingAverage = True, windowSize = 5, numberOfUpdates = 10, debug=True):
         """
         movingAverage: If false, divide up the range into numberOfUpdates bins and average to find spike rate
 
@@ -169,12 +170,10 @@ class IndividualChannelInformation(QWidget):
         self.SpikeRatePlot.plot(t, spike_rate, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
 
         if debug:
-            print("spike rate list: " + str(y))
-            print("spike rate times list: " + str(x))
             print("length of recording: " + str(len(self.electrode_times)) + " data points")
             print("electrode times: " + str(self.electrode_times[0]) + "-" + str(self.electrode_times[-1]))
             print("spikes: " + str(self.electrode_spikes))
-            print("double binned spikes: " + str(num_spikes))
+            #print("double binned spikes: " + str(num_spikes))
             print("number of spike bins: " + str(len(self.electrode_spikes)))
             print("incoming spike times: " + str(self.electrode_spike_times))
             print("noise mean: " + str(self.session_parent.LoadedData.array_stats['noise_mean'][self.current_row, self.current_col]))
