@@ -192,7 +192,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
             self.charts["channelTraceVerticalLayout"] = self.channelTraceVerticalLayout
             self.charts["channelTraces"] = [self.channelTrace1, self.channelTrace2, self.channelTrace3, self.channelTrace4]
-
+            self.toggleDarkMode()
+            self.toggleDarkMode()
             for plot in self.charts["channelTraces"]:
                 plot.scene().sigMouseClicked.connect(self.pausePlotting)
 
@@ -201,15 +202,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         elif self.settings["visStyle"] == "Spike Search":
 
             uic.loadUi("./src/gui/spikefinding_vis.ui", self)
-
-
             # self.charts["ResetButton"] = self.resetButton
             # self.charts["nextFigButton"] = self.nextFigButton
             # self.charts["yScaleButton"] = self.yScaleButton
             # self.charts["backButton"] = self.backButton
             # self.charts["nextButton"] = self.nextButton
             # self.charts["atTimeWindowButton"] = self.atTimeWindowButton
-
             self.charts.clear()
             self.FigureLabel.setText("Figure: " + str(self.pageNum))
 

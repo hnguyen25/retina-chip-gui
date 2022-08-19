@@ -420,10 +420,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			4+5LS4E1Ot4cOaFimwp4HQEFTLU=
+			NkOSFK2A91YjmfLxG9TbMix2kPs=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"defbf55a820c79ae0d0df28d0c751f77acd13a40" or cdhash H"e3ee4b4b81353ade1c39a1629b0a781d01054cb5"</string>
+			<string>cdhash H"fce2b044c110753193ef9c8d1885f80e085d0cec" or cdhash H"36439214ad80f7562399f2f11bd4db322c7690fb"</string>
 		</dict>
 		<key>MacOS/libffi.7.dylib</key>
 		<dict>
@@ -474,10 +474,10 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			A1rsrT+Cik06oAyV3rYQt8ZQRhs=
+			c/0l0CBoGGNzTzz8BcAeq3MEkR4=
 			</data>
 			<key>requirement</key>
-			<string>cdhash H"408589eab76c686858a7731397b2512f5756ef2f" or cdhash H"035aecad3f828a4d3aa00c95deb610b7c650461b"</string>
+			<string>cdhash H"d05c9ba122a3e1bfa9ea470684e11407dcc8135d" or cdhash H"73fd25d020681863734f3cfc05c01eab7304911e"</string>
 		</dict>
 		<key>MacOS/libtinfow.6.dylib</key>
 		<dict>
