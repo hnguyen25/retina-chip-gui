@@ -123,23 +123,30 @@ def setupSpikeTrace(list_of_plots):
 
 
 def setupOneSpikeTrace(plot_widget,label):
+    """
+    function to set up trace plots in the spike search gui
+    @param plot_widget:
+    @param label:
+    @return:
+    """
     color = 'g'
     if CURRENT_THEME == 'light':
         color = 'k'
-        print("here")
     plot_widget.setTitle('Ch #  ' + str(label), color = color, size = '10pt')
     plot_widget.setLabel('bottom', 'time')
 
-
-
-# TODO: fix the swap on the next two functions
 def setupNoiseHistogramPlot(plot_widget):
 
     plot_widget.setLabel('left', "Num Channels")
     plot_widget.setLabel('bottom', "Standard Deviations")
-    plot_widget.setLabel('top', 'Channel Noise')
+    plot_widget.setTitle('Channel Noise', size = '10pt')
 
     plot_widget.setLimits(xMin=0, yMin=0)
+
+    font = pg.Qt.QtGui.QFont()
+    font.setPixelSize(20)
+    plot_widget.getAxis("bottom").tickFont = font
+    plot_widget.getAxis("bottom").setStyle(tickTextOffset=1)
 
     plot_widget.getPlotItem().getAxis('top').setTextPen(pg.mkPen(None))
     plot_widget.getPlotItem().hideAxis('top')

@@ -892,11 +892,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         plot = self.charts["noiseHeatMap"]
         plot.clear()
 
+        font = pg.QtGui.QFont()
+        font.setPixelSize(20)
+        plot.getAxis("bottom").tickFont = font
+        plot.getAxis("bottom").setStyle(tickTextOffset=1)
+
         if self.first_time_plotting is False:
             data = self.LoadedData.array_stats["noise_std"]
             data = data.T
         else:
             data = None
+
 
         img = pg.ImageItem(data)
         cm = pg.colormap.get('plasma', source='matplotlib')
