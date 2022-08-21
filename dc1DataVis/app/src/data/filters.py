@@ -3,6 +3,11 @@ import numpy as np
 import time
 
 """
+Contains functions to filter data.
+
+Each filter function is overloaded, with one version
+that uses just two inputs (default) and one with multiple more params ("Timed"). 
+
 use:
 numChan, chMap, chId, startIdx, findCoors = identifyRelevantChannels(dataAll)
 filtData = applyFilterToData (dataAll, numChan, chMap, filtType='modHierlemann')
@@ -72,21 +77,21 @@ def applyFilterToAllData(dataAll, numChan, chMap, filtType='Modified Hierlemann'
     dataFilt = np.zeros((np.shape(dataAll)))
 
     if filtType == 'Hierlemann':
-        dataFilt = applyFilterHierlemann(dataAll, dataFilt, numChan, chMap)
+        dataFilt = applyFilterHierlemannTimed(dataAll, dataFilt, numChan, chMap)
     elif filtType == 'Modified Hierlemann':
-        dataFilt = applyFilterModHierlemann(dataAll, dataFilt, numChan, chMap)
+        dataFilt = applyFilterModHierlemannTimed(dataAll, dataFilt, numChan, chMap)
     elif filtType == 'Highpass':
-        dataFilt = applyFilterHighpass(dataAll, dataFilt, numChan, chMap)
+        dataFilt = applyFilterHighpassTimed(dataAll, dataFilt, numChan, chMap)
     elif filtType == 'H0 Bandpass':
-        dataFilt = applyFilterH0bandpass(dataAll, dataFilt, numChan, chMap)
+        dataFilt = applyFilterH0bandpassTimed(dataAll, dataFilt, numChan, chMap)
     elif filtType == 'Auto':
-        dataFilt = applyFilterAuto(dataAll, dataFilt, numChan, chMap)
+        dataFilt = applyFilterAutoTimed(dataAll, dataFilt, numChan, chMap)
     elif filtType == 'Fast Bandpass':
-        dataFilt = applyFilterFastBandpass(dataAll, dataFilt, numChan, chMap)
+        dataFilt = applyFilterFastBandpassTimed(dataAll, dataFilt, numChan, chMap)
     elif filtType == 'Faster Bandpass':
-        dataFilt = applyFilterFasterBandpass(dataAll, dataFilt, numChan, chMap)
+        dataFilt = applyFilterFasterBandpassTimed(dataAll, dataFilt, numChan, chMap)
     elif filtType == 'Litke':
-        dataFilt = applyFilterLitke(dataAll, dataFilt, numChan, chMap)
+        dataFilt = applyFilterLitkeTimed(dataAll, dataFilt, numChan, chMap)
     elif filtType == 'None':
         dataFilt = np.copy(dataAll)
     else:
@@ -95,7 +100,26 @@ def applyFilterToAllData(dataAll, numChan, chMap, filtType='Modified Hierlemann'
 
     return dataFilt
 
-def applyFilterHierlemann(dataAll, dataFilt, numChan, chMap):
+def applyFilterHierlemann(channel_data, dataFilt):
+    """
+
+    Args:
+
+    Returns:
+
+    """
+    BP_LOW_CUTOFF = 100.0
+    NUM_TAPS = 75
+    TAPS = signal.firwin(NUM_TAPS,
+                         [BP_LOW_CUTOFF, ],
+                         pass_zero=False,
+                         fs=20e3 * 1.0)
+    a = 1
+    dataFilt= signal.filtfilt(TAPS, [a], channel_data)
+    return dataFilt
+
+# Extra params
+def applyFilterHierlemannTimed(dataAll, dataFilt, numChan, chMap):
     """
 
     Args:
@@ -123,7 +147,29 @@ def applyFilterHierlemann(dataAll, dataFilt, numChan, chMap):
         print(text1 + ' ' + text2, end="\r")
     return dataFilt
 
-def applyFilterModHierlemann(dataAll, dataFilt, numChan, chMap):
+def applyFilterModHierlemann(channel_data, dataFilt):
+    """
+
+    Args:
+        channel_data:
+        dataFilt:
+
+    Returns:
+
+    """
+    BP_LOW_CUTOFF = 250.0
+    BP_HIGH_CUTOFF = 4000.0
+    NUM_TAPS = 100
+    TAPS = signal.firwin(NUM_TAPS,
+                         [BP_LOW_CUTOFF, BP_HIGH_CUTOFF],
+                         pass_zero=False,
+                         fs=20e3 * 1.0)
+    a = 1
+    dataFilt = signal.filtfilt(TAPS, [a], channel_data)
+    return dataFilt
+
+# Extra params
+def applyFilterModHierlemannTimed(dataAll, dataFilt, numChan, chMap):
     """
 
     Args:
@@ -153,28 +199,23 @@ def applyFilterModHierlemann(dataAll, dataFilt, numChan, chMap):
 
     return dataFilt
 
-def applyFilterModHierlemann(channel_data, dataFilt):
+def applyFilterHighpass(channel_data, dataFilt):
     """
 
     Args:
-        channel_data:
-        dataFilt:
+
 
     Returns:
 
     """
-    BP_LOW_CUTOFF = 250.0
-    BP_HIGH_CUTOFF = 4000.0
-    NUM_TAPS = 100
-    TAPS = signal.firwin(NUM_TAPS,
-                         [BP_LOW_CUTOFF, BP_HIGH_CUTOFF],
-                         pass_zero=False,
-                         fs=20e3 * 1.0)
-    a = 1
-    dataFilt = signal.filtfilt(TAPS, [a], channel_data)
+    nyq = 0.5 * (20e3 * 1.0)
+    cutoff = 250 / nyq
+    b, a = signal.butter(5, [cutoff], btype="highpass", analog=False)
+    dataFilt = signal.filtfilt(b, a, channel_data)
     return dataFilt
 
-def applyFilterHighpass(dataAll, dataFilt, numChan, chMap):
+# Extra params
+def applyFilterHighpassTimed(dataAll, dataFilt, numChan, chMap):
     """
 
     Args:
@@ -198,7 +239,23 @@ def applyFilterHighpass(dataAll, dataFilt, numChan, chMap):
         print(text1 + ' ' + text2, end="\r")
     return dataFilt
 
-def applyFilterH0bandpass(dataAll, dataFilt, numChan, chMap):
+def applyFilterH0bandpass(channel_data, dataFilt):
+    """
+
+    Args:
+
+    Returns:
+
+    """
+    nyq = 0.5 * (20e3 * 1.0)
+    cutoff1 = 250 / nyq
+    cutoff2 = 4000 / nyq
+    b, a = signal.butter(5, [cutoff1, cutoff2], btype="bandpass", analog=False)
+    dataFilt = signal.filtfilt(b, a, channel_data)
+    return dataFilt
+
+# Extra params
+def applyFilterH0bandpassTimed(dataAll, dataFilt, numChan, chMap):
     """
 
     Args:
@@ -224,7 +281,27 @@ def applyFilterH0bandpass(dataAll, dataFilt, numChan, chMap):
         print(text1 + ' ' + text2, end="\r")
     return dataFilt
 
-def applyFilterAuto(dataAll, dataFilt, numChan, chMap):
+
+def applyFilterAuto(channel_data, dataFilt):
+    """
+
+    Args:
+
+    Returns:
+
+    """
+    samFreq = 20e3 * 1.0
+    passband = [250, 4000]
+    stopband = [5, 6000]
+    max_loss_passband = 3
+    min_loss_stopband = 30
+    order, normal_cutoff = signal.buttord(passband, stopband, max_loss_passband, min_loss_stopband, fs=samFreq)
+    b, a = signal.butter(order, normal_cutoff, btype='bandpass', fs=samFreq)
+    dataFilt = signal.filtfilt(b, a, channel_data)
+    return dataFilt
+
+# Extra params
+def applyFilterAutoTimed(dataAll, dataFilt, numChan, chMap):
     """
 
     Args:
@@ -253,7 +330,27 @@ def applyFilterAuto(dataAll, dataFilt, numChan, chMap):
         print(text1 + ' ' + text2, end="\r")
     return dataFilt
 
-def applyFilterFastBandpass(dataAll, dataFilt, numChan, chMap):
+def applyFilterFastBandpass(channel_data, dataFilt):
+    """
+
+    Args:
+        dataAll:
+        dataFilt:
+        numChan:
+        chMap:
+
+    Returns:
+
+    """
+    nyq = 0.5 * (20e3 * 1.0)
+    cutoff1 = 250 / nyq
+    cutoff2 = 4000 / nyq
+    b, a = signal.butter(1, [cutoff1, cutoff2], btype='bandpass', analog=False)
+    dataFilt= signal.filtfilt(b, a, channel_data)
+    return dataFilt
+
+# Extra params
+def applyFilterFastBandpassTimed(dataAll, dataFilt, numChan, chMap):
     """
 
     Args:
@@ -279,7 +376,24 @@ def applyFilterFastBandpass(dataAll, dataFilt, numChan, chMap):
         print(text1 + ' ' + text2, end="\r")
     return dataFilt
 
-def applyFilterFasterBandpass(dataAll, dataFilt, numChan, chMap):
+def applyFilterFasterBandpass(channel_data, dataFilt):
+    """
+
+    Args:
+
+
+    Returns:
+
+    """
+    nyq = 0.5 * (20e3 * 1.0)
+    cutoff1 = 250 / nyq
+    cutoff2 = 4000 / nyq
+    sos1 = signal.butter(1, [cutoff1, cutoff2], btype='bandpass', output='sos')
+    dataFilt = signal.sosfiltfilt(sos1, channel_data)
+    return dataFilt
+
+# Extra params
+def applyFilterFasterBandpassTimed(dataAll, dataFilt, numChan, chMap):
     """
 
     Args:
@@ -305,7 +419,28 @@ def applyFilterFasterBandpass(dataAll, dataFilt, numChan, chMap):
         print(text1 + ' ' + text2, end="\r")
     return dataFilt
 
-def applyFilterLitke(dataAll, dataFilt, numChan, chMap):
+
+def applyFilterLitke(channel_data, dataFilt):
+    """
+
+    Args:
+        dataAll:
+        dataFilt:
+        numChan:
+        chMap:
+
+    Returns:
+
+    """
+    nyq = 0.5 * (20e3 * 1.0)
+    cutoff1 = 250 / nyq
+    cutoff2 = 2000 / nyq
+    b, a = signal.butter(2, [cutoff1, cutoff2], btype="bandpass", analog=False)
+    dataFilt = signal.filtfilt(b, a, channel_data)
+    return dataFilt
+
+# Extra params
+def applyFilterLitkeTimed(dataAll, dataFilt, numChan, chMap):
     """
 
     Args:
