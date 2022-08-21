@@ -30,24 +30,23 @@ def applyFilterToChannelData(channel_data, filtType='Hierlemann'):
 
     """
     dataFilt = np.zeros((np.shape(channel_data)))
-
     if filtType == 'Hierlemann':
         dataFilt = applyFilterHierlemann(channel_data, dataFilt)
-    elif filtType == 'modHierlemann':
+    elif filtType == 'Modified Hierlemann':
         dataFilt = applyFilterModHierlemann(channel_data, dataFilt)
-    elif filtType == 'highpass':
+    elif filtType == 'Highpass':
         dataFilt = applyFilterHighpass(channel_data, dataFilt)
-    elif filtType == 'hObandpass':
+    elif filtType == 'H0 Bandpass':
         dataFilt = applyFilterH0bandpass(channel_data, dataFilt)
-    elif filtType == 'auto':
+    elif filtType == 'Auto':
         dataFilt = applyFilterAuto(channel_data, dataFilt)
-    elif filtType == 'fastBandpass':
+    elif filtType == 'Fast Bandpass':
         dataFilt = applyFilterFastBandpass(channel_data, dataFilt)
-    elif filtType == 'fasterBandpass':
+    elif filtType == 'Faster Bandpass':
         dataFilt = applyFilterFasterBandpass(channel_data, dataFilt)
     elif filtType == 'Litke':
         dataFilt = applyFilterLitke(channel_data, dataFilt)
-    elif filtType == 'none':
+    elif filtType == 'None':
         dataFilt = np.copy(channel_data)
     else:
         dataFilt = np.copy(channel_data)
@@ -57,7 +56,7 @@ def applyFilterToChannelData(channel_data, filtType='Hierlemann'):
 
 
 
-def applyFilterToAllData(dataAll, numChan, chMap, filtType='modHierlemann'):
+def applyFilterToAllData(dataAll, numChan, chMap, filtType='Modified Hierlemann'):
     """
 
     Args:
@@ -74,21 +73,21 @@ def applyFilterToAllData(dataAll, numChan, chMap, filtType='modHierlemann'):
 
     if filtType == 'Hierlemann':
         dataFilt = applyFilterHierlemann(dataAll, dataFilt, numChan, chMap)
-    elif filtType == 'modHierlemann':
+    elif filtType == 'Modified Hierlemann':
         dataFilt = applyFilterModHierlemann(dataAll, dataFilt, numChan, chMap)
-    elif filtType == 'highpass':
+    elif filtType == 'Highpass':
         dataFilt = applyFilterHighpass(dataAll, dataFilt, numChan, chMap)
-    elif filtType == 'hObandpass':
+    elif filtType == 'H0 Bandpass':
         dataFilt = applyFilterH0bandpass(dataAll, dataFilt, numChan, chMap)
-    elif filtType == 'auto':
+    elif filtType == 'Auto':
         dataFilt = applyFilterAuto(dataAll, dataFilt, numChan, chMap)
-    elif filtType == 'fastBandpass':
+    elif filtType == 'Fast Bandpass':
         dataFilt = applyFilterFastBandpass(dataAll, dataFilt, numChan, chMap)
-    elif filtType == 'fasterBandpass':
+    elif filtType == 'Faster Bandpass':
         dataFilt = applyFilterFasterBandpass(dataAll, dataFilt, numChan, chMap)
     elif filtType == 'Litke':
         dataFilt = applyFilterLitke(dataAll, dataFilt, numChan, chMap)
-    elif filtType == 'none':
+    elif filtType == 'None':
         dataFilt = np.copy(dataAll)
     else:
         dataFilt = np.copy(dataAll)
