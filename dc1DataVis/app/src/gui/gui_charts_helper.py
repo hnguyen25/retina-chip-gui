@@ -132,6 +132,8 @@ def setupOneSpikeTrace(plot_widget,label):
     color = 'g'
     if CURRENT_THEME == 'light':
         color = 'k'
+    if label > 1023:
+        label = "####"
     plot_widget.setTitle('Ch #  ' + str(label), color = color, size = '10pt')
     plot_widget.setLabel('bottom', 'time')
 

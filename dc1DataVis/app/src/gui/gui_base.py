@@ -1,5 +1,5 @@
 """
-Huy Nguyen (2022)
+Huy Nguyen, John Bailey (2022)
 Contains the base app framework for loading up the GUI.
 
 Note: To regenerate gui_layout.py, in terminal do
@@ -400,7 +400,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.onLoadRealtimeStream(load_from_beginning=False)
         elif self.settings['realTime'] == "No, load raw .mat file":
             #TODO parallelize
-            self.onLoadRealTimeStraet(load_from_beginning=True)
+            self.onLoadRealtimeStream(load_from_beginning=True)
         elif self.settings['realTime'] == "No, load pre-processed .npz file":
             #TODO
             self.onActionLoadNPZ()
@@ -518,7 +518,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     self.profile_data['appendRawData'] = end - start
 
                 start = time.time()
-                self.LoadedData.update_filtered_data()
+                #self.dataAll, self.cntAll, self.times = processData(loadingDict, dataIdentifierString='gmem1',buffer_num=0)
+                #self.numChan, self.chMap, self.chId, self.startIdx, self.findCoors, self.recordedChannels = identify_relevant_channels(self.dataAll)
+
+                self.LoadedData.update_filtered_data(filtType=self.settings["filter"])
                 end = time.time()
                 if self.gui_state['is_mode_profiling']:
                     self.profile_data['filterData'] = end - start
@@ -548,6 +551,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         else:
             self.loadDataFromFileMat(path, loadingDict)
 
+# TODO : when is this next function used?
     def loadDataFromFileMat(self, path, loadingDict):
         """
 
@@ -625,7 +629,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
     def nextPage(self):
-        if self.pageNum < 29:
+        if self.pageNum < 28:
             self.pageNum += 1
             self.FigureLabel.setText("Page: " + str(self.pageNum))
             self.updateSpikeSearchPlots()
