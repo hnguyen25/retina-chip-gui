@@ -169,6 +169,7 @@ def setupSpikeRatePlot(plot_widget):
     plot_widget.getAxis("left").setTextPen(themes[CURRENT_THEME]['dark1'])
 
     plot_widget.setLabel('bottom', "Time (ms)")
+    plot_widget.setTitle("Array Spike Rate",  size = '10pt')
     plot_widget.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['dark1'])
     plot_widget.setLimits(xMin=0, yMin=0, minXRange=5)
 

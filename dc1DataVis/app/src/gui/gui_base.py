@@ -954,7 +954,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 if noise_std == 0:
                     plt.setAutoVisible(y=True)
                 else:
-                    plt.setYRange(- 3 * noise_std, 3 * noise_std, padding=0)
+                    plt.setAutoVisible(y=True)
+
+                    #plt.setYRange(- 3 * noise_std, 3 * noise_std, padding=0)
 
                 begin_time = x[0]
                 end_time = x[-1]
