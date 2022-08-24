@@ -52,9 +52,6 @@
         <item row="5" column="4">
          <widget class="PlotWidget" name="r4c4" native="true"/>
         </item>
-        <item row="1" column="3">
-         <widget class="PlotWidget" name="r0c3" native="true"/>
-        </item>
         <item row="1" column="2">
          <widget class="PlotWidget" name="r0c2" native="true"/>
         </item>
@@ -76,9 +73,9 @@
         <item row="0" column="3">
          <layout class="QHBoxLayout" name="horizontalLayoutC4">
           <item>
-           <widget class="QPushButton" name="atTimeWindowButton">
+           <widget class="QPushButton" name="resetButton">
             <property name="text">
-             <string>At Time Window</string>
+             <string>Reset</string>
             </property>
            </widget>
           </item>
@@ -90,15 +87,15 @@
         <item row="0" column="4">
          <layout class="QHBoxLayout" name="horizontalLayoutC5">
           <item>
-           <widget class="QPushButton" name="resetButton">
+           <widget class="QPushButton" name="lastTimeStep">
             <property name="maximumSize">
              <size>
-              <width>60</width>
+              <width>600</width>
               <height>16777215</height>
              </size>
             </property>
             <property name="text">
-             <string>Reset</string>
+             <string>Last Time Step</string>
             </property>
            </widget>
           </item>
@@ -113,28 +110,9 @@
         <item row="0" column="5">
          <layout class="QHBoxLayout" name="horizontalLayoutC6">
           <item>
-           <widget class="QPushButton" name="backButton">
-            <property name="maximumSize">
-             <size>
-              <width>60</width>
-              <height>16777215</height>
-             </size>
-            </property>
+           <widget class="QPushButton" name="nextTimeStepButton">
             <property name="text">
-             <string>Back</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="nextButton">
-            <property name="maximumSize">
-             <size>
-              <width>60</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Next</string>
+             <string>Next Time Step</string>
             </property>
            </widget>
           </item>
@@ -149,9 +127,12 @@
         <item row="0" column="2">
          <layout class="QHBoxLayout" name="horizontalLayoutC3">
           <item>
-           <widget class="QPushButton" name="yScaleButton">
+           <widget class="QSpinBox" name="spinBox"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label">
             <property name="text">
-             <string>Y Scale</string>
+             <string>Y Range</string>
             </property>
            </widget>
           </item>
@@ -175,9 +156,28 @@
         <item row="0" column="1">
          <layout class="QHBoxLayout" name="horizontalLayoutC2">
           <item>
-           <widget class="QPushButton" name="nextFigButton">
+           <widget class="QPushButton" name="backButton">
+            <property name="maximumSize">
+             <size>
+              <width>60</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Next Fig</string>
+             <string>Back</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="nextButton">
+            <property name="maximumSize">
+             <size>
+              <width>60</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Next</string>
             </property>
            </widget>
           </item>
@@ -219,6 +219,9 @@
         </item>
         <item row="6" column="5">
          <widget class="PlotWidget" name="r5c5" native="true"/>
+        </item>
+        <item row="1" column="3">
+         <widget class="PlotWidget" name="r0c3" native="true"/>
         </item>
        </layout>
       </item>

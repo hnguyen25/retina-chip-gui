@@ -232,8 +232,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.charts["channelTraceVerticalLayout"] = self.channelTraceLayout
             self.charts["channelTraces"] = [self.channelTrace1, self.channelTrace2, self.channelTrace3, self.channelTrace4]
             setupSpikeTrace(self.charts["channelTraces"])
+            self.charts["noiseHeatMap"].setTitle("Noise Heat Map", size = "12pt")
+
         else:
             sys.exit()
+
 
         # Because we needed to call self.setupInteractivity separately in
         # the case that Spike Search is called, we don't want to call it twice (causes a bug)
@@ -246,9 +249,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.timer.timeout.connect(self.continouslyUpdateTracePlotData)
         self.timer.start()
 
+
+
         # just sets background to white TODO make this cleaner
         #self.toggleDarkMode()
         #self.toggleDarkMode()
+
+
     def showArrayLocOnStatusBar(self, x, y):
         """ Given x, y mouse location on a chart -> display on the status bar on the bottom of the GUI
 
@@ -1063,7 +1070,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.charts["spikeRatePlot"].setLimits(xMin=0, yMin=-5, minXRange=5)
             self.charts["spikeRatePlot"].enableAutoRange(axis='x')
             self.charts["spikeRatePlot"].setYRange(0, max(y) + 50, padding=0.1)
-            line_plot = self.charts["spikeRatePlot"].plot(x, y, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
+            self.charts["spikeRatePlot"].plot(x, y, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
 
     def updateMiniMapPlot(self):
         self.charts["miniMap"].clear()

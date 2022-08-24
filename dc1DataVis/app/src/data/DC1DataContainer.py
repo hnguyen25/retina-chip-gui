@@ -290,7 +290,6 @@ class DC1DataContainer():
         # subtract recorded_data by filtered_data
         len_preprocessed_data = len(self.preprocessed_data)
         len_filtered_data = len(self.filtered_data)
-
         # TODO parallelize filtering
         if len_filtered_data < len_preprocessed_data:
             while len_filtered_data < len_preprocessed_data:

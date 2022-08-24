@@ -83,6 +83,7 @@ class IndividualChannelInformation(QWidget):
         end = time.time()
         if self.session_parent.gui_state['is_mode_profiling']:
             print("Individual Channel update time: " + str(np.round(end-start,2)))
+        #print(self.session_parent.LoadedData.)
 
     def updateElectrodeData(self, debug = False):
         self.electrode_packets.clear()
