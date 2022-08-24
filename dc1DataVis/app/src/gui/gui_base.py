@@ -298,6 +298,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         """ Connects all the different buttons with their respective actions. Also set up multithreading."""
         self.LoadedData = DC1DataContainer()  # class for holding and manipulating data
         self.LoadedData.setSpikeThreshold(self.settings["spikeThreshold"])
+        self.LoadedData.setNumChannels(self.settings["numChannels"])
         # Set up PyQt multithreading
         self.threadpool = QThreadPool()
         if self.gui_state['is_mode_multithreading']:
@@ -948,7 +949,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
             if m < int(self.settings['numChannels']): #TODO stopgap actually implement num of trace plots for simult recordings
                 plt.clear()
-                idx_of_channel_order = len_data + (m - self.LoadedData.data_processing_settings["simultaneousChannelsRecordedPerPacket"])
+                idx_of_channel_order = len_data + (m - int(self.LoadedData.data_processing_settings["simultaneousChannelsRecordedPerPacket"]))
+                print(int(self.LoadedData.data_processing_settings["simultaneousChannelsRecordedPerPacket"]))
 
                 chan_idx = self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']
                 row, col = idx2map(chan_idx)

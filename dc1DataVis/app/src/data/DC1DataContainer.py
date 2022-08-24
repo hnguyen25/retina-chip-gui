@@ -139,6 +139,9 @@ class DC1DataContainer():
     def setSpikeThreshold(self, threshold):
         self.data_processing_settings["spikeThreshold"] = threshold
 
+    def setNumChannels(self, numChannels):
+        self.data_processing_settings["simultaneousChannelsRecordedPerPacket"] =  numChannels
+
     def extend_data_containers(self):
         """Change data containers dynamically to accommodate longer time windows of data
         by doubling the capacity of data containers when the max has been reached
