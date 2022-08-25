@@ -55,7 +55,7 @@ def applyFilterToChannelData(channel_data, filtType='Hierlemann'):
         dataFilt = np.copy(channel_data)
     else:
         dataFilt = np.copy(channel_data)
-        print('Filter not recognized. Options include Hierlemann, highpass, bandpass, Litke or none')
+        print('Filter type "' + str(filtType) +'" not recognized. Options include Hierlemann, highpass, bandpass, Litke or none')
 
     return dataFilt
 

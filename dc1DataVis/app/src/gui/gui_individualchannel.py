@@ -10,9 +10,6 @@ import time
 from ..data.spikeDetection import *
 from ..data.DC1DataContainer import *
 
-# TODO:
-#1. Fix hist
-
 class IndividualChannelInformation(QWidget):
 
     session_parent = None
@@ -22,7 +19,8 @@ class IndividualChannelInformation(QWidget):
     recordedTime = None
     has_data = None
 
-    # List of dictionaries containing data packets with electrode info (data, times, spikes, etc)
+    # List of dictionaries containing data packets with electrode info (data, times, spikes, etc).
+    # Each packet is for the same electrode, but come in at different times
     electrode_packets = []
 
     # Lists containing values stored in the associated key in electrode_packets dictionaries
@@ -53,15 +51,18 @@ class IndividualChannelInformation(QWidget):
         self.AmplitudeHistPlot.setBackground('w')
         self.AmplitudeHistPlot.setLabel('left', 'Number of data points')
         self.AmplitudeHistPlot.setLabel('bottom', 'Standard Deviations')
+        self.AmplitudeHistPlot.setTitle("Amplitude Histogram", size = "12pt")
 
         self.SpikeRatePlot.setBackground('w')
         self.SpikeRatePlot.setLabel('left', 'Spikes per second')
         self.SpikeRatePlot.setLabel('bottom','Time (ms)')
+        self.SpikeRatePlot.setTitle("Spike rate plot", size = "12pt")
 
 
         self.ChannelTracePlot.setBackground('w')
         self.ChannelTracePlot.setLabel('bottom','Time (ms)')
         self.ChannelTracePlot.setLabel('left', 'Counts')
+        self.ChannelTracePlot.setTitle("Channel Trace", size = "12pt")
         self.ChannelTracePlot.enableAutoRange
 
 
@@ -83,7 +84,6 @@ class IndividualChannelInformation(QWidget):
         end = time.time()
         if self.session_parent.gui_state['is_mode_profiling']:
             print("Individual Channel update time: " + str(np.round(end-start,2)))
-        #print(self.session_parent.LoadedData.)
 
     def updateElectrodeData(self, debug = False):
         self.electrode_packets.clear()
@@ -124,7 +124,7 @@ class IndividualChannelInformation(QWidget):
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         self.AmplitudeHistPlot.addItem(curve)
 
-    def updateSpikeRate(self, movingAverage = True, windowSize = 5, numberOfUpdates = 10, debug=False):
+    def updateSpikeRate(self, movingAverage = True, windowSize = 15, numberOfUpdates = 10, debug=False):
         """
         movingAverage: If false, divide up the range into numberOfUpdates bins and average to find spike rate
 
@@ -136,6 +136,11 @@ class IndividualChannelInformation(QWidget):
         debug: Print helpful data.
         """
         self.SpikeRatePlot.clear()
+
+        print(self.electrode_times)
+        print(self.electrode_spikes)
+        print("Length of electrode times: " + str(len(self.electrode_times)))
+        print("Length of electrode spikes list: " + str(len(self.electrode_spikes)))
         spikeList = self.electrode_spikes
         indexes = np.linspace(0, len(spikeList), numberOfUpdates+1)
         indexes = [int(i) for i in indexes]
