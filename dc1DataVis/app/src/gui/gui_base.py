@@ -1,5 +1,5 @@
 """
-Huy Nguyen (2022)
+Huy Nguyen, John Bailey (2022)
 Contains the base app framework for loading up the GUI.
 
 Note: To regenerate gui_layout.py, in terminal do
@@ -233,8 +233,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.charts["channelTraceVerticalLayout"] = self.channelTraceLayout
             self.charts["channelTraces"] = [self.channelTrace1, self.channelTrace2, self.channelTrace3, self.channelTrace4]
             setupSpikeTrace(self.charts["channelTraces"])
+            self.charts["noiseHeatMap"].setTitle("Noise Heat Map", size = "12pt")
+
         else:
             sys.exit()
+
 
         # Because we needed to call self.setupInteractivity separately in
         # the case that Spike Search is called, we don't want to call it twice (causes a bug)
@@ -247,9 +250,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.timer.timeout.connect(self.continouslyUpdateTracePlotData)
         self.timer.start()
 
+
+
         # just sets background to white TODO make this cleaner
         #self.toggleDarkMode()
         #self.toggleDarkMode()
+
+
     def showArrayLocOnStatusBar(self, x, y):
         """ Given x, y mouse location on a chart -> display on the status bar on the bottom of the GUI
 
@@ -292,6 +299,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         """ Connects all the different buttons with their respective actions. Also set up multithreading."""
         self.LoadedData = DC1DataContainer()  # class for holding and manipulating data
         self.LoadedData.setSpikeThreshold(self.settings["spikeThreshold"])
+        self.LoadedData.setNumChannels(self.settings["numChannels"])
         # Set up PyQt multithreading
         self.threadpool = QThreadPool()
         if self.gui_state['is_mode_multithreading']:
@@ -401,7 +409,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.onLoadRealtimeStream(load_from_beginning=False)
         elif self.settings['realTime'] == "No, load raw .mat file":
             #TODO parallelize
-            self.onLoadRealTimeStraet(load_from_beginning=True)
+            self.onLoadRealtimeStream(load_from_beginning=True)
         elif self.settings['realTime'] == "No, load pre-processed .npz file":
             #TODO
             self.onActionLoadNPZ()
@@ -519,7 +527,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     self.profile_data['appendRawData'] = end - start
 
                 start = time.time()
-                self.LoadedData.update_filtered_data()
+                #self.dataAll, self.cntAll, self.times = processData(loadingDict, dataIdentifierString='gmem1',buffer_num=0)
+                #self.numChan, self.chMap, self.chId, self.startIdx, self.findCoors, self.recordedChannels = identify_relevant_channels(self.dataAll)
+
+                self.LoadedData.update_filtered_data(filtType=self.settings["filter"])
                 end = time.time()
                 if self.gui_state['is_mode_profiling']:
                     self.profile_data['filterData'] = end - start
@@ -549,6 +560,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         else:
             self.loadDataFromFileMat(path, loadingDict)
 
+# TODO : when is this next function used?
     def loadDataFromFileMat(self, path, loadingDict):
         """
 
@@ -626,7 +638,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
     def nextPage(self):
-        if self.pageNum < 29:
+        if self.pageNum < 28:
             self.pageNum += 1
             self.FigureLabel.setText("Page: " + str(self.pageNum))
             self.updateSpikeSearchPlots()
@@ -938,7 +950,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
             if m < int(self.settings['numChannels']): #TODO stopgap actually implement num of trace plots for simult recordings
                 plt.clear()
-                idx_of_channel_order = len_data + (m - self.LoadedData.data_processing_settings["simultaneousChannelsRecordedPerPacket"])
+                idx_of_channel_order = len_data + (m - int(self.LoadedData.data_processing_settings["simultaneousChannelsRecordedPerPacket"]))
 
                 chan_idx = self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']
                 row, col = idx2map(chan_idx)
@@ -951,7 +963,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 if noise_std == 0:
                     plt.setAutoVisible(y=True)
                 else:
-                    plt.setYRange(- 3 * noise_std, 3 * noise_std, padding=0)
+                    plt.setAutoVisible(y=True)
+
+                    #plt.setYRange(- 3 * noise_std, 3 * noise_std, padding=0)
 
                 begin_time = x[0]
                 end_time = x[-1]
@@ -1055,10 +1069,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
             x = np.cumsum(avg_spike_rate_times)
             y = self.LoadedData.array_stats["array spike rate"]
+            print("x: " + str(x))
+            print("y: " + str(y))
             self.charts["spikeRatePlot"].setLimits(xMin=0, yMin=-5, minXRange=5)
             self.charts["spikeRatePlot"].enableAutoRange(axis='x')
             self.charts["spikeRatePlot"].setYRange(0, max(y) + 50, padding=0.1)
-            line_plot = self.charts["spikeRatePlot"].plot(x, y, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
+            self.charts["spikeRatePlot"].plot(x, y, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
 
     def updateMiniMapPlot(self):
         self.charts["miniMap"].clear()

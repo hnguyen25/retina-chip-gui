@@ -132,6 +132,8 @@ def setupOneSpikeTrace(plot_widget,label):
     color = 'g'
     if CURRENT_THEME == 'light':
         color = 'k'
+    if label > 1023:
+        label = "####"
     plot_widget.setTitle('Ch #  ' + str(label), color = color, size = '10pt')
     plot_widget.setLabel('bottom', 'time')
 
@@ -139,7 +141,7 @@ def setupNoiseHistogramPlot(plot_widget):
 
     plot_widget.setLabel('left', "Num Channels")
     plot_widget.setLabel('bottom', "Standard Deviations")
-    plot_widget.setTitle('Channel Noise', size = '10pt')
+    plot_widget.setTitle('Channel Noise', size = '12pt')
 
     plot_widget.setLimits(xMin=0, yMin=0)
 
@@ -167,6 +169,7 @@ def setupSpikeRatePlot(plot_widget):
     plot_widget.getAxis("left").setTextPen(themes[CURRENT_THEME]['dark1'])
 
     plot_widget.setLabel('bottom', "Time (ms)")
+    plot_widget.setTitle("Array Spike Rate",  size = '12pt')
     plot_widget.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['dark1'])
     plot_widget.setLimits(xMin=0, yMin=0, minXRange=5)
 
