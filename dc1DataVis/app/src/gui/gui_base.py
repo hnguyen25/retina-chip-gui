@@ -228,7 +228,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.charts["noiseHeatMap"] = self.noiseHeatMap
             self.charts["noiseHistogram"] = self.noiseHistogramPlot
             setupNoiseHistogramPlot(self.charts["noiseHistogram"])
-
+            self.toggleDarkMode()
+            self.toggleDarkMode()
             self.charts["channelTraceVerticalLayout"] = self.channelTraceLayout
             self.charts["channelTraces"] = [self.channelTrace1, self.channelTrace2, self.channelTrace3, self.channelTrace4]
             setupSpikeTrace(self.charts["channelTraces"])
