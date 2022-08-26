@@ -950,7 +950,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             if m < int(self.settings['numChannels']): #TODO stopgap actually implement num of trace plots for simult recordings
                 plt.clear()
                 idx_of_channel_order = len_data + (m - int(self.LoadedData.data_processing_settings["simultaneousChannelsRecordedPerPacket"]))
-                print(int(self.LoadedData.data_processing_settings["simultaneousChannelsRecordedPerPacket"]))
 
                 chan_idx = self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']
                 row, col = idx2map(chan_idx)
@@ -1069,6 +1068,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
             x = np.cumsum(avg_spike_rate_times)
             y = self.LoadedData.array_stats["array spike rate"]
+            print("x: " + str(x))
+            print("y: " + str(y))
             self.charts["spikeRatePlot"].setLimits(xMin=0, yMin=-5, minXRange=5)
             self.charts["spikeRatePlot"].enableAutoRange(axis='x')
             self.charts["spikeRatePlot"].setYRange(0, max(y) + 50, padding=0.1)
