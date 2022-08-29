@@ -235,9 +235,14 @@ class DC1DataContainer():
         if filtered is True:
             noise_mean = 0
             noise_std = np.std(channel_data['data'])
+            if debug:
+                print("filtered is true activated, std : " + str(noise_std))
         else:
             noise_mean = self.array_stats["noise_mean"][row, col]
             noise_std = self.array_stats["noise_std"][row, col]
+            if debug:
+                print("filtered is FALSE activated, std : " + str(noise_std) + "row: " + str(row) + " col: " + str(col))
+
 
         incom_spike_times, incom_spike_amplitude = self.getAboveThresholdActivity(channel_data['data'],
                                                                                   channel_data['times'],
@@ -327,7 +332,15 @@ class DC1DataContainer():
             if debug and (len_filtered_data > 1):
                 print("Filtered data: " + str(filtered_data))
 
-    def update_array_stats(self, data_real, N):
+    def update_array_stats(self, data_real, N, individualChannel = False, row =0, col = 0):
+        """
+
+        @param data_real:
+        @param N:
+        @param individualChannel: True if function called from gui_individualchannel for debugging purposes
+        @param row, col: When individual channel is true, row and col ar used to access array stats for a row and col
+        @return:
+        """
         # AX1,AX3,AX4) Finding average ADC of samples per electrode
 
         # only some of the channels are actually recording, check for all which are false
@@ -335,7 +348,7 @@ class DC1DataContainer():
         mask[mask == 0] = np.nan
 
         incom_cnt, incom_mean, incom_std = self.calculate_incoming_noise_statistics(data_real, mask)
-        self.update_array_noise_statistics(incom_cnt, incom_mean, incom_std)
+        self.update_array_noise_statistics(incom_cnt, incom_mean, incom_std, individualChannel, row, col)
         incom_spike_cnt, incom_spike_avg, incom_spike_std = self.calculate_incoming_array_spike_statistics(data_real, mask)
         self.update_array_spike_statistics(incom_spike_cnt, incom_spike_avg, incom_spike_std, N)
 
@@ -353,9 +366,10 @@ class DC1DataContainer():
             # AX3,AX4) Finding standard deviation ADC of samples per electrode
             incom_std = np.nanstd(mask, axis=2)
             incom_std = np.nan_to_num(incom_std, nan=0)
+            print("incom_cnt: " + str(incom_cnt))
         return incom_cnt, incom_mean, incom_std
 
-    def update_array_noise_statistics(self, incom_cnt, incom_mean, incom_std):
+    def update_array_noise_statistics(self, incom_cnt, incom_mean, incom_std, individualChannel, row, col):
         # AX3,AX4) Building standard deviation of samples per electrode as buffers come in
         pre_mean = np.copy(self.array_stats["noise_mean"])
         pre_std = np.copy(self.array_stats["noise_std"])
@@ -369,6 +383,10 @@ class DC1DataContainer():
             np.nan_to_num((pre_cnt * (pre_std ** 2 + (pre_mean - self.array_stats["noise_mean"]) ** 2) + incom_cnt * (
                     incom_std ** 2 + (incom_mean - self.array_stats["noise_mean"]) ** 2)) / (cnt_div), nan=0))
         self.array_stats["noise_cnt"] = np.nan_to_num(pre_cnt + incom_cnt, nan=0)
+        print("noise cnt: " + str(self.array_stats["noise_cnt"]))
+
+        if individualChannel:
+            print(self.array_stats["noise_std"][row][col])
 
     def calculate_incoming_array_spike_statistics(self, data_real, mask):
         chan_cnt = np.count_nonzero(self.array_stats['num_sam'])

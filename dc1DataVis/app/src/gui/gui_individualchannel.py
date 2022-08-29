@@ -20,7 +20,7 @@ class IndividualChannelInformation(QWidget):
     has_data = None
 
     # List of dictionaries containing data packets with electrode info (data, times, spikes, etc).
-    # Each packet is for the same electrode, but come in at different times
+    # Each packet is for the same electrode, but may have data from different times within recording session
     electrode_packets = []
 
     # Lists containing values stored in the associated key in electrode_packets dictionaries
@@ -76,6 +76,12 @@ class IndividualChannelInformation(QWidget):
         self.updateAmplitudeHist()
         self.updateSpikeRate()
         self.updateChannelTrace()
+
+        #print("std from update array stats: " + str(self.session_parent.LoadedData.update_array_stats()))
+        print('std from array stats: ' +
+              str(self.session_parent.LoadedData.array_stats["noise_std"][self.current_row][self.current_col]))
+        print('std from direct calculation: ' + str(np.std(self.electrode_packets[0]["data"])))
+
         self.totalSamples.setText("Total number of samples: " + str(len(self.electrode_data)))
         self.timeRecorded.setText("Total time recording electrode: "
                                   + str(self.recordedTime)

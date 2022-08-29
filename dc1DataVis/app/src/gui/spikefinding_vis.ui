@@ -19,56 +19,62 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="2">
+         <layout class="QHBoxLayout" name="horizontalLayoutC3">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Y Max</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="yMax"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>-Y Min</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="yMin"/>
+          </item>
+         </layout>
+        </item>
         <item row="5" column="2">
          <widget class="PlotWidget" name="r4c2" native="true"/>
         </item>
-        <item row="2" column="3">
-         <widget class="PlotWidget" name="r1c3" native="true"/>
+        <item row="4" column="0">
+         <widget class="PlotWidget" name="r3c0" native="true"/>
         </item>
-        <item row="2" column="1">
-         <widget class="PlotWidget" name="r1c1" native="true"/>
-        </item>
-        <item row="3" column="0">
-         <widget class="PlotWidget" name="r2c0" native="true"/>
-        </item>
-        <item row="4" column="3">
-         <widget class="PlotWidget" name="r3c3" native="true"/>
-        </item>
-        <item row="5" column="1">
-         <widget class="PlotWidget" name="r4c1" native="true"/>
+        <item row="1" column="3">
+         <widget class="PlotWidget" name="r0c3" native="true"/>
         </item>
         <item row="3" column="5">
          <widget class="PlotWidget" name="r2c5" native="true"/>
         </item>
-        <item row="1" column="4">
-         <widget class="PlotWidget" name="r0c4" native="true"/>
+        <item row="3" column="1">
+         <widget class="PlotWidget" name="r2c1" native="true"/>
         </item>
-        <item row="2" column="5">
-         <widget class="PlotWidget" name="r1c5" native="true"/>
+        <item row="2" column="2">
+         <widget class="PlotWidget" name="r1c2" native="true"/>
         </item>
-        <item row="1" column="0">
-         <widget class="PlotWidget" name="r0c0" native="true"/>
+        <item row="3" column="4">
+         <widget class="PlotWidget" name="r2c4" native="true"/>
         </item>
-        <item row="5" column="4">
-         <widget class="PlotWidget" name="r4c4" native="true"/>
+        <item row="6" column="4">
+         <widget class="PlotWidget" name="r5c4" native="true"/>
         </item>
         <item row="1" column="2">
          <widget class="PlotWidget" name="r0c2" native="true"/>
         </item>
-        <item row="1" column="1">
-         <widget class="PlotWidget" name="r0c1" native="true"/>
+        <item row="6" column="0">
+         <widget class="PlotWidget" name="r5c0" native="true"/>
         </item>
-        <item row="3" column="1">
-         <widget class="PlotWidget" name="r2c1" native="true"/>
-        </item>
-        <item row="1" column="5">
-         <widget class="PlotWidget" name="r0c5" native="true"/>
-        </item>
-        <item row="4" column="1">
-         <widget class="PlotWidget" name="r3c1" native="true"/>
-        </item>
-        <item row="5" column="3">
-         <widget class="PlotWidget" name="r4c3" native="true"/>
+        <item row="4" column="4">
+         <widget class="PlotWidget" name="r3c4" native="true"/>
         </item>
         <item row="0" column="3">
          <layout class="QHBoxLayout" name="horizontalLayoutC4">
@@ -81,8 +87,78 @@
           </item>
          </layout>
         </item>
-        <item row="2" column="2">
-         <widget class="PlotWidget" name="r1c2" native="true"/>
+        <item row="6" column="2">
+         <widget class="PlotWidget" name="r5c2" native="true"/>
+        </item>
+        <item row="2" column="1">
+         <widget class="PlotWidget" name="r1c1" native="true"/>
+        </item>
+        <item row="2" column="4">
+         <widget class="PlotWidget" name="r1c4" native="true"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="PlotWidget" name="r1c0" native="true"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="PlotWidget" name="r2c0" native="true"/>
+        </item>
+        <item row="3" column="3">
+         <widget class="PlotWidget" name="r2c3" native="true"/>
+        </item>
+        <item row="5" column="3">
+         <widget class="PlotWidget" name="r4c3" native="true"/>
+        </item>
+        <item row="1" column="4">
+         <widget class="PlotWidget" name="r0c4" native="true"/>
+        </item>
+        <item row="4" column="1">
+         <widget class="PlotWidget" name="r3c1" native="true"/>
+        </item>
+        <item row="4" column="2">
+         <widget class="PlotWidget" name="r3c2" native="true"/>
+        </item>
+        <item row="3" column="2">
+         <widget class="PlotWidget" name="r2c2" native="true"/>
+        </item>
+        <item row="6" column="1">
+         <widget class="PlotWidget" name="r5c1" native="true"/>
+        </item>
+        <item row="4" column="5">
+         <widget class="PlotWidget" name="r3c5" native="true"/>
+        </item>
+        <item row="6" column="5">
+         <widget class="PlotWidget" name="r5c5" native="true"/>
+        </item>
+        <item row="5" column="0">
+         <widget class="PlotWidget" name="r4c0" native="true"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="FigureLabel">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="PlotWidget" name="r1c3" native="true"/>
+        </item>
+        <item row="5" column="4">
+         <widget class="PlotWidget" name="r4c4" native="true"/>
+        </item>
+        <item row="4" column="3">
+         <widget class="PlotWidget" name="r3c3" native="true"/>
+        </item>
+        <item row="2" column="5">
+         <widget class="PlotWidget" name="r1c5" native="true"/>
+        </item>
+        <item row="1" column="5">
+         <widget class="PlotWidget" name="r0c5" native="true"/>
         </item>
         <item row="0" column="4">
          <layout class="QHBoxLayout" name="horizontalLayoutC5">
@@ -99,18 +175,8 @@
             </property>
            </widget>
           </item>
-         </layout>
-        </item>
-        <item row="5" column="0">
-         <widget class="PlotWidget" name="r4c0" native="true"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="PlotWidget" name="r1c0" native="true"/>
-        </item>
-        <item row="0" column="5">
-         <layout class="QHBoxLayout" name="horizontalLayoutC6">
           <item>
-           <widget class="QPushButton" name="nextTimeStepButton">
+           <widget class="QPushButton" name="nextTimeStep">
             <property name="text">
              <string>Next Time Step</string>
             </property>
@@ -118,40 +184,8 @@
           </item>
          </layout>
         </item>
-        <item row="3" column="4">
-         <widget class="PlotWidget" name="r2c4" native="true"/>
-        </item>
-        <item row="4" column="0">
-         <widget class="PlotWidget" name="r3c0" native="true"/>
-        </item>
-        <item row="0" column="2">
-         <layout class="QHBoxLayout" name="horizontalLayoutC3">
-          <item>
-           <widget class="QSpinBox" name="spinBox"/>
-          </item>
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Y Range</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="4">
-         <widget class="PlotWidget" name="r1c4" native="true"/>
-        </item>
-        <item row="4" column="4">
-         <widget class="PlotWidget" name="r3c4" native="true"/>
-        </item>
-        <item row="4" column="2">
-         <widget class="PlotWidget" name="r3c2" native="true"/>
-        </item>
-        <item row="3" column="2">
-         <widget class="PlotWidget" name="r2c2" native="true"/>
-        </item>
-        <item row="4" column="5">
-         <widget class="PlotWidget" name="r3c5" native="true"/>
+        <item row="5" column="5">
+         <widget class="PlotWidget" name="r4c5" native="true"/>
         </item>
         <item row="0" column="1">
          <layout class="QHBoxLayout" name="horizontalLayoutC2">
@@ -164,7 +198,7 @@
              </size>
             </property>
             <property name="text">
-             <string>Back</string>
+             <string>Last fig</string>
             </property>
            </widget>
           </item>
@@ -177,51 +211,34 @@
              </size>
             </property>
             <property name="text">
-             <string>Next</string>
+             <string>Next fig</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
-        <item row="5" column="5">
-         <widget class="PlotWidget" name="r4c5" native="true"/>
-        </item>
-        <item row="3" column="3">
-         <widget class="PlotWidget" name="r2c3" native="true"/>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="FigureLabel">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>30</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="PlotWidget" name="r5c0" native="true"/>
-        </item>
-        <item row="6" column="1">
-         <widget class="PlotWidget" name="r5c1" native="true"/>
-        </item>
-        <item row="6" column="2">
-         <widget class="PlotWidget" name="r5c2" native="true"/>
-        </item>
         <item row="6" column="3">
          <widget class="PlotWidget" name="r5c3" native="true"/>
         </item>
-        <item row="6" column="4">
-         <widget class="PlotWidget" name="r5c4" native="true"/>
+        <item row="0" column="5">
+         <layout class="QHBoxLayout" name="horizontalLayoutC6">
+          <item>
+           <widget class="QPushButton" name="timeZoomToggle">
+            <property name="text">
+             <string>Toggle Time Zoom</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
-        <item row="6" column="5">
-         <widget class="PlotWidget" name="r5c5" native="true"/>
+        <item row="5" column="1">
+         <widget class="PlotWidget" name="r4c1" native="true"/>
         </item>
-        <item row="1" column="3">
-         <widget class="PlotWidget" name="r0c3" native="true"/>
+        <item row="1" column="1">
+         <widget class="PlotWidget" name="r0c1" native="true"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="PlotWidget" name="r0c0" native="true"/>
         </item>
        </layout>
       </item>

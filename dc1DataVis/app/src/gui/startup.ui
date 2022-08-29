@@ -201,12 +201,12 @@
     <widget class="QComboBox" name="chooseFilter">
      <item>
       <property name="text">
-       <string>Hierlemann</string>
+       <string>Modified Hierlemann</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Modified Hierlemann</string>
+       <string>Hierlemann</string>
       </property>
      </item>
      <item>
