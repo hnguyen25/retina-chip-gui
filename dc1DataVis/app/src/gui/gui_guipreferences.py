@@ -66,6 +66,7 @@ class GUIPreferences(QtWidgets.QDialog, Ui_Startup):
 
     def setFilter(self):
         self.settings["filter"] = self.chooseFilter.currentText()
+        print("set filter: " + str(self.settings["filter"]))
 
     def setSpikeThreshold(self):
         self.settings["spikeThreshold"] = round(self.chooseSpikeThreshold.value() / 100, 2)

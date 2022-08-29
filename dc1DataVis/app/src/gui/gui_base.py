@@ -514,25 +514,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 data_real, cnt_real, N = removeMultipleCounts(dataRaw)
 
                 start = time.time()
+                self.LoadedData.append_raw_data(data_real, cnt_real, N, filtType = self.settings["filter"])
+                end = time.time()
+                if self.gui_state['is_mode_profiling']:
+                    self.profile_data['appendRawData'] = end - start
+
+
+                start = time.time()
+                #self.dataAll, self.cntAll, self.times = processData(loadingDict, dataIdentifierString='gmem1',buffer_num=0)
+                #self.numChan, self.chMap, self.chId, self.startIdx, self.findCoors, self.recordedChannels = identify_relevant_channels(self.dataAll)
+                self.LoadedData.update_filtered_data(filtType=self.settings["filter"])
+                end = time.time()
+                if self.gui_state['is_mode_profiling']:
+                    self.profile_data['filterData'] = end - start
+
+
+                start = time.time()
                 self.LoadedData.update_array_stats(data_real, N)
                 end = time.time()
                 if self.gui_state['is_mode_profiling']:
                     self.profile_data['calculateArrayStats'] = end - start
 
-                start = time.time()
-                self.LoadedData.append_raw_data(data_real, cnt_real, N)
-                end = time.time()
-                if self.gui_state['is_mode_profiling']:
-                    self.profile_data['appendRawData'] = end - start
-
-                start = time.time()
-                #self.dataAll, self.cntAll, self.times = processData(loadingDict, dataIdentifierString='gmem1',buffer_num=0)
-                #self.numChan, self.chMap, self.chId, self.startIdx, self.findCoors, self.recordedChannels = identify_relevant_channels(self.dataAll)
-
-                self.LoadedData.update_filtered_data(filtType=self.settings["filter"])
-                end = time.time()
-                if self.gui_state['is_mode_profiling']:
-                    self.profile_data['filterData'] = end - start
 
                 # we need to call the main GUI thread to update graphs (can't do with non GUI-thread)
                 gui_callback.emit()

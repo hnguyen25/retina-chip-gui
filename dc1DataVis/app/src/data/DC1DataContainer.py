@@ -154,7 +154,7 @@ class DC1DataContainer():
         self.times = np.concatenate((self.times, padding_times))
         self.DATA_CONTAINER_MAX_SAMPLES *= 2
 
-    def append_raw_data(self, data_real, cnt_real, N, sampling_period=0.05, debug = False):
+    def append_raw_data(self, data_real, cnt_real, N, sampling_period=0.05, filtType = "Modified Hierlemann", debug = False):
         """
         appends raw data in buffer to end of data container, append nonzero data to recorded_data
 
@@ -213,14 +213,15 @@ class DC1DataContainer():
             self.preprocessed_data.append(channel_data)
 
             # Filter data, run spike detection
-            self.update_filtered_data()
+            self.update_filtered_data(filtType)
             self.filtered_data[-1] = self.calculate_realtime_spike_info_for_channel_in_buffer(self.filtered_data[-1])
 
             # add spike count to array stats
             self.array_stats["spike_cnt"][x][y] += sum(self.filtered_data[-1]["spikeBins"])
 
             if debug:
-                print(self.array_stats["spike_cnt"])
+                print("spike cnt: " + str(self.array_stats["spike_cnt"]))
+                print("sum of spike cnt: " + str(sum(self.array_stats["spike_cnt"])))
 
         self.time_track += end_time
         self.count_track += N
@@ -234,7 +235,6 @@ class DC1DataContainer():
         if filtered is True:
             noise_mean = 0
             noise_std = np.std(channel_data['data'])
-            #prin# t('filtered and with new std of', noise_std)
         else:
             noise_mean = self.array_stats["noise_mean"][row, col]
             noise_std = self.array_stats["noise_std"][row, col]
@@ -270,7 +270,7 @@ class DC1DataContainer():
         else:
             below_threshold = channel_noise_mean + (spike_threshold * channel_noise_std)
 
-        above_threshold_activity = (abs(data) >= below_threshold)
+        above_threshold_activity = (data <= -below_threshold)
         incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
         incom_spike_times = times[incom_spike_idx]
         incom_spike_amplitude = data[incom_spike_idx]
@@ -304,7 +304,7 @@ class DC1DataContainer():
 
         return spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER
 
-    def update_filtered_data(self, num_threads=4, filtType='Modified Hierlemann', debug = False ):
+    def update_filtered_data(self, filtType='Modified Hierlemann', num_threads=4, debug = False ):
         # subtract recorded_data by filtered_data
         len_preprocessed_data = len(self.preprocessed_data)
         len_filtered_data = len(self.filtered_data)
@@ -387,7 +387,8 @@ class DC1DataContainer():
             row = chan_elec[x, 0]
             col = chan_elec[x, 1]
 
-            incom_spike_cnt = self.array_stats["spike_cnt"][row][col]
+            incom_spike_cnt[row][col] = self.array_stats["spike_cnt"][row][col]
+            #print("row: " + str(row) + " col: " + str(col) + " " + str(incom_spike_cnt))
 
             # above_threshold = self.array_stats["noise_mean"][row, col] + \
             #                   self.data_processing_settings["spikeThreshold"] * self.array_stats["noise_std"][row, col]
@@ -410,7 +411,7 @@ class DC1DataContainer():
 
         return incom_spike_cnt, incom_spike_avg, incom_spike_std
 
-    def update_array_spike_statistics(self, incom_spike_cnt, incom_spike_avg, incom_spike_std, N, debug = True):
+    def update_array_spike_statistics(self, incom_spike_cnt, incom_spike_avg, incom_spike_std, N, debug = False):
         pre_spike_avg = np.copy(self.array_stats["spike_avg"])
         pre_spike_std = np.copy(self.array_stats["spike_std"])
         pre_spike_cnt = np.copy(self.array_stats["spike_cnt"])
@@ -435,7 +436,11 @@ class DC1DataContainer():
         self.array_stats["times"] = np.linspace(0, total_time, N)
 
         self.array_stats["array spike rate times"].append(total_time)
-        self.array_stats["array spike rate"].append(np.sum(incom_spike_avg))
+
+        # Buffer time is ~500 ms, divided by number of channels to give time recorded for the last set of packets
+        # Divide the total number of spikes from the last recorded channels by this time, x1000 --> spikes/sec
+        self.array_stats["array spike rate"].append(
+            1000*(np.sum(incom_spike_cnt)/(500/int(self.data_processing_settings["simultaneousChannelsRecordedPerPacket"]))))
 
         if debug:
             print(self.array_stats["spike_cnt"])
