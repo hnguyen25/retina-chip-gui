@@ -129,7 +129,7 @@ class DC1DataContainer():
             "noise_cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
             "spike_avg": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
             "spike_std": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "spike_cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "spike_cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)), # number of SPIKES
             "size": None,
             "times": None,
             "array spike rate times": [],  # x
@@ -352,7 +352,7 @@ class DC1DataContainer():
         incom_spike_cnt, incom_spike_avg, incom_spike_std = self.calculate_incoming_array_spike_statistics(data_real, mask)
         self.update_array_spike_statistics(incom_spike_cnt, incom_spike_avg, incom_spike_std, N)
 
-    def calculate_incoming_noise_statistics(self, data_real, mask):
+    def calculate_incoming_noise_statistics(self, data_real, mask, debug = True ):
         # AX1,AX3,AX4) Sample Counting (Note: Appends are an artifact from previous real time codes)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
@@ -363,10 +363,13 @@ class DC1DataContainer():
             avg_val = np.nan_to_num(self.array_stats['avg_val'], nan=0)
             incom_mean = avg_val[:, :, 0]
 
+            if debug:
+                print("incom_mean: " + str(incom_mean))
+
             # AX3,AX4) Finding standard deviation ADC of samples per electrode
             incom_std = np.nanstd(mask, axis=2)
             incom_std = np.nan_to_num(incom_std, nan=0)
-            print("incom_cnt: " + str(incom_cnt))
+            #print("incom_cnt: " + str(incom_cnt))
         return incom_cnt, incom_mean, incom_std
 
     def update_array_noise_statistics(self, incom_cnt, incom_mean, incom_std, individualChannel, row, col):
@@ -383,7 +386,7 @@ class DC1DataContainer():
             np.nan_to_num((pre_cnt * (pre_std ** 2 + (pre_mean - self.array_stats["noise_mean"]) ** 2) + incom_cnt * (
                     incom_std ** 2 + (incom_mean - self.array_stats["noise_mean"]) ** 2)) / (cnt_div), nan=0))
         self.array_stats["noise_cnt"] = np.nan_to_num(pre_cnt + incom_cnt, nan=0)
-        print("noise cnt: " + str(self.array_stats["noise_cnt"]))
+        #print("noise cnt: " + str(self.array_stats["noise_cnt"]))
 
         if individualChannel:
             print(self.array_stats["noise_std"][row][col])
@@ -446,7 +449,7 @@ class DC1DataContainer():
                                                                        incom_spike_avg - self.array_stats[
                                                                    "spike_avg"]) ** 2)) / (
                                                                   new_spike_cnt), nan=0))
-        self.array_stats["spike_cnt"] = np.nan_to_num(new_spike_cnt, nan=0)
+        #self.array_stats["spike_cnt"] = np.nan_to_num(new_spike_cnt, nan=0)
 
 
         # AX2) Determine the Time of Each Sample

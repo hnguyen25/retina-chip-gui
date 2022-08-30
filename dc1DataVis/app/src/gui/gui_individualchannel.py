@@ -80,6 +80,8 @@ class IndividualChannelInformation(QWidget):
         #print("std from update array stats: " + str(self.session_parent.LoadedData.update_array_stats()))
         print('std from array stats: ' +
               str(self.session_parent.LoadedData.array_stats["noise_std"][self.current_row][self.current_col]))
+        print("noise mean from array stats: " +
+              str(self.session_parent.LoadedData.array_stats["noise_mean"][self.current_row][self.current_col]))
         print('std from direct calculation: ' + str(np.std(self.electrode_packets[0]["data"])))
 
         self.totalSamples.setText("Total number of samples: " + str(len(self.electrode_data)))
@@ -87,6 +89,8 @@ class IndividualChannelInformation(QWidget):
                                   + str(self.recordedTime)
                                   + "ms")
         self.numSpikes.setText("Number of spikes: " + str(sum(self.electrode_spikes)))
+        print('number of spikes from array stats: ' +
+              str(self.session_parent.LoadedData.array_stats['spike_cnt'][self.current_row][self.current_col]))
         end = time.time()
         if self.session_parent.gui_state['is_mode_profiling']:
             print("Individual Channel update time: " + str(np.round(end-start,2)))
@@ -143,10 +147,11 @@ class IndividualChannelInformation(QWidget):
         """
         self.SpikeRatePlot.clear()
 
-        print(self.electrode_times)
-        print(self.electrode_spikes)
-        print("Length of electrode times: " + str(len(self.electrode_times)))
-        print("Length of electrode spikes list: " + str(len(self.electrode_spikes)))
+        if debug:
+            print("self.electrode_times: " + str(self.electrode_times))
+            print("self.electrode_spikes: " + str(self.electrode_spikes))
+            print("Length of electrode times: " + str(len(self.electrode_times)))
+            print("Length of electrode spikes list: " + str(len(self.electrode_spikes)))
         spikeList = self.electrode_spikes
         indexes = np.linspace(0, len(spikeList), numberOfUpdates+1)
         indexes = [int(i) for i in indexes]

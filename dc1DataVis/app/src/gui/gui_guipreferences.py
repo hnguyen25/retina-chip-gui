@@ -41,6 +41,9 @@ class GUIPreferences(QtWidgets.QDialog, Ui_Startup):
         self.chooseFilter.activated.connect(self.setFilter)
         self.settings["filter"] = self.chooseFilter.currentText()
 
+        self.chooseSpikeDetectionMethod.activated.connect(self.setSpikeDetectionMethod)
+        self.settings["spikeDetectionMethod"] = self.chooseSpikeDetectionMethod.currentText()
+
         self.chooseSpikeThreshold.sliderMoved.connect(self.setSpikeThreshold)
         self.chooseSpikeThreshold.setRange(float(self.THRESHOLD_MIN) * 100, float(self.THRESHOLD_MAX) * 100)
         self.chooseSpikeThreshold.setValue(self.THRESHOLD_DEFAULT * 100)
@@ -66,7 +69,10 @@ class GUIPreferences(QtWidgets.QDialog, Ui_Startup):
 
     def setFilter(self):
         self.settings["filter"] = self.chooseFilter.currentText()
-        print("set filter: " + str(self.settings["filter"]))
+
+    def setSpikeDetectionMethod(self):
+        self.settings["spikeDetectionMethod"] = self.chooseSpikeDetectionMethod.currentText()
+        print(self.settings["spikeDetectionMethod"])
 
     def setSpikeThreshold(self):
         self.settings["spikeThreshold"] = round(self.chooseSpikeThreshold.value() / 100, 2)

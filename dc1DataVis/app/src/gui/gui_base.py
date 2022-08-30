@@ -1102,7 +1102,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     plot_dict['curr_y'] = np.concatenate([plot_dict['curr_y'][NUM_SAMPS_REFRESHED:], new_y])
                     plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
 
-    def updateNoiseHistogramPlot(self, debug=True, colored = False ):
+    def updateNoiseHistogramPlot(self, debug=False, colored = False ):
         self.charts["noiseHistogram"].clear()
         vals = self.LoadedData.array_stats['noise_std']
 
@@ -1137,7 +1137,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
                 self.charts["noiseHistogram"].addItem(curve)
         else:
-            print('here')
             curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
             self.charts["noiseHistogram"].addItem(curve)
 
