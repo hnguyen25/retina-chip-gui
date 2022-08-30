@@ -214,7 +214,12 @@ class DC1DataContainer():
 
             # Filter data, run spike detection
             self.update_filtered_data(filtType)
-            self.filtered_data[-1] = self.calculate_realtime_spike_info_for_channel_in_buffer(self.filtered_data[-1])
+            filtered = True
+            if filtType == "None":
+                filtered = False
+
+            self.filtered_data[-1] = self.calculate_realtime_spike_info_for_channel_in_buffer(self.filtered_data[-1],
+                                                                                              filtered)
 
             # add spike count to array stats
             self.array_stats["spike_cnt"][x][y] += sum(self.filtered_data[-1]["spikeBins"])
@@ -228,7 +233,9 @@ class DC1DataContainer():
 
         # TODO this shouldn't call update_filtered_data -> should be async, and threaded
 
-    def calculate_realtime_spike_info_for_channel_in_buffer(self, channel_data, filtered=True, debug = False):
+# TODO : the problem right now with this function is that when the data is unfiltered, it tries to use
+# TODO : values from array stats to calculate spike info, but we haven't calculated that yet.
+    def calculate_realtime_spike_info_for_channel_in_buffer(self, channel_data, filtered=True, debug=False):
 
         row, col = idx2map(channel_data['channel_idx'])
 
@@ -237,18 +244,22 @@ class DC1DataContainer():
             noise_std = np.std(channel_data['data'])
             if debug:
                 print("filtered is true activated, std : " + str(noise_std))
-        else:
-            noise_mean = self.array_stats["noise_mean"][row, col]
-            noise_std = self.array_stats["noise_std"][row, col]
+        else: # Note: these array stats values aren't good right now.
+            #noise_mean = self.array_stats["noise_mean"][row, col]
+            #noise_std = self.array_stats["noise_std"][row, col]
+            noise_mean = np.mean(channel_data["data"])
+            noise_std = np.std(channel_data["data"])
             if debug:
-                print("filtered is FALSE activated, std : " + str(noise_std) + "row: " + str(row) + " col: " + str(col))
+                print("filtered is false activated, std : " + str(noise_std) + ", mean: " + str(noise_mean) +
+                  ", row: " + str(row) + " col: " + str(col))
 
 
         incom_spike_times, incom_spike_amplitude = self.getAboveThresholdActivity(channel_data['data'],
                                                                                   channel_data['times'],
                                                                                   noise_mean, noise_std,
                                                                                   self.data_processing_settings['spikeThreshold'],
-                                                                                  filtered)
+                                                                                  filtered,
+                                                                                  row, col)
         channel_data["incom_spike_times"] = incom_spike_times
         channel_data["incom_spike_amp"] = incom_spike_amplitude
 
@@ -261,7 +272,7 @@ class DC1DataContainer():
             print("channel idx: " + str(channel_data["channel_idx"]))
             print("noise mean: " + str(noise_mean))
             print("noise std: " + str(noise_std))
-            print("threshold: " + str (self.data_processing_settings["spikeThreshold"]))
+            print("threshold: " + str(self.data_processing_settings["spikeThreshold"]))
             print("num spikes for channel " + str(channel_data["channel_idx"]) + ": " + str(sum(channel_data['spikeBins'])))
             print("incoming spike times: " + str(incom_spike_times))
             print('spikeBins', channel_data['spikeBins'])
@@ -269,13 +280,22 @@ class DC1DataContainer():
 
         return channel_data
 
-    def getAboveThresholdActivity(self, data, times, channel_noise_mean, channel_noise_std, spike_threshold, filtered=False):
+    def getAboveThresholdActivity(self, data, times, channel_noise_mean, channel_noise_std,
+                                  spike_threshold, filtered=False, row=0, col=0, debug = False):
+
         if filtered:
             below_threshold = 0 + spike_threshold * channel_noise_std # filtered data -> makes mean 0
-        else:
-            below_threshold = channel_noise_mean + (spike_threshold * channel_noise_std)
+            above_threshold_activity = (data <= -below_threshold)
 
-        above_threshold_activity = (data <= -below_threshold)
+        else:
+            below_threshold = channel_noise_mean - (spike_threshold * channel_noise_std)
+            above_threshold_activity = (data <= below_threshold)
+
+            if debug:
+                print("Row: " + str(row) + ", Col: " + str(col) + ", below_threshold: " + str(below_threshold) +
+                ", above_threshold_activity: " + str(above_threshold_activity) +
+                ", sum of above threshold: " + str(sum(above_threshold_activity)))
+
         incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
         incom_spike_times = times[incom_spike_idx]
         incom_spike_amplitude = data[incom_spike_idx]
@@ -352,7 +372,7 @@ class DC1DataContainer():
         incom_spike_cnt, incom_spike_avg, incom_spike_std = self.calculate_incoming_array_spike_statistics(data_real, mask)
         self.update_array_spike_statistics(incom_spike_cnt, incom_spike_avg, incom_spike_std, N)
 
-    def calculate_incoming_noise_statistics(self, data_real, mask, debug = True ):
+    def calculate_incoming_noise_statistics(self, data_real, mask, debug = False):
         # AX1,AX3,AX4) Sample Counting (Note: Appends are an artifact from previous real time codes)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
