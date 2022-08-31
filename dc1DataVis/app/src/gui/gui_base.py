@@ -975,7 +975,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         scatter.addPoints(spots)  # adding spots to the scatter plot
         self.charts["arrayMap"].addItem(scatter)  # adding scatter plot to the plot window
 
-    def updateNoiseHeatMap(self, debug = True):
+    def updateNoiseHeatMap(self, debug = False):
 
         plot = self.charts["noiseHeatMap"]
         plot.clear()
@@ -1039,7 +1039,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     plt.setAutoVisible(y=True)
                 else:
                     plt.setAutoVisible(y=True)
-
                     #plt.setYRange(- 3 * noise_std, 3 * noise_std, padding=0)
 
                 begin_time = x[0]
@@ -1102,23 +1101,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     plot_dict['curr_y'] = np.concatenate([plot_dict['curr_y'][NUM_SAMPS_REFRESHED:], new_y])
                     plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
 
-    def updateNoiseHistogramPlot(self, debug=False, colored = False ):
+    def updateNoiseHistogramPlot(self, debug=False, colored=True):
+        """
+        @param debug: if true, prints helpful infomration
+        @param colored: if true, plots normal range of histogram and colors according to bin. false plots single
+        color with larger range, used primarily for debugging array_stats
+        @return:
+        """
+
         self.charts["noiseHistogram"].clear()
+
         vals = self.LoadedData.array_stats['noise_std']
 
         vals = vals[np.nonzero(vals)]
 
         cm = pg.colormap.get('plasma', source='matplotlib')
 
-        y, x = np.histogram(vals, bins=np.linspace(0, 50, 100))
-
         if debug:
             print("updating noise histogram plot")
             print("vals: " + str(vals))
-            print("x: " + str(x))
-            print("y: " + str(y))
 
         if colored:
+            y, x = np.histogram(vals, bins=np.linspace(0, 20, 50))
+
             colors = cm.getColors()
 
             scale = (int(len(colors) / 10))
@@ -1137,6 +1142,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
                 self.charts["noiseHistogram"].addItem(curve)
         else:
+            y, x = np.histogram(vals, bins=np.linspace(0, 50, 100))
             curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
             self.charts["noiseHistogram"].addItem(curve)
 
