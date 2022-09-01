@@ -534,7 +534,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 data_real, cnt_real, N = removeMultipleCounts(dataRaw)
 
                 start = time.time()
-                self.LoadedData.append_raw_data(data_real, cnt_real, N, filtType = self.settings["filter"])
+                electrodeList = self.LoadedData.append_raw_data(data_real, cnt_real, N, filtType = self.settings["filter"])
                 end = time.time()
                 if self.gui_state['is_mode_profiling']:
                     self.profile_data['appendRawData'] = end - start
@@ -550,7 +550,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
 
                 start = time.time()
-                self.LoadedData.update_array_stats(data_real, N)
+                self.LoadedData.update_array_stats(data_real, N, electrodeList)
                 end = time.time()
                 if self.gui_state['is_mode_profiling']:
                     self.profile_data['calculateArrayStats'] = end - start
