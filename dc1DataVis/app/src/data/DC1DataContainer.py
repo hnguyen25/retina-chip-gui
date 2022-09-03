@@ -19,7 +19,7 @@ class DC1DataContainer():
     To-Dos:
     ----------
     TODO figure out time alignment of the data / the actual sampling rate / check for dropped packets
-    TODO fuse code in identify_relevant_channels with this file
+    TODO fuse code in identify_relevant_channelxfs with this file
     TODO figure out time budget for data processing + filtering
     TODO make filtering of data async -> specifically, only filter the data that is directly needed for the analysis gui
     TODO decompose update_array_stats() to make it more readable

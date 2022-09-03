@@ -466,7 +466,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         Returns:
 
         """
-        print('realtimeLoading()')
+        #print('realtimeLoading()')
 
         progress_callback.emit("in realtimeloading(): " + path)
 
@@ -705,7 +705,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 chart_type = type(self.charts[chart])
                 # then it's the list of channel traces
                 if chart_type is list:
-                    print(chart)
+                    #print(chart)
                     self.updateChannelTracePlot(self.charts[chart])
 
             for chart in self.charts.keys():
@@ -1069,8 +1069,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
             x = np.cumsum(avg_spike_rate_times)
             y = self.LoadedData.array_stats["array spike rate"]
-            print("x: " + str(x))
-            print("y: " + str(y))
+            #print("x: " + str(x))
+            #print("y: " + str(y))
             self.charts["spikeRatePlot"].setLimits(xMin=0, yMin=-5, minXRange=5)
             self.charts["spikeRatePlot"].enableAutoRange(axis='x')
             self.charts["spikeRatePlot"].setYRange(0, max(y) + 50, padding=0.1)
