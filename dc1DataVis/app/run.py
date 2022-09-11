@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
 
         # init main GUI window
-        from src.gui.gui_base import MainWindow
+        from dc1DataVis.app.src.MainWindow import MainWindow
         window = MainWindow(settings=settings, window_title=WINDOW_TITLE)
 
         # setup visualization layout chosen during startup

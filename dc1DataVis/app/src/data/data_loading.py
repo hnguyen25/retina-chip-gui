@@ -1,35 +1,78 @@
 """
-@authors Maddy Hays, Huy Nguyen (2022)
+@authors Maddy Hays, Huy Nguyen, John Bailey (2022)
 Functions for loading data files into form that can be read by GUI
 """''
 import os
-import numpy as np
+import scipy.io as sio
+from ..data.filters import *
 
+def load_one_mat_file(params):
+    # this is designed to be multi-processed
+    file_dir = params["file_dir"]
+    filter_type = params["filter_type"]
 
+    mat_contents = sio.loadmat(file_dir)
+    dataRaw = mat_contents['gmem1'][0][:]
+    data_real, cnt_real, N = removeMultipleCounts(dataRaw)
 
-# MULTIPROCESS
-def load_one_mat_file():
+    # Note: this code does not timestamp data bc that cannot be parallelized properly
+    packet_data = preprocess_raw_data(data_real, cnt_real, N)
+    packet_data = filter_preprocessed_data(packet_data, filter_type=filter_type)
+    packet_data = calculate_channel_stats(packet_data)
 
-    data_real = None
-    cnt_real = None
-    N = None
-    preprocessed_data, filtered_data = None, None
-    electrodeList = None
-    
-    return {
-        "data_real": data_real,
-        "cnt_real": cnt_real,
-        "N": N,
-        "preprocessed_data": preprocessed_data,
-        "filtered_data": filtered_data,
-        "electrodeList": electrodeList
-    }
+    return packet_data
 
+def calculate_channel_stats(packet_data):
+    for idx, channel_data in enumerate(packet_data):
+        channel_data["stats_noise+mean"] = np.mean(channel_data["filtered_data"])
+        channel_data["stats_noise+std"] = np.std(channel_data["filtered_data"])
+    return packet_data
 
+def filter_preprocessed_data(packet_data, filter_type="Modified Hierlemann"):
+    for idx, channel_data in enumerate(packet_data):
+        filtered_data = applyFilterToChannelData(channel_data['preprocessed_data'], filtType=filter_type)
+        packet_data[idx]["filtered_data"] = filtered_data
+    return packet_data
 
+def preprocess_raw_data(data_real, cnt_real, N, SAMPLING_PERIOD=0.05):
+    # Determine time estimate and sample counts for the total combined buffers
+    # (note this does not take into account communication delays - hence an estimate)
+    end_time = N * SAMPLING_PERIOD  # 20kHz sampling rate, means time_recording (ms) = num_sam * 0.05ms
 
+    # we are not determining absolute time, because we want to parallelize this,
+    # and time tracking must be done in sequence
+    times = np.linspace(0, end_time, N + 1)
 
+    # identify relevant, nonzero channels, and then append only this data into recorded_data
+    num_channels, channel_map, channel_id, start_idx, find_coords, recorded_channels = identify_relevant_channels(data_real)
 
+    packet_data = []
+    for i in range(recorded_channels.shape[0]):
+
+        # process each channel index
+        channel_idx = int(recorded_channels[i][0])
+        x, y = idx2map(channel_idx)
+        start_idx = recorded_channels[i][0]
+
+        channel_data = data_real[x, y, start_idx:N]
+        # channel_times = self.times[self.count_track + start_idx: self.count_track+N] can't do
+        # prune the times in the packet where nothing is recorded (aka when data == 0)
+        # TODO turn on
+        # actual_recording_times = (channel_data != 0]
+        # channel_times = channel_times[actual_recording_times]
+        # channel_data = channel_data[actual_recording_times]
+
+        channel_data = {
+            "data_real": data_real,
+            "cnt_real": cnt_real,
+            "N": N,
+            "channel_idx": channel_idx,
+            "preprocessed_data": channel_data
+        }
+
+        packet_data.append(channel_data)
+
+    return packet_data
 
 
 """
@@ -64,12 +107,7 @@ def init_data_loading(path : str):
         "cntAll": cntAll,
         "times": times
     }
-
     return loadingDict
-
-
-
-
 
 def removeMultipleCounts(dataRaw):
     # Initialize Variables Needed for Each Buffer
@@ -110,4 +148,73 @@ def removeMultipleCounts(dataRaw):
             cnt_real[row][col][N] = cnt
 
     return data_real, cnt_real, N
+
+def identify_relevant_channels(raw_data: np.array):
+    """ Only n number of channels can be recorded at a given time due to bandwidth concerns--the rest are shut off.
+    For given data recorded at during a certain window, find which channels were recorded.
+
+    Args:
+        raw_data_all: unprocessed data in a given time window (num_channels_X x num_channels_Y x time_len)
+
+    Returns:
+        num_channels: number of channels that were found to have been recorded for given data
+        channel_map: list of channels that were recorded, i.e. nonzero (x/y_coords, num_channels)
+        channel_id: list of channels that were recorded, but identified by a single numerical ID
+        start_idx:
+
+    @param raw_data: all the raw data loaded thus far from files
+    """
+    # This bit takes the longest. ~ 30 sec for whole array 4 channel recording
+    num_samples = np.count_nonzero(raw_data, axis=2)
+    num_channels = np.count_nonzero(num_samples)
+
+    # Map and Identify recorded channels
+    find_coords = np.nonzero(num_samples)
+    channel_map = np.array(find_coords)
+    channel_id = np.zeros(num_channels)
+    start_idx = np.zeros(num_channels)
+
+    for k in range(0,num_channels):
+        channel_id[k] = map2idx(channel_map[0,k],channel_map[1,k])
+        start_idx[k] = (raw_data[channel_map[0, k], channel_map[1, k], :] != 0).argmax(axis=0)
+
+    recorded_channels = np.stack((channel_id, start_idx), axis=1).astype(int)
+
+    #return recorded_channels
+    return num_channels, channel_map, channel_id, start_idx, find_coords, recorded_channels
+
+def map2idx(ch_row: int, ch_col: int):
+    """ Given a channel's row and col, return channel's index
+
+    Args:
+        ch_row: row index of channel in array (up to 32)
+        ch_col: column index of channel in array (up to 32)
+
+    Returns: numerical index of array
+    """
+    if ch_row > 31 or ch_row <0:
+        print('Row out of range')
+    elif ch_col >31 or ch_col<0:
+        print('Col out of range')
+    else:
+        ch_idx = int(ch_row*32 + ch_col)
+    return ch_idx
+
+def idx2map(ch_idx: int):
+    """ Given a channel index, return the channel's row and col
+
+    Args:
+        ch_idx: single numerical index for array (up to 1024)
+
+    Returns:
+        channel row and channel index
+    """
+    if ch_idx > 1023 or ch_idx < 0:
+        print('Chan num out of range')
+    else:
+        ch_row = int(ch_idx/32)
+        ch_col = int(ch_idx - ch_row*32)
+    return ch_row, ch_col
+
+
 

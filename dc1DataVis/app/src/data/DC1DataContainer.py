@@ -1,10 +1,10 @@
 import numpy as np
 import time
-from ..data.preprocessing import *
+from ..data.data_loading import *
 from ..data.filters import *
 import warnings
 
-class DC1DataContainer():
+class DC1DataContainer:
     """
     Container for holding recording data for the DC1 retina chip. Each container is designed to hold all
     the relevant information extracted from data collected from a SINGLE recording, of any particular type.
@@ -210,6 +210,7 @@ class DC1DataContainer():
         # identify relevant, nonzero channels, and then append only this data into recorded_data
         num_channels, channel_map, channel_id, start_idx, find_coords, recorded_channels = identify_relevant_channels(data_real)
 
+
         for i in range(recorded_channels.shape[0]):
             channel_idx = int(recorded_channels[i][0])
             electrodeList.append(channel_idx)
@@ -232,7 +233,6 @@ class DC1DataContainer():
             }
             #  Add this data to preprocessed data
             self.preprocessed_data.append(channel_data)
-
 
             # TODO: the following lines are not a long term fix -- once we fix pipeline from
             # TODO: append_raw_data --> filter --> update array stats, this will happen in the update array stats part

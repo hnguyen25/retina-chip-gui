@@ -7,18 +7,18 @@ pyuic5 layout.ui -o gui_layout.py
 """
 
 import math
+import multiprocessing
 import queue
-
 from PyQt5 import QtWidgets, QtCore
 
-from ..data.spikeDetection import *
-from ..data.DC1DataContainer import *
-from ..gui.worker import *  # multithreading
+from dc1DataVis.app.src.data.spikeDetection import *
+from dc1DataVis.app.src.data.DC1DataContainer import *
+from dc1DataVis.app.src.gui.worker import *  # multithreading
 
-from ..gui.default_vis import Ui_mainWindow # layout
-from ..gui.gui_individualchannel import IndividualChannelInformation
+from dc1DataVis.app.src.gui.default_vis import Ui_mainWindow  # layout
+from dc1DataVis.app.src.gui.gui_individualchannel import IndividualChannelInformation
 
-from ..gui.gui_charts_helper import *
+from dc1DataVis.app.src.gui.gui_charts_helper import *
 
 CURRENT_THEME = 'light'
 
@@ -95,7 +95,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         'miniMap': [], 'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
     }
 
-    gui_packet_queue = [] # for GUI thread
+    packets_to_visualize = [] # for GUI thread
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__()
@@ -111,46 +111,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     last_complete_refresh_time = time.time()
     MIN_REFRESH_INTERVAL = 2
-
-    def gui_refresh_loop(self):
-        # TODO also update individual charts if needed
-
-        if len(self.gui_packet_queue) == 0:
-            return
-        else:
-            time_elapsed = time.time() - self.last_complete_refresh_time
-            print('time_elapsed:', time_elapsed)
-
-            if time_elapsed > self.MIN_REFRESH_INTERVAL:
-                self.gui_packet_queue = sorted(self.gui_packet_queue)
-                print('current packet queue', self.gui_packet_queue)
-                next_packet = self.gui_packet_queue[0]
-
-                for window in self.external_windows:
-                    window.update()
-
-                # prioritize processing channel trace plot info first #TODO optimization - this is slightly inefficient
-                # if doing spike search, don't use the normal update methods
-                if self.settings["visStyle"] == "Spike Search":
-                    self.updateSpikeSearchPlots()
-                else:
-                    for chart in self.charts.keys():
-                        chart_type = type(self.charts[chart])
-                        if chart_type is list:
-                            # print(chart)
-                            self.updateChannelTracePlot(self.charts[chart])
-
-                    for chart in self.charts.keys():
-                        chart_type = type(self.charts[chart])
-                        if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
-                            self.chart_update_function_mapping[chart]()
-
-                self.last_complete_refresh_time = time.time()
-                self.gui_packet_queue = self.gui_packet_queue[1:]
-            else:
-                time.sleep(0.5) # TODO call this outside of this loop
-                self.gui_refresh_loop()
-
 
     # Continuously Check for New Data
     def realtimeLoading(self, path, loadingDict, load_from_beginning,
@@ -169,9 +129,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         else:
             last_file_idx = loadingDict["num_of_buf"] - 2
 
+        # TODO optimization if > 5 in self.gui_packet_queue, don't need to process anymore
         while True:
             # In case multiple files coming in at once, hold 100ms (not likely)
             #     time.sleep(0.1)
+
             next_file = path + "/" + data_run + "_" + str(last_file_idx + 1) + ".mat"
 
             # If the next numbered file doesn't exist, just wait
@@ -208,12 +170,174 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 self.LoadedData.update_filtered_data(filtType=self.settings["filter"])
                 self.LoadedData.update_array_stats(data_real, N, electrodeList)
 
-                self.gui_packet_queue.append(last_file_idx)
+                self.packets_to_visualize.append(last_file_idx)
+
                 gui_callback.emit()  # tell the GUI loop that it needs to refresh
 
+    NUM_UNPROCESSED, NUM_PROCESSED, NUM_GUI_QUEUE, NUM_DISPLAYED = 0, 0, 0, 0
+    NUM_TOTAL = 0  # should be = NUM_UNPROCESSED + NUM_PROCESSED + NUM_GUI_QUEUE + NUM_DISPLAYED
+
+    gui_queue_loading = []  # maybe use Queue data struct?
+    # this is one separate thread running a multiprocessing
+
+    """
+    # (1) Yes, load first .mat chunk & (2) Yes, load latest .mat chunk
+    def onLoadRealtimeStream(self, load_from_beginning = True):
+    self.loading_dict = init_data_loading(self.settings["path"])
 
 
+    """
+    array_data, latest_buffers, buffer_metadata = None, None, None
+    def setup_data_container(self):
+        from ..data.ArrayStatsContainer import ArrayStatsContainer
+        self.array_data = ArrayStatsContainer()
+        from ..data.LatestBufferContainer import LatestBufferContainer
+        self.latest_buffers = LatestBufferContainer()
+        from ..data.BufferMetadataContainer import BufferMetadataContainer
+        self.buffer_metadata = BufferMetadataContainer()
 
+    def setup_multithreading(self):
+        # (1) set up thread for handling the parallelized part of data loading
+        data_loading_parallelized_worker = Worker(self.data_loading_parallelized_thread)
+
+        # (2) set up thread for handling the serialized part of data loading
+        data_loading_serialized_worker = Worker(self.data_loading_parallelized_thread)
+
+        # (3) set up thread for handling the manipulation of gui elements in PyQt
+        # (can only be one bc PyQt is designed for only one thread at a time)
+        gui_refresh_worker = Worker(self.gui_refresh_thread)
+
+        # Start all concurrent threads
+        self.threadpool.start(data_loading_parallelized_worker)
+        self.threadpool.start(data_loading_serialized_worker)
+        self.threadpool.start(gui_refresh_worker)
+
+    def data_loading_parallelized_thread(self):
+        while True:
+            buf_dir = os.listdir(self.settings["paths"])
+
+            # update counters
+            self.NUM_TOTAL = len(buf_dir)
+            self.NUM_UNPROCESSED = self.NUM_TOTAL - self.NUM_PROCESSED - self.NUM_GUI_QUEUE - self.NUM_DISPLAYED
+
+            # run when there isn't enough processed data to display + there is data left to process
+            if self.NUM_GUI_QUEUE < 5 and self.NUM_UNPROCESSED > 1:
+                num_packets_processed = self.file_loading_parallelized_loop()
+                # update counters
+                self.NUM_PROCESSED += num_packets_processed
+                self.NUM_UNPROCESSED -= num_packets_processed
+            else:  # sleep this thread because there's nothing to do
+                time.sleep(1)
+
+    def data_loading_serialized_thread(self):
+        while True:
+            if self.NUM_PROCESSED > 0:
+                packets_successfully_added = self.data_loading_serialized_loop()
+                if packets_successfully_added:
+                    self.NUM_PROCESSED -= 1
+                    self.NUM_GUI_QUEUE += 1
+            else:  # sleep this thread if there's nothing to process
+                time.sleep(1)
+
+    def gui_refresh_thread(self):
+        while True:
+            time_elapsed = time.time() - self.last_complete_refresh_time
+            print('time_elapsed:', time_elapsed)
+
+            if self.NUM_GUI_QUEUE > 0 and time_elapsed > self.MIN_REFRESH_INTERVAL:
+                new_packet_displayed = self.gui_refresh_loop()
+                if new_packet_displayed:
+                    self.NUM_DISPLAYED += 1
+            else:  # check again later to display more data
+                time.sleep(0.2)
+
+    def file_loading_parallelized_loop(self, NUM_SIMULTANEOUS_PROCESSES=8):
+        # decide how many packets to multiprocess this time
+        if self.NUM_UNPROCESSED >= NUM_SIMULTANEOUS_PROCESSES:
+            num_packets_to_process = NUM_SIMULTANEOUS_PROCESSES
+        else:
+            num_packets_to_process = self.NUM_UNPROCESSED
+
+        # generate parameters
+        params_to_process = []
+        for i in range(num_packets_to_process):
+            curr_buf_idx = None
+            path = None
+            packet_params = {
+                "file_dir": path,
+                "filter_type": self.settings["filter_type"]
+            }
+            params_to_process.append(packet_params)
+            curr_buf_idx += 1
+
+        # multiprocessing core
+        if self.settings["is_multiprocessing"] is True:
+            # create params to put through multiprocessing
+            pool = multiprocessing.Pool(processes=NUM_SIMULTANEOUS_PROCESSES)
+            vals = pool.imap(load_one_mat_file, params_to_process)
+            self.gui_queue_loading += vals
+        else:  # if multiprocessing disabled, just serialized (this is useful for debugging)
+            for idx, params in params_to_process:
+                packet_data = load_one_mat_file(params)
+                self.gui_queue_loading.append(packet_data)
+
+        return num_packets_to_process
+
+    def data_loading_serialized_loop(self):
+
+        next_packet = self.gui_queue_loading[0]  # switch to queue struct?
+        self.gui_queue_loading = self.gui_queue_loading[1:]
+
+        count_track, time_track = None, None
+        # TODO
+        # else new_times = np.linspace(self.time_track, self.time_track + end_time, N)
+
+
+        array_stats_data, next_buffer_data, next_buffer_metadata = None, None, None
+        data = next_packet
+
+        # for future data-loading
+        # summarized data, sorted by array electrode location, processed data so far
+        self.array_statistics.update(array_stats_data)
+        # full resolution data, discarded after displayed
+        self.latest_buffers.update(next_buffer_data)
+        # metadata for each packet in case it needs to be loaded again (i.e. individual channels)
+        self.buffer_metadata.update(next_buffer_metadata)
+
+        # for gui thread to display
+        self.packets_to_visualize.append(next_packet)
+        return True
+
+    def gui_refresh_loop(self):
+        # TODO also update individual charts if needed
+        self.packets_to_visualize = sorted(self.packets_to_visualize)
+        print('current packet queue', self.packets_to_visualize)
+        # TODO
+        next_packet = self.packets_to_visualize[0]
+
+        for window in self.external_windows:
+            window.update()
+
+        # prioritize processing channel trace plot info first #TODO optimization - this is slightly inefficient
+        # if doing spike search, don't use the normal update methods
+        if self.settings["visStyle"] == "Spike Search":
+            self.updateSpikeSearchPlots()
+        else:
+            for chart in self.charts.keys():
+                chart_type = type(self.charts[chart])
+                if chart_type is list:
+                    # print(chart)
+                    self.updateChannelTracePlot(self.charts[chart])
+
+            for chart in self.charts.keys():
+                chart_type = type(self.charts[chart])
+                if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
+                    self.chart_update_function_mapping[chart]()
+
+        self.last_complete_refresh_time = time.time()
+        self.packets_to_visualize = self.packets_to_visualize[1:]
+
+        return True
 
     def setupLayout(self):
         """ Runs initial setup to load all the charts and their basic information for a given layout
@@ -376,7 +500,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.updateMiniMapPlot()
         self.updateArrayMapPlot()
 
-
     def setupInteractivity(self):
         """ Connects all the different buttons with their respective actions. Also set up multithreading."""
         self.LoadedData = DC1DataContainer()  # class for holding and manipulating data
@@ -408,7 +531,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
         for analyzing individual channels on DC1. """
 
-        from ..gui.gui_individualchannel import IndividualChannelInformation
+        from gui.gui_individualchannel import IndividualChannelInformation
         new_window = IndividualChannelInformation()
         new_window.label = QLabel("Individual Channel Analysis")
         new_window.setSessionParent(self)
@@ -418,7 +541,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     def viewChannelListInformation(self):
         """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant data
         for sorting all the electrodes on the array. """
-        from ..gui.gui_electrodelist import ElectrodeListInformation
+        from gui.gui_electrodelist import ElectrodeListInformation
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
@@ -426,7 +549,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIPreferences(self):
-        from ..gui.gui_sessionparameters import GUIPreferences
+        from gui.gui_sessionparameters import GUIPreferences
         new_window = GUIPreferences()
         new_window.label = QLabel("GUI Preferences")
         new_window.show()
@@ -523,11 +646,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.statusBar().showMessage(message)
 
 
-
-
-
-
-
     def onActionLoadMAT(self):
         """
 
@@ -550,7 +668,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         else:
             self.loadDataFromFileMat(path, loadingDict)
 
-# TODO : when is this next function used?
+    # TODO : when is this next function used?
     def loadDataFromFileMat(self, path, loadingDict):
         """
 
