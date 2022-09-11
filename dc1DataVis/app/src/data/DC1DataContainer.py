@@ -171,7 +171,7 @@ class DC1DataContainer():
         self.times = np.concatenate((self.times, padding_times))
         self.DATA_CONTAINER_MAX_SAMPLES *= 2
 
-# TODO: need to have electrodes that had data appended
+    # TODO: need to have electrodes that had data appended
     def append_raw_data(self, data_real, cnt_real, N, sampling_period=0.05, filtType = "Modified Hierlemann", debug = False):
         """
         appends raw data in buffer to end of data container, append nonzero data to recorded_data

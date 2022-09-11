@@ -1,10 +1,6 @@
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
-from PyQt5.QtWidgets import *
-from PyQt5 import uic
-import os, sys
-from ..gui.startup import Ui_Startup # layout
+import os
+from ..gui.startup import Ui_Startup  # layout
 
 class GUIPreferences(QtWidgets.QDialog, Ui_Startup):
     THRESHOLD_MIN = 0.5

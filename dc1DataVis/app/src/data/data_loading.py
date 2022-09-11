@@ -2,30 +2,35 @@
 @authors Maddy Hays, Huy Nguyen (2022)
 Functions for loading data files into form that can be read by GUI
 """''
-import numpy as np
-import scipy.io
 import os
-from os.path import dirname, join as pjoin
 import numpy as np
-import time
-import scipy.io as sio
 
-"""
-=========================================
-DATA LOADING FUNCTIONS FOR NUMPY FILES
-=========================================
-"""
 
-def loadDataFromFileNpz(path):
-    raw_data = np.load(path)
-    print(raw_data.keys)
-    # TODO: manipulate raw .npz data into a better form
-    return raw_data['modified_data']
 
-# For current variable names
-path = '/Volumes/Lab/Users/mads/dc1DataVis/debugData'
-date_piece = '2022-02-18-1'
-datarun = 'data000'
+# MULTIPROCESS
+def load_one_mat_file():
+
+    data_real = None
+    cnt_real = None
+    N = None
+    preprocessed_data, filtered_data = None, None
+    electrodeList = None
+    
+    return {
+        "data_real": data_real,
+        "cnt_real": cnt_real,
+        "N": N,
+        "preprocessed_data": preprocessed_data,
+        "filtered_data": filtered_data,
+        "electrodeList": electrodeList
+    }
+
+
+
+
+
+
+
 
 """
 ========================================
@@ -35,15 +40,7 @@ HOW TO USE
 loadingDict = initDataLoading('/Volumes/Lab/Users/mads/dc1DataVis/debugData', '2022-02-18-1', 'data000', 'gmem1'):
 dataAll, cntAll, times = processData(loadingDict, dataIdentifierString='gmem1', buffer_num=0)
 """
-def initDataLoading(path : str):
-    # load and convert all data
-
-    """
-    # old method
-    fileDir = pjoin(path, date_piece, datarun)
-
-    """
-    # original data
+def init_data_loading(path : str):
     bufDir = os.listdir(path)
     num_of_buf = len(bufDir)
     bramdepth = 65536
@@ -67,61 +64,12 @@ def initDataLoading(path : str):
         "cntAll": cntAll,
         "times": times
     }
-    print('num of buf', num_of_buf)
+
     return loadingDict
 
-def processData(loadingDict, dataIdentifierString='gmem1', buffer_num=0):
-    # Idea: plot in order of which buffers have the most 'spikes'
 
-    # initialize variables
-    timeTrack = 0
-    cntTrack = 0
-    print(loadingDict.keys())
-    # Process all the Data
-    for k in range(buffer_num, loadingDict['num_of_buf']):
-        start = time.time()
 
-        # Load Data from this Loop's Buffer
-        #file_next = pjoin(path, date_piece, datarun, datarun + '_' + str(k) + '.mat')
-        file_next = pjoin(loadingDict['path'], loadingDict['datarun'] + '_' + str(k) + '.mat')
-        mat_contents = sio.loadmat(file_next)
-        dataRaw = mat_contents[dataIdentifierString][0][:]
 
-        data_real, cnt_real, N = removeMultipleCounts(dataRaw)
-
-        # Determine time estimate and sample counts for the total combined buffers
-        # ===============================
-        # For the first buffer, we assume the first sample comes in at time 0
-        if timeTrack == 0:
-            loadingDict['dataAll'][:, :, :N] = data_real[:, :, :N]
-            loadingDict['cntAll'][:, :, :N] = cnt_real[:, :, :N]
-            endTime = N * 0.05  # 20kHz sampling rate, means time_recording (ms) = num_sam*0.05ms
-            new_times = np.linspace(0, endTime, N + 1)
-            loadingDict['times'][0:len(new_times)] = new_times
-        # For buffers after the first, we place these values directly after the previous buffer
-        # (note this does not take into account communication delays - hence an estimate)
-        elif timeTrack != 0:
-            loadingDict['dataAll'][:, :, cntTrack:cntTrack + N] = data_real[:, :, :N]
-            loadingDict['cntAll'][:, :, cntTrack:cntTrack + N] = cnt_real[:, :, :N]
-            endTime = N * 0.05
-            new_times = np.linspace(timeTrack, timeTrack + endTime, N)
-            loadingDict['times'][cntTrack:cntTrack + N] = new_times
-
-        # Update for the next buffer file
-        timeTrack += endTime
-        cntTrack += N
-
-        end = time.time()
-        text1 = 'Estimated Time Remaining: ' + str.format('{0:.2f}', (end - start) * (loadingDict['num_of_buf'] - k) / 60) + ' min'
-        text2 = file_next
-        print(text1 + ' ' + text2, end="\r")
-
-    # Truncate dataAll, cntAll, and times to remove the 0's representing lost data potential due to triple counts
-    loadingDict['dataAll'] = loadingDict['dataAll'][:, :, :cntTrack - 1]
-    loadingDict['cntAll'] = loadingDict['cntAll'][:, :, :cntTrack - 1]
-    loadingDict['times'] = loadingDict['times'][:cntTrack - 1]
-
-    return loadingDict['dataAll'], loadingDict['cntAll'], loadingDict['times']
 
 def removeMultipleCounts(dataRaw):
     # Initialize Variables Needed for Each Buffer
