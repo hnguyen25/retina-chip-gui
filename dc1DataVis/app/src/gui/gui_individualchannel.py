@@ -20,7 +20,7 @@ class IndividualChannelInformation(QWidget):
     has_data = None
 
     # List of dictionaries containing data packets with electrode info (data, times, spikes, etc).
-    # Each packet is for the same electrode, but come in at different times
+    # Each packet is for the same electrode, but may have data from different times within recording session
     electrode_packets = []
 
     # Lists containing values stored in the associated key in electrode_packets dictionaries
@@ -66,21 +66,30 @@ class IndividualChannelInformation(QWidget):
         self.ChannelTracePlot.enableAutoRange
 
 
-# TODO: print profiling data?
-
     # Note: do NOT change name from "update"
-    def update(self):
+    def update(self, debug=False):
         start = time.time()
         print("Update individual channels: " + str(self.current_elec))
         self.updateElectrodeData()
         self.updateAmplitudeHist()
         self.updateSpikeRate()
         self.updateChannelTrace()
+
+        if debug:
+            print('std from array stats: ' +
+                  str(self.session_parent.LoadedData.array_stats["noise_std"][self.current_row][self.current_col]))
+            print("noise mean from array stats: " +
+                  str(self.session_parent.LoadedData.array_stats["noise_mean"][self.current_row][self.current_col]))
+            print('std from direct calculation: ' + str(np.std(self.electrode_packets[0]["data"])))
+
         self.totalSamples.setText("Total number of samples: " + str(len(self.electrode_data)))
         self.timeRecorded.setText("Total time recording electrode: "
                                   + str(self.recordedTime)
                                   + "ms")
         self.numSpikes.setText("Number of spikes: " + str(sum(self.electrode_spikes)))
+        if debug:
+            print('number of spikes from array stats: ' +
+                  str(self.session_parent.LoadedData.array_stats['spike_cnt'][self.current_row][self.current_col]))
         end = time.time()
         if self.session_parent.gui_state['is_mode_profiling']:
             print("Individual Channel update time: " + str(np.round(end-start,2)))
@@ -104,17 +113,21 @@ class IndividualChannelInformation(QWidget):
             if not match:
                 print("No data from this electrode yet")
 
+        filtered = True
+        if self.session_parent.settings["filter"] == "None":
+            filtered = False
+
         # Get lists of times and data from each packet for the selected electrode
         for i in range(len(self.electrode_packets)):
             self.session_parent.LoadedData.\
-                calculate_realtime_spike_info_for_channel_in_buffer(self.electrode_packets[i], filtered=True)
+                calculate_realtime_spike_info_for_channel_in_buffer(self.electrode_packets[i], filtered)
             self.electrode_spikes.extend(self.electrode_packets[i]["spikeBins"])
             self.electrode_spike_times.extend(self.electrode_packets[i]["incom_spike_times"])
             self.electrode_times.extend(self.electrode_packets[i]['times'])
             self.electrode_data.extend(self.electrode_packets[i]['data'])
 
         self.recordedTime = round((len(self.electrode_data)) * 0.05, 2)
-        
+
     def updateAmplitudeHist(self):
         vals = self.electrode_data
         std = np.std(vals)
@@ -137,10 +150,11 @@ class IndividualChannelInformation(QWidget):
         """
         self.SpikeRatePlot.clear()
 
-        print(self.electrode_times)
-        print(self.electrode_spikes)
-        print("Length of electrode times: " + str(len(self.electrode_times)))
-        print("Length of electrode spikes list: " + str(len(self.electrode_spikes)))
+        if debug:
+            print("self.electrode_times: " + str(self.electrode_times))
+            print("self.electrode_spikes: " + str(self.electrode_spikes))
+            print("Length of electrode times: " + str(len(self.electrode_times)))
+            print("Length of electrode spikes list: " + str(len(self.electrode_spikes)))
         spikeList = self.electrode_spikes
         indexes = np.linspace(0, len(spikeList), numberOfUpdates+1)
         indexes = [int(i) for i in indexes]

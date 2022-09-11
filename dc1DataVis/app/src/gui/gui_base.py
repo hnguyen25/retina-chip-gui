@@ -6,6 +6,7 @@ Note: To regenerate gui_layout.py, in terminal do
 pyuic5 layout.ui -o gui_layout.py
 """
 import numpy as np
+import math
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5 import uic
@@ -87,6 +88,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
 
     ### MISCELLANEOUS ###
     pageNum = 0 # used for knowing which traces to display in spike search mode. Zero-indexed
+    timeStep = 0 # used for stepping through trace plots in spike search mode. Zero-indexed
+    numberOfTimeSteps = 4 # how many segments to divide trace plots into per view in spike search mode
+    timeZoom = True # bool for spike search mode. True if plots display in time steps divided into numberOfTimeSteps,
+                    # if false the entire trace displays on spike search
     tracesToPlot = []
     p = None
     arrayMap_colorbar = None  # reference to the colorbar embedded with the array map chart
@@ -128,6 +133,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             "spikeRatePlot": self.updateSpikeRatePlot, "noiseHistogram": self.updateNoiseHistogramPlot,
             "channelTrace1": self.updateChannelTracePlot, "arrayMap": self.updateArrayMapPlot,
             "noiseHeatMap": self.updateNoiseHeatMap
+        }
+
+        self.buttons = {
+
         }
         '''old
         self.chart_update_function_mapping = {
@@ -202,13 +211,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         elif self.settings["visStyle"] == "Spike Search":
 
             uic.loadUi("./src/gui/spikefinding_vis.ui", self)
-            # self.charts["ResetButton"] = self.resetButton
-            # self.charts["nextFigButton"] = self.nextFigButton
-            # self.charts["yScaleButton"] = self.yScaleButton
-            # self.charts["backButton"] = self.backButton
-            # self.charts["nextButton"] = self.nextButton
-            # self.charts["atTimeWindowButton"] = self.atTimeWindowButton
+            # self.buttons["ResetButton"] = self.resetButton
+            # self.buttons["nextFigButton"] = self.nextFigButton
+            # self.buttons["yScaleButton"] = self.yScaleButton
+            # self.buttons["backButton"] = self.backButton
+            # self.buttons["nextButton"] = self.nextButton
+            # self.buttons["atTimeWindowButton"] = self.atTimeWindowButton
+
             self.charts.clear()
+
             self.FigureLabel.setText("Figure: " + str(self.pageNum))
 
             CURRENT_THEME = 'light'
@@ -309,9 +320,18 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.actionListElectrodesInfo.triggered.connect(self.viewChannelListInformation)
         self.actionAnalysisParameters.triggered.connect(self.viewGUIPreferences)
         if self.settings["visStyle"] == "Spike Search":
-            self.resetButton.clicked.connect(self.updateSpikeSearchPlots)
+            self.resetButton.clicked.connect(self.resetSpikeSearchPlotParams)
             self.nextButton.clicked.connect(self.nextPage)
             self.backButton.clicked.connect(self.backPage)
+            self.timeZoomToggle.clicked.connect(self.switchTimeZoom)
+            self.nextTimeStep.clicked.connect(self.timeStepUp)
+            self.lastTimeStep.clicked.connect(self.timeStepDown)
+            self.yMin.valueChanged.connect(self.updateSpikeSearchPlots)
+            self.yMax.valueChanged.connect(self.updateSpikeSearchPlots)
+
+            self.yMax.setValue(20)
+            self.yMin.setValue(30) # note: pyqt spin boxes don't support negative values (for some reason)
+            # so yMin is the distance below the mean we display
 
     def viewNewIndividualChannelInformation(self):
         """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
@@ -515,25 +535,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                 data_real, cnt_real, N = removeMultipleCounts(dataRaw)
 
                 start = time.time()
-                self.LoadedData.update_array_stats(data_real, N)
-                end = time.time()
-                if self.gui_state['is_mode_profiling']:
-                    self.profile_data['calculateArrayStats'] = end - start
-
-                start = time.time()
-                self.LoadedData.append_raw_data(data_real, cnt_real, N)
+                electrodeList = self.LoadedData.append_raw_data(data_real, cnt_real, N, filtType = self.settings["filter"])
                 end = time.time()
                 if self.gui_state['is_mode_profiling']:
                     self.profile_data['appendRawData'] = end - start
 
+
                 start = time.time()
                 #self.dataAll, self.cntAll, self.times = processData(loadingDict, dataIdentifierString='gmem1',buffer_num=0)
                 #self.numChan, self.chMap, self.chId, self.startIdx, self.findCoors, self.recordedChannels = identify_relevant_channels(self.dataAll)
-
                 self.LoadedData.update_filtered_data(filtType=self.settings["filter"])
                 end = time.time()
                 if self.gui_state['is_mode_profiling']:
                     self.profile_data['filterData'] = end - start
+
+
+                start = time.time()
+                self.LoadedData.update_array_stats(data_real, N, electrodeList)
+                end = time.time()
+                if self.gui_state['is_mode_profiling']:
+                    self.profile_data['calculateArrayStats'] = end - start
+
 
                 # we need to call the main GUI thread to update graphs (can't do with non GUI-thread)
                 gui_callback.emit()
@@ -636,17 +658,40 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         for chart in self.charts:
             self.charts[chart].clear()
 
+    def resetSpikeSearchPlotParams(self):
+        self.yMax.setValue(20)
+        self.yMin.setValue(30)
+        self.timeZoom = True
+        self.timeStep = 0
+        self.updateSpikeSearchPlots()
+
+    def switchTimeZoom(self):
+        self.timeZoom = not self.timeZoom
+        self.timeStep = 0
+        self.updateSpikeSearchPlots()
 
     def nextPage(self):
         if self.pageNum < 28:
             self.pageNum += 1
             self.FigureLabel.setText("Page: " + str(self.pageNum))
+            self.timeStep = 0
             self.updateSpikeSearchPlots()
 
     def backPage(self):
         if self.pageNum > 0:
             self.pageNum -= 1
             self.FigureLabel.setText("Page: " + str(self.pageNum))
+            self.timeStep = 0
+            self.updateSpikeSearchPlots()
+
+    def timeStepUp(self):
+        if self.timeStep < self.numberOfTimeSteps-1:
+            self.timeStep += 1
+            self.updateSpikeSearchPlots()
+
+    def timeStepDown(self):
+        if self.timeStep > 0:
+            self.timeStep -= 1
             self.updateSpikeSearchPlots()
 
     def updateSpikeSearchPlots(self):
@@ -668,17 +713,48 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         individualChannel.setSessionParent(self)
 
         pen = pg.mkPen(color = themes[CURRENT_THEME]['tracePlotting'])
-        yMin = -50
-        yMax = 20
+
         # Third, fill in plots with what data you have
         for elec in self.getTracesToPlot():
             individualChannel.current_elec = elec
             individualChannel.updateElectrodeData()
-            row, col = self.electrodeToPlotGrid(elec)
-            gridToPlot = "r" + str(row) + "c" + str(col)
-            self.charts[gridToPlot].plot(individualChannel.electrode_times,
-                                        individualChannel.electrode_data, pen = pen)
-            self.charts[gridToPlot].setYRange(yMin, yMax, padding = 0)
+
+            # The Y range we display is [mean-self.yMin, mean+self.yMax]
+            mean = np.nanmean(individualChannel.electrode_data)
+            if math.isnan(mean):
+                mean = 0
+            lowerYBound = mean - int(self.yMin.value())
+            upperYBound = mean + int(self.yMax.value())
+
+            # If timeZoom, we want to zoom in on specific time windows of each trace
+            if self.timeZoom:
+                # The X range we display is based on which time step the user is on
+                totalTime = len(individualChannel.electrode_times)
+                if totalTime == 0:
+                    xRange = [0,0]
+                else:
+                    windowLength = int(totalTime/self.numberOfTimeSteps)
+                    startIdx = self.timeStep*windowLength
+                    xRange = [individualChannel.electrode_times[startIdx],
+                              individualChannel.electrode_times[startIdx+windowLength-1]]
+                row, col = self.electrodeToPlotGrid(elec)
+                gridToPlot = "r" + str(row) + "c" + str(col)
+                self.charts[gridToPlot].plot(individualChannel.electrode_times,
+                                             individualChannel.electrode_data, pen=pen)
+                self.charts[gridToPlot].setYRange(lowerYBound, upperYBound, padding=0)
+                self.charts[gridToPlot].setXRange(xRange[0], xRange[1], padding=0)
+
+            # If timeZoom is false, we just want to display the whole trace, not zoomed in portions
+            else:
+                row, col = self.electrodeToPlotGrid(elec)
+                gridToPlot = "r" + str(row) + "c" + str(col)
+                self.charts[gridToPlot].plot(individualChannel.electrode_times,
+                                             individualChannel.electrode_data, pen=pen)
+                self.charts[gridToPlot].setYRange(lowerYBound, upperYBound, padding=0)
+                self.charts[gridToPlot].enableAutoRange(axis = 'x', enable = True)
+
+
+            # Spike highlighting
             if len(individualChannel.electrode_times)>25:
                 for spike in individualChannel.electrode_spike_times:
                     lr = pg.LinearRegionItem([spike-2, spike+2])
@@ -900,7 +976,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         scatter.addPoints(spots)  # adding spots to the scatter plot
         self.charts["arrayMap"].addItem(scatter)  # adding scatter plot to the plot window
 
-    def updateNoiseHeatMap(self, debug = True):
+    def updateNoiseHeatMap(self, debug = False):
 
         plot = self.charts["noiseHeatMap"]
         plot.clear()
@@ -964,7 +1040,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     plt.setAutoVisible(y=True)
                 else:
                     plt.setAutoVisible(y=True)
-
                     #plt.setYRange(- 3 * noise_std, 3 * noise_std, padding=0)
 
                 begin_time = x[0]
@@ -1027,50 +1102,61 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     plot_dict['curr_y'] = np.concatenate([plot_dict['curr_y'][NUM_SAMPS_REFRESHED:], new_y])
                     plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
 
-    def updateNoiseHistogramPlot(self, debug=True):
+    def updateNoiseHistogramPlot(self, debug=False, colored=True):
+        """
+        @param debug: if true, prints helpful infomration
+        @param colored: if true, plots normal range of histogram and colors according to bin. false plots single
+        color with larger range, used primarily for debugging array_stats
+        @return:
+        """
+
         self.charts["noiseHistogram"].clear()
+
         vals = self.LoadedData.array_stats['noise_std']
+
         vals = vals[np.nonzero(vals)]
 
         cm = pg.colormap.get('plasma', source='matplotlib')
 
-        y, x = np.histogram(vals, bins=np.linspace(0, 15, 30))
-
-        colors = cm.getColors()
-
-        scale = (int(len(colors) / 10))
-
         if debug:
-            print(scale)
+            print("updating noise histogram plot")
+            print("vals: " + str(vals))
 
-        for i in range(len(x) - 1):
-            bins = [x[i], x[i + 1]]
-            values = [y[i]]
+        if colored:
+            y, x = np.histogram(vals, bins=np.linspace(0, 20, 50))
 
-            color = int(scale*x[i])
+            colors = cm.getColors()
 
-            if color > 255:
-                color = 255
+            scale = (int(len(colors) / 10))
 
-            '''
-            if debug:
-                print(x[i])
-                print(color)
-            '''
+            for i in range(len(x) - 1):
+                bins = [x[i], x[i + 1]]
+                values = [y[i]]
 
-            curve = pg.PlotCurveItem(bins, values, stepMode=True, fillLevel=0,
-                                     brush=colors[color])
+                color = int(scale*x[i])
 
+                if color > 255:
+                    color = 255
+
+                curve = pg.PlotCurveItem(bins, values, stepMode=True, fillLevel=0,
+                                         brush=colors[color])
+
+                self.charts["noiseHistogram"].addItem(curve)
+        else:
+            y, x = np.histogram(vals, bins=np.linspace(0, 50, 100))
+            curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
             self.charts["noiseHistogram"].addItem(curve)
 
-    def updateSpikeRatePlot(self):
+    def updateSpikeRatePlot(self, debug = False):
         self.charts["spikeRatePlot"].clear()
         if self.LoadedData is not None:
             avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
             x = np.cumsum(avg_spike_rate_times)
             y = self.LoadedData.array_stats["array spike rate"]
-            #print("x: " + str(x))
-            #print("y: " + str(y))
+
+            if debug:
+                print("x: " + str(x))
+                print("y: " + str(y))
             self.charts["spikeRatePlot"].setLimits(xMin=0, yMin=-5, minXRange=5)
             self.charts["spikeRatePlot"].enableAutoRange(axis='x')
             self.charts["spikeRatePlot"].setYRange(0, max(y) + 50, padding=0.1)

@@ -24,7 +24,7 @@ none = no filtering of data (~0 min)
 """
 
 
-def applyFilterToChannelData(channel_data, filtType='Hierlemann'):
+def applyFilterToChannelData(channel_data, filtType='Hierlemann', debug = False):
     """
 
     Args:
@@ -56,12 +56,13 @@ def applyFilterToChannelData(channel_data, filtType='Hierlemann'):
     else:
         dataFilt = np.copy(channel_data)
         print('Filter type "' + str(filtType) +'" not recognized. Options include Hierlemann, highpass, bandpass, Litke or none')
-
+    if debug:
+        print("Filter type: " +str(filtType))
     return dataFilt
 
 
 
-def applyFilterToAllData(dataAll, numChan, chMap, filtType='Modified Hierlemann'):
+def applyFilterToAllData(dataAll, numChan, chMap, filtType='Modified Hierlemann', debug = False):
     """
 
     Args:
@@ -97,7 +98,8 @@ def applyFilterToAllData(dataAll, numChan, chMap, filtType='Modified Hierlemann'
     else:
         dataFilt = np.copy(dataAll)
         print('Filter not recognized. Options include Hierlemann, highpass, bandpass, Litke or none')
-
+    if debug:
+        print("Filter type: " +str(filtType))
     return dataFilt
 
 def applyFilterHierlemann(channel_data, dataFilt):
