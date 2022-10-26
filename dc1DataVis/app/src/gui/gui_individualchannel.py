@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pyqtgraph as pg
 import time
-from ..data.spikeDetection import *
+from ..data.spike_detection import *
 from ..data.DC1DataContainer import *
 
 class IndividualChannelInformation(QWidget):
@@ -34,7 +34,7 @@ class IndividualChannelInformation(QWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi("./src/gui/IndividualChannelWindow.ui", self)
+        uic.loadUi("./src/layouts/IndividualChannelWindow.ui", self)
 
         self.updateElectrodeNum.clicked.connect(self.setElecNum)
         self.updateRC.clicked.connect(self.setRC)
@@ -47,23 +47,6 @@ class IndividualChannelInformation(QWidget):
         self.session_parent = session_parent
         self.setupCharts()
 
-    def setupCharts(self):
-        self.AmplitudeHistPlot.setBackground('w')
-        self.AmplitudeHistPlot.setLabel('left', 'Number of data points')
-        self.AmplitudeHistPlot.setLabel('bottom', 'Standard Deviations')
-        self.AmplitudeHistPlot.setTitle("Amplitude Histogram", size = "12pt")
-
-        self.SpikeRatePlot.setBackground('w')
-        self.SpikeRatePlot.setLabel('left', 'Spikes per second')
-        self.SpikeRatePlot.setLabel('bottom','Time (ms)')
-        self.SpikeRatePlot.setTitle("Spike rate plot", size = "12pt")
-
-
-        self.ChannelTracePlot.setBackground('w')
-        self.ChannelTracePlot.setLabel('bottom','Time (ms)')
-        self.ChannelTracePlot.setLabel('left', 'Counts')
-        self.ChannelTracePlot.setTitle("Channel Trace", size = "12pt")
-        self.ChannelTracePlot.enableAutoRange
 
 
     # Note: do NOT change name from "update"
@@ -77,9 +60,9 @@ class IndividualChannelInformation(QWidget):
 
         if debug:
             print('std from array stats: ' +
-                  str(self.session_parent.LoadedData.array_stats["noise_std"][self.current_row][self.current_col]))
+                  str(self.session_parent.LoadedData.array_indexed["noise_std"][self.current_row][self.current_col]))
             print("noise mean from array stats: " +
-                  str(self.session_parent.LoadedData.array_stats["noise_mean"][self.current_row][self.current_col]))
+                  str(self.session_parent.LoadedData.array_indexed["noise_mean"][self.current_row][self.current_col]))
             print('std from direct calculation: ' + str(np.std(self.electrode_packets[0]["data"])))
 
         self.totalSamples.setText("Total number of samples: " + str(len(self.electrode_data)))
@@ -89,7 +72,7 @@ class IndividualChannelInformation(QWidget):
         self.numSpikes.setText("Number of spikes: " + str(sum(self.electrode_spikes)))
         if debug:
             print('number of spikes from array stats: ' +
-                  str(self.session_parent.LoadedData.array_stats['spike_cnt'][self.current_row][self.current_col]))
+                  str(self.session_parent.LoadedData.array_indexed['spike_cnt'][self.current_row][self.current_col]))
         end = time.time()
         if self.session_parent.gui_state['is_mode_profiling']:
             print("Individual Channel update time: " + str(np.round(end-start,2)))
@@ -137,7 +120,7 @@ class IndividualChannelInformation(QWidget):
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         self.AmplitudeHistPlot.addItem(curve)
 
-    def updateSpikeRate(self, movingAverage = True, windowSize = 15, numberOfUpdates = 10, debug=False):
+    def updateSpikeRate(self, movingAverage=True, windowSize=15, numberOfUpdates=10, debug=False):
         """
         movingAverage: If false, divide up the range into numberOfUpdates bins and average to find spike rate
 
@@ -196,8 +179,8 @@ class IndividualChannelInformation(QWidget):
             #print("double binned spikes: " + str(num_spikes))
             print("number of spike bins: " + str(len(self.electrode_spikes)))
             print("incoming spike times: " + str(self.electrode_spike_times))
-            print("noise mean: " + str(self.session_parent.LoadedData.array_stats['noise_mean'][self.current_row, self.current_col]))
-            print("noise std: " + str(self.session_parent.LoadedData.array_stats['noise_std'][self.current_row, self.current_col]))
+            print("noise mean: " + str(self.session_parent.LoadedData.array_indexed['noise_mean'][self.current_row, self.current_col]))
+            print("noise std: " + str(self.session_parent.LoadedData.array_indexed['noise_std'][self.current_row, self.current_col]))
 
     def updateChannelTrace(self):
         self.ChannelTracePlot.clear()
@@ -207,7 +190,7 @@ class IndividualChannelInformation(QWidget):
         self.ChannelTracePlot.setLabel('top', '#' + str(self.current_elec))
 
     def setRC(self):
-        """ Set the row and column entries and textboxes given an electrode number.
+        """ Set the row and column entries and text boxes given an electrode number.
 
         Connected to "Update Row and Column" button
 
@@ -289,7 +272,8 @@ class IndividualChannelInformation(QWidget):
         """
         if ch_idx > 1023 or ch_idx < 0:
             print('Chan num out of range')
+            return -1
         else:
             ch_row = int(ch_idx / 32)
             ch_col = int(ch_idx - ch_row * 32)
-        return ch_row, ch_col
+            return ch_row, ch_col

@@ -1,74 +1,43 @@
 """
 Huy Nguyen, John Bailey (2022)
 Contains the base app framework for loading up the GUI.
-
-Note: To regenerate gui_layout.py, in terminal do
-pyuic5 layout.ui -o gui_layout.py
 """
 
 import math
 import multiprocessing
-import queue
 from PyQt5 import QtWidgets, QtCore
 
-from dc1DataVis.app.src.data.spikeDetection import *
 from dc1DataVis.app.src.data.DC1DataContainer import *
-from dc1DataVis.app.src.gui.worker import *  # multithreading
+from dc1DataVis.app.src.data.python_thread_worker import *  # multithreading
+from dc1DataVis.app.src.gui.setup_charts import *
+from dc1DataVis.app.src.gui.update_charts import *
+from dc1DataVis.app.src.data.data_loading import *
 
-from dc1DataVis.app.src.gui.default_vis import Ui_mainWindow  # layout
 from dc1DataVis.app.src.gui.gui_individualchannel import IndividualChannelInformation
+from dc1DataVis.app.src.gui.themes import *
 
-from dc1DataVis.app.src.gui.gui_charts_helper import *
-
-CURRENT_THEME = 'light'
-
-light_theme_colors = {
-    'dark1': '#2E3440',
-    'dark2': '#3B4252',
-    'dark3': '#434C5E',
-    'dark4': '#4C566A',
-    'light1': '#ECEFF4',
-    'light2': '#E5E9F0', # '#'
-    'light3': '#D8DEE9', # '#'
-    'blue1': '#5E81AC',
-    'blue2': '#81A1C1',
-    'blue3': '#88C0D0',
-    'blue4': '#8FBCBB',
-    'red': '#BF616A',
-    'orange': '#D08770',
-    'yellow': '#EBCB8B',
-    'green': '#A3BE8C',
-    'purple': '#B48EAD',
-    'spikeHighlighting' : '#FFEF00',
-    'tracePlotting' : 'k'
-}
-
-dark_theme_colors = {
-    'spikeHighlighting' : '#EBCB8B',
-    'tracePlotting': '#08F7FE'
-}
-
-themes = {
-    'light': light_theme_colors,
-    'dark': dark_theme_colors
-}
-
-class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     """ Inherited from PyQt main window class. Contains all the functions necessary
     to start and run GUI elements.
     """
     ### PROGRAM VARS ###
+    is_paused = False
     first_time_plotting = True  # toggles to false when all the charts are setup for the first time
     settings = {}  # session parameters created through user input from the startup pane
-    loading_dict = {}  # contains details of the datarun currently being analyzed
-    LoadedData = None  # contains all neural data loaded from specified datarun
-    profile_data = None  # contains information about how long different gui functions took to run
+    loading_dict = {}  # contains details of the data run currently being analyzed
+    LoadedData = None  # contains all neural data loaded from specified data run
+    profile_data = {
+        'appendRawData': [], 'filterData': [], 'calculateArrayStats': [], 'arrayMap': [],
+        'noiseHeatMap': [], 'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [],
+        'miniMap': [], 'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
+    }  # contains information about how long different gui functions took to run
     charts = {}  # keys=name of every possible chart, value=reference to chart in GUI, None if not in it
     chart_update_function_mapping = {}  # keys=names of charts, value=related functions to update respective charts
+    chart_update_extra_params = {}
     external_windows = []  # reference to windows that have been generated outside of this MainWindow
     basedir = None  # base directory of where the program is loaded up, acquired from run.py script
 
-    # list of length DC1DataContainer.data_processing_settings["simultaneousChannelsRecordedPerPacket"] with data and
+    # list of length DC1DataContainer.settings["simultaneousChannelsRecordedPerPacket"] with data and
     # information to plot every channel in the latest data packet processed
     # list contains a dictionary for every channel, with keys
     # 'x': all times in packet
@@ -79,27 +48,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     trace_channels_info = []
 
     ### MISCELLANEOUS ###
-    pageNum = 0 # used for knowing which traces to display in spike search mode. Zero-indexed
-    timeStep = 0 # used for stepping through trace plots in spike search mode. Zero-indexed
-    numberOfTimeSteps = 4 # how many segments to divide trace plots into per view in spike search mode
-    timeZoom = True # bool for spike search mode. True if plots display in time steps divided into numberOfTimeSteps,
-                    # if false the entire trace displays on spike search
+    pageNum = 0  # used for knowing which traces to display in spike search mode. Zero-indexed
+    timeStep = 0  # used for stepping through trace plots in spike search mode. Zero-indexed
+    numberOfTimeSteps = 4  # how many segments to divide trace plots into per view in spike search mode
+    timeZoom = True  # bool for spike search mode. True if plots display in time steps divided into numberOfTimeSteps,
+                     # if false the entire trace displays on spike search
     tracesToPlot = []
     p = None
-    arrayMap_colorbar = None  # reference to the colorbar embedded with the array map chart
-    noiseHeatMap_colorbar = None
+    array_map_color_bar = None  # reference to the color bar embedded with the array map chart
+    noise_heat_map_color_bar = None
     arrayMapHoverCoords = None
-    profile_data = {
-        'appendRawData': [], 'filterData': [], 'calculateArrayStats': [], 'arrayMap': [],
-        'noiseHeatMap': [], 'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [],
-        'miniMap': [], 'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
-    }
-
-    packets_to_visualize = [] # for GUI thread
+    array_map_channels_to_update = []
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__()
-
         if "settings" in kwargs:
             self.settings = kwargs["settings"]
         if "window_title" in kwargs:
@@ -109,149 +71,144 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
             self.chart_update_function_mapping = kwargs["layout"]["chart_update_function_mapping"]
             self.buttons = kwargs["layout"]["buttons"]
 
-    last_complete_refresh_time = time.time()
-    MIN_REFRESH_INTERVAL = 2
+        # load first buffer so that layout can load properly from start
+        self.data = DC1DataContainer(self)
+        self.settings["num_channels"] = load_first_buffer_info(self)
+        self.data_loading_serialized_loop()
+        print(self.data.array_indexed["stats_spikes+cnt"])
 
-    # Continuously Check for New Data
-    def realtimeLoading(self, path, loadingDict, load_from_beginning,
-                        progress_callback, gui_callback, dataIdentifierString='gmem1'):
-        print('realtimeLoading()')
+        if not setup_layout(self, self.settings['visStyle'],
+                            self.settings["current_theme"], themes,
+                            self.settings["num_channels"]):
+            print("This layout has not been developed yet! Exiting application...")
+            sys.exit()
 
-        progress_callback.emit("in realtimeloading(): " + path)
+        charts_list = self.chart_update_function_mapping.keys()
+        self.gui_charts_time_counter = {chart: 100 for chart in charts_list}
 
-        # string parse datarun+datapiece
-        split_path = os.path.split(path)
-        data_run = split_path[1]
-        data_piece = os.path.split(split_path[0])[1]
+        self.exec_multithreading()
 
+    last_gui_refresh_time = time.time()
+    array_data, latest_buffers, buffer_metadata = None, None, None
+
+    NUM_UNPROCESSED, NUM_PROCESSED, NUM_GUI_QUEUE, NUM_DISPLAYED = 0, 0, 0, 0
+    NUM_TOTAL = 0  # should be = NUM_UNPROCESSED + NUM_PROCESSED + NUM_GUI_QUEUE + NUM_DISPLAYED
+    threadpool = None
+    def exec_multithreading(self):
+        print('setup multithreading')
+
+        # Set up PyQt multithreading
+        self.threadpool = QThreadPool()
+        if self.settings['is_mode_multithreading']:
+            print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
+
+        # TODO LOAD FROM BEGINNING vs LOAD FROM END
+        """
         if load_from_beginning:
             last_file_idx = 0
         else:
             last_file_idx = loadingDict["num_of_buf"] - 2
-
-        # TODO optimization if > 5 in self.gui_packet_queue, don't need to process anymore
-        while True:
-            # In case multiple files coming in at once, hold 100ms (not likely)
-            #     time.sleep(0.1)
-
-            next_file = path + "/" + data_run + "_" + str(last_file_idx + 1) + ".mat"
-
-            # If the next numbered file doesn't exist, just wait
-            if os.path.exists(next_file) is False:
-                status_bar_message = "Waiting... {Piece: " + loadingDict['datapiece'] + ",  Run: " + loadingDict[
-                    'datarun'] + '}' \
-                                 " | Received Packets: " + str(loadingDict['num_of_buf']) + \
-                                     " | Processing Packet #" + str(last_file_idx) + \
-                                     " | Viewing Packet #" + str(last_file_idx)
-                progress_callback.emit(status_bar_message)
-                continue
-            else:  # next file does exist, so process it
-                last_file_idx += 1  # update idx
-
-                status_bar_message = "Real-Time {Piece: " + loadingDict['datapiece'] + ",  Run: " + loadingDict[
-                    'datarun'] + '}' \
-                                 " | Received Packets: " + str(loadingDict['num_of_buf']) + \
-                                     " | Processing Packet #" + str(last_file_idx) + \
-                                     " | Viewing Packet #" + str(last_file_idx)
-
-                # progress_callback.emit("Loading latest buffer file idx " + str(last_file_idx))
-                progress_callback.emit(status_bar_message)
-
-                # In the off chance the file has been written, but not saved by the TCP socket yet, pause
-                time.sleep(0.5)
-
-                # Load Data from this Loop's Buffer file
-                import scipy.io as sio
-                mat_contents = sio.loadmat(next_file)
-                dataRaw = mat_contents[dataIdentifierString][0][:]
-                data_real, cnt_real, N = removeMultipleCounts(dataRaw)
-                electrodeList = self.LoadedData.append_raw_data(data_real, cnt_real, N,
-                                                                filtType=self.settings["filter"])
-                self.LoadedData.update_filtered_data(filtType=self.settings["filter"])
-                self.LoadedData.update_array_stats(data_real, N, electrodeList)
-
-                self.packets_to_visualize.append(last_file_idx)
-
-                gui_callback.emit()  # tell the GUI loop that it needs to refresh
-
-    NUM_UNPROCESSED, NUM_PROCESSED, NUM_GUI_QUEUE, NUM_DISPLAYED = 0, 0, 0, 0
-    NUM_TOTAL = 0  # should be = NUM_UNPROCESSED + NUM_PROCESSED + NUM_GUI_QUEUE + NUM_DISPLAYED
-
-    gui_queue_loading = []  # maybe use Queue data struct?
-    # this is one separate thread running a multiprocessing
-
-    """
-    # (1) Yes, load first .mat chunk & (2) Yes, load latest .mat chunk
-    def onLoadRealtimeStream(self, load_from_beginning = True):
-    self.loading_dict = init_data_loading(self.settings["path"])
-
-
-    """
-    array_data, latest_buffers, buffer_metadata = None, None, None
-    def setup_data_container(self):
-        from ..data.ArrayStatsContainer import ArrayStatsContainer
-        self.array_data = ArrayStatsContainer()
-        from ..data.LatestBufferContainer import LatestBufferContainer
-        self.latest_buffers = LatestBufferContainer()
-        from ..data.BufferMetadataContainer import BufferMetadataContainer
-        self.buffer_metadata = BufferMetadataContainer()
-
-    def setup_multithreading(self):
+        """
         # (1) set up thread for handling the parallelized part of data loading
         data_loading_parallelized_worker = Worker(self.data_loading_parallelized_thread)
+        data_loading_parallelized_worker.signals.progress.connect(self.updateStatusBar)
+        # TODO GUI refresh loop cannot be a separate worker
+        data_loading_parallelized_worker.signals.gui_callback.connect(self.gui_refresh_loop)
 
         # (2) set up thread for handling the serialized part of data loading
-        data_loading_serialized_worker = Worker(self.data_loading_parallelized_thread)
+        data_loading_serialized_worker = Worker(self.data_loading_serialized_thread)
+        data_loading_serialized_worker.signals.progress.connect(self.updateStatusBar)
+        data_loading_serialized_worker.signals.gui_callback.connect(self.gui_refresh_loop)
 
-        # (3) set up thread for handling the manipulation of gui elements in PyQt
-        # (can only be one bc PyQt is designed for only one thread at a time)
-        gui_refresh_worker = Worker(self.gui_refresh_thread)
-
+        # main thread = self.gui_refresh_thread + self.gui_refresh_loop
         # Start all concurrent threads
         self.threadpool.start(data_loading_parallelized_worker)
         self.threadpool.start(data_loading_serialized_worker)
-        self.threadpool.start(gui_refresh_worker)
 
-    def data_loading_parallelized_thread(self):
+        # start a gui refresh loop
+        self.timer = QTimer(self)
+        self.timer.setSingleShot(False)
+        self.timer.setInterval(2000) # in milliseconds
+        self.timer.timeout.connect(self.gui_refresh_thread)
+        self.timer.start()
+
+    # this is one separate thread running a multiprocessing
+    def data_loading_parallelized_thread(self, progress_callback, gui_callback,  NUM_SIMULTANEOUS_PROCESSES=6):
+        print("START: parallel thread")
+        pool = multiprocessing.Pool(processes=NUM_SIMULTANEOUS_PROCESSES)
+
         while True:
-            buf_dir = os.listdir(self.settings["paths"])
+            print('Thread-Parallel >> Time elapsed', round(time.time() - self.last_gui_refresh_time, 2))
 
             # update counters
+            buf_dir = os.listdir(self.settings["path"])
             self.NUM_TOTAL = len(buf_dir)
             self.NUM_UNPROCESSED = self.NUM_TOTAL - self.NUM_PROCESSED - self.NUM_GUI_QUEUE - self.NUM_DISPLAYED
+            self.NUM_PROCESSED = self.data.to_serialize.qsize()
+            self.NUM_GUI_QUEUE = self.data.to_show.qsize()
 
             # run when there isn't enough processed data to display + there is data left to process
-            if self.NUM_GUI_QUEUE < 5 and self.NUM_UNPROCESSED > 1:
-                num_packets_processed = self.file_loading_parallelized_loop()
-                # update counters
-                self.NUM_PROCESSED += num_packets_processed
-                self.NUM_UNPROCESSED -= num_packets_processed
+            if self.NUM_GUI_QUEUE < 3 and self.NUM_UNPROCESSED > 1:
+                num_packets_processed = self.file_loading_parallelized_loop(pool, NUM_SIMULTANEOUS_PROCESSES)
+                if num_packets_processed == 0:
+                    time.sleep(5)
             else:  # sleep this thread because there's nothing to do
-                time.sleep(1)
+                time.sleep(5)
 
-    def data_loading_serialized_thread(self):
+    def data_loading_serialized_thread(self, progress_callback, gui_callback):
+        print("START: serial thread")
         while True:
+            buf_dir = os.listdir(self.settings["path"])
+            self.NUM_TOTAL = len(buf_dir)
+            self.NUM_UNPROCESSED = self.NUM_TOTAL - self.NUM_PROCESSED - self.NUM_GUI_QUEUE - self.NUM_DISPLAYED
+            self.NUM_PROCESSED = self.data.to_serialize.qsize()
+            self.NUM_GUI_QUEUE = self.data.to_show.qsize()
+
+            print('Thread-Serial >> Time elapsed', round(time.time() - self.last_gui_refresh_time, 2))
             if self.NUM_PROCESSED > 0:
-                packets_successfully_added = self.data_loading_serialized_loop()
-                if packets_successfully_added:
-                    self.NUM_PROCESSED -= 1
-                    self.NUM_GUI_QUEUE += 1
+                packet_successfully_added = self.data_loading_serialized_loop()
+
             else:  # sleep this thread if there's nothing to process
                 time.sleep(1)
 
+        #TODO status bar messages
+        #status_bar_message = "Waiting... {Piece: " + loadingDict['datapiece'] + ",  Run: " + loadingDict[
+        #            'datarun'] + '}' \
+        #                         " | Received Packets: " + str(loadingDict['num_of_buf']) + \
+        #                             " | Processing Packet #" + str(last_file_idx) + \
+        #                             " | Viewing Packet #" + str(last_file_idx)
+        #status_bar_message = "Real-Time {Piece: " + loadingDict['datapiece'] + ",  Run: " + loadingDict[
+        #    'datarun'] + '}' \
+        #                 " | Received Packets: " + str(loadingDict['num_of_buf']) + \
+        #                     " | Processing Packet #" + str(last_file_idx) + \
+        #                     " | Viewing Packet #" + str(last_file_idx)
+
+    MIN_GUI_REFRESH_INTERVAL = 2
+    # this loop is run by a QTimer in MainWindow.exec_multithread
     def gui_refresh_thread(self):
-        while True:
-            time_elapsed = time.time() - self.last_complete_refresh_time
-            print('time_elapsed:', time_elapsed)
+        buf_dir = os.listdir(self.settings["path"])
+        self.NUM_TOTAL = len(buf_dir)
+        self.NUM_UNPROCESSED = self.NUM_TOTAL - self.NUM_PROCESSED - self.NUM_GUI_QUEUE - self.NUM_DISPLAYED
+        self.NUM_PROCESSED = self.data.to_serialize.qsize()
+        self.NUM_GUI_QUEUE = self.data.to_show.qsize()
+        time_elapsed = round(time.time() - self.last_gui_refresh_time, 2)
+        print('Thread-GUI >> Time elapsed:', time_elapsed)
+        print('======================')
+        print('||TOT', self.NUM_TOTAL, '|| UNPROC', self.NUM_UNPROCESSED, ' >> PROC',
+              self.NUM_PROCESSED, ' >> GUIQ', self.NUM_GUI_QUEUE, ' >> DISP', self.NUM_DISPLAYED)
+        print('======================')
+        print('NUM_GUI_QUEUE', 0, 'time_elapsed', time_elapsed)
+        if (self.NUM_GUI_QUEUE > 0 and time_elapsed > self.MIN_GUI_REFRESH_INTERVAL) or \
+            (self.NUM_GUI_QUEUE > 0 and self.NUM_DISPLAYED == 0):
+            print('refresh gui loop')
+            self.last_gui_refresh_time = time.time()
+            new_packet_displayed = self.gui_refresh_loop()
+            if new_packet_displayed:
+                self.NUM_DISPLAYED += 1
 
-            if self.NUM_GUI_QUEUE > 0 and time_elapsed > self.MIN_REFRESH_INTERVAL:
-                new_packet_displayed = self.gui_refresh_loop()
-                if new_packet_displayed:
-                    self.NUM_DISPLAYED += 1
-            else:  # check again later to display more data
-                time.sleep(0.2)
-
-    def file_loading_parallelized_loop(self, NUM_SIMULTANEOUS_PROCESSES=8):
+    curr_buf_idx = 0
+    def file_loading_parallelized_loop(self, pool, NUM_SIMULTANEOUS_PROCESSES):
+        if self.is_paused: return
         # decide how many packets to multiprocess this time
         if self.NUM_UNPROCESSED >= NUM_SIMULTANEOUS_PROCESSES:
             num_packets_to_process = NUM_SIMULTANEOUS_PROCESSES
@@ -261,209 +218,75 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         # generate parameters
         params_to_process = []
         for i in range(num_packets_to_process):
-            curr_buf_idx = None
-            path = None
-            packet_params = {
-                "file_dir": path,
-                "filter_type": self.settings["filter_type"]
-            }
-            params_to_process.append(packet_params)
-            curr_buf_idx += 1
+            if self.curr_buf_idx < self.NUM_TOTAL:
+                data_run = os.path.basename(self.settings["path"])
+                next_file = self.settings["path"] + "/" + data_run + "_" + str(self.curr_buf_idx) + ".mat"
+                packet_params = {
+                    "file_dir": next_file,
+                    "filter_type": self.settings["filter"],
+                    "packet_idx": self.curr_buf_idx,
+                    "SPIKING_THRESHOLD": self.settings["spikeThreshold"],
+                    "BIN_SIZE": self.settings["binSize"]
+                }
+                params_to_process.append(packet_params)
+                self.curr_buf_idx += 1
+            else:
+                num_packets_to_process = i
+                break
+        if num_packets_to_process == 0:
+            return 0
 
         # multiprocessing core
-        if self.settings["is_multiprocessing"] is True:
+        # TODO BUG right now not multiprocessing is faster than multiprocessing
+        self.settings["is_mode_multithreading"] = False
+        if self.settings["is_mode_multithreading"] is True:
             # create params to put through multiprocessing
-            pool = multiprocessing.Pool(processes=NUM_SIMULTANEOUS_PROCESSES)
-            vals = pool.imap(load_one_mat_file, params_to_process)
-            self.gui_queue_loading += vals
-        else:  # if multiprocessing disabled, just serialized (this is useful for debugging)
-            for idx, params in params_to_process:
-                packet_data = load_one_mat_file(params)
-                self.gui_queue_loading.append(packet_data)
+            a = time.time()
+            for packet in pool.map(load_one_mat_file, params_to_process):
+                print("Time elapsed: {}s)".format(int(time.time() - a)))
+                self.data.to_serialize.put(packet)
 
+        else:  # if multiprocessing disabled, just serialized (this is useful for debugging)
+            for idx, buffer_params in enumerate(params_to_process):
+                packet = load_one_mat_file(buffer_params)
+                self.data.to_serialize.put(packet)
         return num_packets_to_process
 
     def data_loading_serialized_loop(self):
-
-        next_packet = self.gui_queue_loading[0]  # switch to queue struct?
-        self.gui_queue_loading = self.gui_queue_loading[1:]
-
-        count_track, time_track = None, None
-        # TODO
-        # else new_times = np.linspace(self.time_track, self.time_track + end_time, N)
-
-
-        array_stats_data, next_buffer_data, next_buffer_metadata = None, None, None
-        data = next_packet
-
-        # for future data-loading
-        # summarized data, sorted by array electrode location, processed data so far
-        self.array_statistics.update(array_stats_data)
-        # full resolution data, discarded after displayed
-        self.latest_buffers.update(next_buffer_data)
-        # metadata for each packet in case it needs to be loaded again (i.e. individual channels)
-        self.buffer_metadata.update(next_buffer_metadata)
-
-        # for gui thread to display
-        self.packets_to_visualize.append(next_packet)
+        if self.is_paused: return
+        next_packet = self.data.to_serialize.get()
+        channel_idxs = self.data.append_buf(next_packet)
+        self.array_map_channels_to_update += channel_idxs
+        print('array map channels to update', self.array_map_channels_to_update)
         return True
+
+    CHART_MIN_TIME_TO_REFRESH = {
+        "miniMap": 2,
+        "spikeRatePlot": 0.5,
+        "noiseHistogram": 2,
+        "channelTraces": 1,
+        "arrayMap": 4, #4
+        "noiseHeatMap": 0.5
+    }
 
     def gui_refresh_loop(self):
-        # TODO also update individual charts if needed
-        self.packets_to_visualize = sorted(self.packets_to_visualize)
-        print('current packet queue', self.packets_to_visualize)
-        # TODO
-        next_packet = self.packets_to_visualize[0]
+        if self.is_paused: return
+        next_packet = self.data.to_show.get()
 
-        for window in self.external_windows:
-            window.update()
+        # TODO implement a force override of chart updating
+        for chart in self.chart_update_function_mapping.keys():
+            if (time.time() - self.gui_charts_time_counter[chart]) > self.CHART_MIN_TIME_TO_REFRESH[chart]:
+                # TODO once you finish adapting array stats, expand to ohter plots
+                # run update function for this chart
 
-        # prioritize processing channel trace plot info first #TODO optimization - this is slightly inefficient
-        # if doing spike search, don't use the normal update methods
-        if self.settings["visStyle"] == "Spike Search":
-            self.updateSpikeSearchPlots()
-        else:
-            for chart in self.charts.keys():
-                chart_type = type(self.charts[chart])
-                if chart_type is list:
-                    # print(chart)
-                    self.updateChannelTracePlot(self.charts[chart])
-
-            for chart in self.charts.keys():
-                chart_type = type(self.charts[chart])
-                if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
-                    self.chart_update_function_mapping[chart]()
-
-        self.last_complete_refresh_time = time.time()
-        self.packets_to_visualize = self.packets_to_visualize[1:]
-
+                if True:
+                #if chart == "channelTraces" or chart == "noiseHistogram" or chart == "arrayMap":
+                    a = time.time()
+                    extra_params = self.chart_update_extra_params[chart]
+                    self.chart_update_function_mapping[chart](self, next_packet, self.settings["current_theme"], themes, extra_params)
+                    print('updating chart time', chart, time.time()-a)
+                self.gui_charts_time_counter[chart] = time.time()
         return True
-
-    def setupLayout(self):
-        """ Runs initial setup to load all the charts and their basic information for a given layout
-
-        Returns:
-            Nothing
-        """
-        print("SESSION SETTINGS | " + str(self.settings))
-        self.buttons = {}
-
-        # Load layout based on QtDesigner .ui file
-        if self.settings["visStyle"] == "Default":
-            uic.loadUi("./src/gui/default_vis.ui", self)
-            self.chart_update_function_mapping = {
-                "miniMap": self.updateMiniMapPlot,
-                "spikeRatePlot": self.updateSpikeRatePlot, "noiseHistogram": self.updateNoiseHistogramPlot,
-                "channelTrace1": self.updateChannelTracePlot, "arrayMap": self.updateArrayMapPlot,
-                "noiseHeatMap": self.updateNoiseHeatMap
-            }
-
-            self.RewindButton = QPushButton("⏪")
-            self.RewindButton.setToolTip('REWIND plotting to the very first recording')
-            self.RewindButton.setStyleSheet("background-color: white")
-
-            self.TogglePlayButton = QPushButton("⏸︎")
-            self.TogglePlayButton.setToolTip('PAUSE plotting on the current packet')
-            self.TogglePlayButton.setStyleSheet("background-color: white")
-
-            self.FastForwardButton = QPushButton("⏩")
-            self.FastForwardButton.setToolTip('FAST FORWARD plotting to the latest processed packet')
-            self.FastForwardButton.setStyleSheet("background-color: white")
-
-            self.statusBar().addPermanentWidget(self.RewindButton)
-            self.statusBar().addPermanentWidget(self.TogglePlayButton)
-            self.statusBar().addPermanentWidget(self.FastForwardButton)
-
-            self.charts["arrayMap"] = self.arrayMap
-            setupArrayMap(self.charts["arrayMap"])
-            self.charts["arrayMapHover"] = HoverRegion(self.charts["arrayMap"], self.showArrayLocOnStatusBar,
-                                                       self.setMiniMapLoc)
-            self.charts["miniMap"] = self.miniMap
-            setupMiniMapPlot(self.charts["miniMap"])
-
-            self.charts["spikeRatePlot"] = self.spikeRatePlot
-            setupSpikeRatePlot(self.charts["spikeRatePlot"])
-
-            self.charts["noiseHistogram"] = self.noiseHistogram
-            setupNoiseHistogramPlot(self.charts["noiseHistogram"])
-
-            self.charts["channelTraceVerticalLayout"] = self.channelTraceVerticalLayout
-            self.charts["channelTraces"] = [self.channelTrace1, self.channelTrace2, self.channelTrace3, self.channelTrace4]
-            self.toggleDarkMode()
-            self.toggleDarkMode()
-            for plot in self.charts["channelTraces"]:
-                plot.scene().sigMouseClicked.connect(self.pausePlotting)
-
-            setupSpikeTrace(self.charts["channelTraces"])
-
-        elif self.settings["visStyle"] == "Spike Search":
-            self.chart_update_function_mapping = {
-                "miniMap": self.updateMiniMapPlot,
-                "spikeRatePlot": self.updateSpikeRatePlot, "noiseHistogram": self.updateNoiseHistogramPlot,
-                "channelTrace1": self.updateChannelTracePlot, "arrayMap": self.updateArrayMapPlot,
-                "noiseHeatMap": self.updateNoiseHeatMap
-            }
-
-            uic.loadUi("./src/gui/spikefinding_vis.ui", self)
-            # self.buttons["ResetButton"] = self.resetButton
-            # self.buttons["nextFigButton"] = self.nextFigButton
-            # self.buttons["yScaleButton"] = self.yScaleButton
-            # self.buttons["backButton"] = self.backButton
-            # self.buttons["nextButton"] = self.nextButton
-            # self.buttons["atTimeWindowButton"] = self.atTimeWindowButton
-
-            self.charts.clear()
-
-            self.FigureLabel.setText("Figure: " + str(self.pageNum))
-
-            CURRENT_THEME = 'light'
-
-            for i in range(0,6):
-                for j in range(0,6):
-                    chart_name = "r" + str(i) + "c" + str(j)
-                    self.charts[chart_name] = eval("self." + chart_name)
-            self.toggleDarkMode()
-            self.toggleDarkMode()
-            self.setupInteractivity()
-            self.updateSpikeSearchPlots()
-
-        elif self.settings["visStyle"] == "Noise":
-            self.chart_update_function_mapping = {
-                "miniMap": self.updateMiniMapPlot,
-                "spikeRatePlot": self.updateSpikeRatePlot, "noiseHistogram": self.updateNoiseHistogramPlot,
-                "channelTrace1": self.updateChannelTracePlot, "arrayMap": self.updateArrayMapPlot,
-                "noiseHeatMap": self.updateNoiseHeatMap
-            }
-
-            uic.loadUi("./src/gui/NoiseWindow.ui", self)
-
-            self.charts["noiseHeatMap"] = self.noiseHeatMap
-            self.charts["noiseHistogram"] = self.noiseHistogramPlot
-            setupNoiseHistogramPlot(self.charts["noiseHistogram"])
-            self.toggleDarkMode()
-            self.toggleDarkMode()
-            self.charts["channelTraceVerticalLayout"] = self.channelTraceLayout
-            self.charts["channelTraces"] = [self.channelTrace1, self.channelTrace2, self.channelTrace3, self.channelTrace4]
-            setupSpikeTrace(self.charts["channelTraces"])
-            self.charts["noiseHeatMap"].setTitle("Noise Heat Map", size = "12pt")
-
-        else:
-            sys.exit()
-
-        # Because we needed to call self.setupInteractivity separately in
-        # the case that Spike Search is called, we don't want to call it twice (causes a bug)
-        if self.settings["visStyle"] != "Spike Search":
-            self.setupInteractivity()
-
-        # for continuously scanning through trace plot data
-        self.timer = QtCore.QTimer()
-        self.timer.setInterval(25)
-        self.timer.timeout.connect(self.continouslyUpdateTracePlotData)
-        self.timer.start()
-
-        # just sets background to white TODO make this cleaner
-        #self.toggleDarkMode()
-        #self.toggleDarkMode()
 
     def showArrayLocOnStatusBar(self, x, y):
         """ Given x, y mouse location on a chart -> display on the status bar on the bottom of the GUI
@@ -478,6 +301,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         self.arrayMapHoverCoords = (int_x, int_y)
 
     def setMiniMapLoc(self, x, y):
+        print('set minimap loc()')
         """ Given an x, y coord as clicked on from the array map,
         reset the center of the electrode minimap to that location.
 
@@ -497,41 +321,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         elif self.settings['cursor_col'] > 29:
             self.settings['cursor_col'] = 29
 
-        self.updateMiniMapPlot()
-        self.updateArrayMapPlot()
-
-    def setupInteractivity(self):
-        """ Connects all the different buttons with their respective actions. Also set up multithreading."""
-        self.LoadedData = DC1DataContainer()  # class for holding and manipulating data
-        self.LoadedData.setSpikeThreshold(self.settings["spikeThreshold"])
-        self.LoadedData.setNumChannels(self.settings["numChannels"])
-        # Set up PyQt multithreading
-        self.threadpool = QThreadPool()
-        if self.settings['is_mode_multithreading']:
-            print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
-
-        self.actionIndividualChannelInfo.triggered.connect(self.viewNewIndividualChannelInformation)
-        self.actionListElectrodesInfo.triggered.connect(self.viewChannelListInformation)
-        self.actionAnalysisParameters.triggered.connect(self.viewGUIPreferences)
-        if self.settings["visStyle"] == "Spike Search":
-            self.resetButton.clicked.connect(self.resetSpikeSearchPlotParams)
-            self.nextButton.clicked.connect(self.nextPage)
-            self.backButton.clicked.connect(self.backPage)
-            self.timeZoomToggle.clicked.connect(self.switchTimeZoom)
-            self.nextTimeStep.clicked.connect(self.timeStepUp)
-            self.lastTimeStep.clicked.connect(self.timeStepDown)
-            self.yMin.valueChanged.connect(self.updateSpikeSearchPlots)
-            self.yMax.valueChanged.connect(self.updateSpikeSearchPlots)
-
-            self.yMax.setValue(20)
-            self.yMin.setValue(30) # note: pyqt spin boxes don't support negative values (for some reason)
-            # so yMin is the distance below the mean we display
+        # TODO update on mouse click functionality for mini map plot
+        #self.update_mini_map_plot()
+        # TODO clear prior indicators
+        update_minimap_indicator(self, self.settings["current_theme"], themes)
 
     def viewNewIndividualChannelInformation(self):
         """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
         for analyzing individual channels on DC1. """
 
-        from gui.gui_individualchannel import IndividualChannelInformation
+        from dc1DataVis.app.src.gui.gui_individualchannel import IndividualChannelInformation
         new_window = IndividualChannelInformation()
         new_window.label = QLabel("Individual Channel Analysis")
         new_window.setSessionParent(self)
@@ -556,36 +355,30 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
         new_window.exec()
         self.external_windows.append(new_window)
 
-    def toggleDarkMode(self):
-        self.settings['is_dark_mode'] = not self.settings['is_dark_mode'] # toggle
-
-        if self.settings['is_dark_mode'] is True:
-            color = 'k'
-        else:
-            color = 'w'
-            self.setStyleSheet("background-color: " + themes[CURRENT_THEME]['light3'])
+    def update_theme(self, new_theme):
+        print('update_theme()')
+        self.settings["current_theme"] = new_theme
+        background_color = themes[new_theme]["background_color"]
+        background_border = themes[new_theme]["background_borders"]
+        self.setStyleSheet("background-color: " + background_border)
 
         for chart in self.charts.keys():
             chart_type = type(self.charts[chart])
             if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
-                self.charts[chart].setBackground(color)
+                self.charts[chart].setBackground(background_color)
             elif chart_type is list:
                 for chart in self.charts[chart]:
-                    chart.setBackground(color)
+                    chart.setBackground(background_color)
 
-    """
-    =======================
-    MULTITHREADING PROGRESS FUNCS
-    =======================
-    """
-    def progress_fn(self, n):
-        print("%d%% done" % n)
+    def toggle_dark_mode(self):
+        if self.settings["current_theme"] == "light":
+            self.update_theme("dark")
+        elif self.settings["current_theme"] == "dark":
+            self.update_theme("light")
 
-    def print_output(self, s):
-        print(s)
-
-    def thread_complete(self):
-        print("THREAD COMPLETE!")
+    def progress_fn(self, n): print("%d%% done" % n)
+    def print_output(self, s): print(s)
+    def thread_complete(self): print("THREAD COMPLETE!")
 
     """
     =======================
@@ -602,38 +395,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                                                       "", file_type, options=options)
         if file_path: print(file_path)
         return file_path
-
-    def loadSession(self):
-        if self.settings["path"] == "":
-            raise ValueError("Path is not specified!")
-        if self.settings['realTime'] == "Yes, load first .mat chunk":
-            self.onLoadRealtimeStream(load_from_beginning=True)
-            # update GUI
-        elif self.settings['realTime'] == "Yes, load latest .mat chunk":
-            self.onLoadRealtimeStream(load_from_beginning=False)
-        elif self.settings['realTime'] == "No, load raw .mat file":
-            #TODO parallelize
-            self.onLoadRealtimeStream(load_from_beginning=True)
-        elif self.settings['realTime'] == "No, load pre-processed .npz file":
-            #TODO
-            self.onActionLoadNPZ()
-        elif self.settings['realTime'] == "No, load filtered .npz file":
-            #TODO
-            self.onActionLoadNPZ()
-        else:
-            raise ValueError("this should not be possible")
-
     # (1) Yes, load first .mat chunk & (2) Yes, load latest .mat chunk
     def onLoadRealtimeStream(self, load_from_beginning = True):
         self.loading_dict = init_data_loading(self.settings["path"])
-
 
         # TODO parallelize loading already saved .mat files
         load_realtime_worker = Worker(self.realtimeLoading, self.settings["path"], self.loading_dict, load_from_beginning)
         load_realtime_worker.signals.progress.connect(self.updateStatusBar)
         load_realtime_worker.signals.gui_callback.connect(self.gui_refresh_loop)
         self.threadpool.start(load_realtime_worker)
-
     # TODO (3) No, load raw .mat file
     # parallelize this faster
 
@@ -644,201 +414,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
     # callback from progress signal
     def updateStatusBar(self, message):
         self.statusBar().showMessage(message)
-
-
-    def onActionLoadMAT(self):
-        """
-
-        Returns:
-
-        """
-        # path = self.getDataPath("MATLAB files (*.mat)")
-        path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
-
-        # init loading dict with path variables
-        loadingDict = init_data_loading(path)
-        self.loading_dict = loadingDict
-
-        # loading data freezes GUI -> multithread
-        if self.settings['is_mode_multithreading']:
-            worker = Worker(self.loadDataFromFileMat, path, loadingDict)
-            #worker.signals.result.connect(self.updateGUIWithNewData)
-            self.threadpool.start(worker)
-
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Up:
+            self.setMiniMapLoc(self.settings['cursor_row'], self.settings['cursor_col']+1)
+        if event.key() == Qt.Key_Down:
+            self.setMiniMapLoc(self.settings['cursor_row'], self.settings['cursor_col']-1)
+        if event.key() == Qt.Key_Right:
+            self.setMiniMapLoc(self.settings['cursor_row']+1, self.settings['cursor_col'])
+        if event.key() == Qt.Key_Left:
+            self.setMiniMapLoc(self.settings['cursor_row']-1, self.settings['cursor_col'])
+    def closeEvent(self, event):
+        quit_msg = "Are you sure you want to exit the program?"
+        reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
+                                               QtWidgets.QMessageBox.Cancel | QtWidgets.QMessageBox.Ok)
+        if reply == QtWidgets.QMessageBox.Ok:
+            event.accept()
         else:
-            self.loadDataFromFileMat(path, loadingDict)
-
-    # TODO : when is this next function used?
-    def loadDataFromFileMat(self, path, loadingDict):
-        """
-
-        Args:
-            path:
-            loadingDict:
-
-        Returns:
-
-        """
-        self.dataAll, self.cntAll, self.times = processData(loadingDict, dataIdentifierString='gmem1',
-                                                            buffer_num=0)  # Any other args, kwargs
-        print('identify relevant channels...')
-        self.numChan, self.chMap, self.chId, self.startIdx, self.findCoors = identify_relevant_channels(
-            self.dataAll)
-        print('applying filter...')
-        self.filtered_data = applyFilterToAllData(self.dataAll, self.numChan, self.chMap, filtType=self.settings["filter"])
-
-        if self.settings['is_mode_multithreading'] is False:  # if multi-threaded, then this function is already connected on completion of fn
-            self.gui_refresh_loop()
-
-    '''
-    def MainGUILoop(self, REFRESH_RATE=100):
-        # REFRESH_RATE in ms
-
-        last_updated_time = time.time()
-
-        while (last_updated_time
-    '''
-
-    def electrodeToPlotGrid(self, electrodeNum):
-        """
-
-        Args:
-            electrodeNum: electrode number on RC array (0-1023)
-
-        Returns: row, col (each between 0 and 5) for the 6x6 plot grid
-
-        """
-        electrodeNum = electrodeNum - 36 * self.pageNum
-        row = int(electrodeNum/6)
-        col = int(electrodeNum - row * 6)
-        return row, col
-
-
-    def getTracesToPlot(self):
-        """
-        Function to determine which electrodes to plot given what page of spike
-        search GUI user is on
-
-        Returns: 36 electrodes #s in a list
-
-        """
-        self.tracesToPlot.clear()
-        for i in range(36):
-            self.tracesToPlot.append(self.pageNum * 36 + i)
-            self.FigureLabel.setText("Figure " + str(self.pageNum)
-                                     + ": Ch " + str(self.tracesToPlot[0]) + " to Ch " + str(self.tracesToPlot[-1]))
-        return self.tracesToPlot
-
-    def clearSpikeSearchPlots(self):
-        for chart in self.charts:
-            self.charts[chart].clear()
-
-    def resetSpikeSearchPlotParams(self):
-        self.yMax.setValue(20)
-        self.yMin.setValue(30)
-        self.timeZoom = True
-        self.timeStep = 0
-        self.updateSpikeSearchPlots()
-
-    def switchTimeZoom(self):
-        self.timeZoom = not self.timeZoom
-        self.timeStep = 0
-        self.updateSpikeSearchPlots()
-
-    def nextPage(self):
-        if self.pageNum < 28:
-            self.pageNum += 1
-            self.FigureLabel.setText("Page: " + str(self.pageNum))
-            self.timeStep = 0
-            self.updateSpikeSearchPlots()
-
-    def backPage(self):
-        if self.pageNum > 0:
-            self.pageNum -= 1
-            self.FigureLabel.setText("Page: " + str(self.pageNum))
-            self.timeStep = 0
-            self.updateSpikeSearchPlots()
-
-    def timeStepUp(self):
-        if self.timeStep < self.numberOfTimeSteps-1:
-            self.timeStep += 1
-            self.updateSpikeSearchPlots()
-
-    def timeStepDown(self):
-        if self.timeStep > 0:
-            self.timeStep -= 1
-            self.updateSpikeSearchPlots()
-
-    def updateSpikeSearchPlots(self):
-        """
-
-        Returns:
-
-        """
-
-        # First, clear the plots
-        self.clearSpikeSearchPlots()
-
-        # Second, set up the plot figures for every electrode on the page
-        for elec in self.getTracesToPlot():
-            row, col = self.electrodeToPlotGrid(elec)
-            setupOneSpikeTrace(self.charts["r" + str(row) + "c" + str(col)],elec)
-
-        individualChannel = IndividualChannelInformation()
-        individualChannel.setSessionParent(self)
-
-        pen = pg.mkPen(color = themes[CURRENT_THEME]['tracePlotting'])
-
-        # Third, fill in plots with what data you have
-        for elec in self.getTracesToPlot():
-            individualChannel.current_elec = elec
-            individualChannel.updateElectrodeData()
-
-            # The Y range we display is [mean-self.yMin, mean+self.yMax]
-            mean = np.nanmean(individualChannel.electrode_data)
-            if math.isnan(mean):
-                mean = 0
-            lowerYBound = mean - int(self.yMin.value())
-            upperYBound = mean + int(self.yMax.value())
-
-            # If timeZoom, we want to zoom in on specific time windows of each trace
-            if self.timeZoom:
-                # The X range we display is based on which time step the user is on
-                totalTime = len(individualChannel.electrode_times)
-                if totalTime == 0:
-                    xRange = [0,0]
-                else:
-                    windowLength = int(totalTime/self.numberOfTimeSteps)
-                    startIdx = self.timeStep*windowLength
-                    xRange = [individualChannel.electrode_times[startIdx],
-                              individualChannel.electrode_times[startIdx+windowLength-1]]
-                row, col = self.electrodeToPlotGrid(elec)
-                gridToPlot = "r" + str(row) + "c" + str(col)
-                self.charts[gridToPlot].plot(individualChannel.electrode_times,
-                                             individualChannel.electrode_data, pen=pen)
-                self.charts[gridToPlot].setYRange(lowerYBound, upperYBound, padding=0)
-                self.charts[gridToPlot].setXRange(xRange[0], xRange[1], padding=0)
-
-            # If timeZoom is false, we just want to display the whole trace, not zoomed in portions
-            else:
-                row, col = self.electrodeToPlotGrid(elec)
-                gridToPlot = "r" + str(row) + "c" + str(col)
-                self.charts[gridToPlot].plot(individualChannel.electrode_times,
-                                             individualChannel.electrode_data, pen=pen)
-                self.charts[gridToPlot].setYRange(lowerYBound, upperYBound, padding=0)
-                self.charts[gridToPlot].enableAutoRange(axis = 'x', enable = True)
-
-
-            # Spike highlighting
-            if len(individualChannel.electrode_times)>25:
-                for spike in individualChannel.electrode_spike_times:
-                    lr = pg.LinearRegionItem([spike-2, spike+2])
-                    lr.setBrush(pg.mkBrush(themes[CURRENT_THEME]["spikeHighlighting"]))
-                    lr.setZValue(-5)
-                    self.charts[gridToPlot].addItem(lr)
-
-
-
+            event.ignore()
     def printProfilingData(self):
         if self.settings['is_mode_profiling']:
             print("------------------------------")
@@ -849,437 +441,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_mainWindow):
                     print(key, avg_time)
             print("------------------------------\n")
 
-    def updateArrayMapPlot(self):
-        self.charts["arrayMap"].clear()
+    def OnRewind(self):
+        print('<<')
+        pass
+
+    def OnPlay(self):
+        print('play')
+        self.is_paused = not self.is_paused
+        print('Paused?', self.is_paused)
+        pass
+
+    def OnFastForward(self):
+        print('>>')
+        pass
 
-        if self.arrayMapHoverCoords is not None:
-            x, y = self.arrayMapHoverCoords
-            if -1 <= x < 31 and 0 <= y < 32:
-                import math
-                spike_cnt = self.LoadedData.array_stats['spike_cnt'][y][x + 1]
-                spike_amp = self.LoadedData.array_stats['spike_avg'][y][x + 1]
-                channel_idx = map2idx(y, x)
-
-                tooltip_text = "<html>" + "Electrode Channel #" + str(channel_idx) + "<br>" + \
-                               "Row " + str(y) + ", Column " + str(x) + "<br>" + \
-                               "Spike Count: " + str(round(spike_cnt)) + "<br>" + \
-                               "Spike Amplitude: " + str(round(spike_amp, 3)) + "<\html>"
-
-                self.charts["arrayMap"].setToolTip(str(tooltip_text))
-
-        if self.first_time_plotting is False:
-            colors = self.LoadedData.array_stats['spike_avg']
-            data = colors.T  # for old pixel-based data
-
-            max_dot = 50
-            # AX1) Size by Number of Samples
-            spike_cnt = self.LoadedData.array_stats['spike_cnt']
-            scale1 = (max_dot - 15) / (np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0]))
-            b_add = max_dot - (np.max(spike_cnt) * scale1)
-            size = np.round(spike_cnt * scale1 + b_add)
-            size[size < 15] = 10  # TODO fix saturation point
-
-        else:
-            data = None
-
-        cm = pg.colormap.get('plasma', source='matplotlib')
-        image = pg.ImageItem(data)
-        self.charts["arrayMap"].addItem(image)
-
-        # bound the LinearRegionItem to the plotted data
-        self.charts["arrayMapHover"].region.setClipItem(image)
-
-        if self.arrayMap_colorbar is None:
-            self.arrayMap_colorbar = self.charts["arrayMap"].addColorBar(image, colorMap=cm, label="Spike Amplitude", values=(0, 150)) #values=(0, np.max(data)))
-            self.arrayMap_colorbar.sigLevelsChanged.connect(self.colorBarLevelsChanged)
-        else:
-
-            self.arrayMap_colorbar.setImageItem(image)
-            #self.charts["arrayMap"]_colorbar.setLevels((0, np.max(data)))
-
-            # Set pxMode=False to allow spots to transform with the view
-            scatter = pg.ScatterPlotItem(pxMode=False)
-
-            # creating empty list for spots
-            spots = []
-
-            for i in range(32):
-                for j in range(32):
-                    # creating  spot position which get updated after each iteration
-                    # of color which also get updated
-
-                    if self.first_time_plotting is True:
-                        spot_dic = {'pos': (i, j), 'size': 0,
-                                    'pen': {'color': 'w', 'width': 1},
-                                    'brush': pg.intColor(1, 100)}
-                    else:
-                        color_map = self.arrayMap_colorbar.colorMap()
-                        levels = self.arrayMap_colorbar.levels()
-
-                        value = colors[i,j]
-                        if value < levels[0]: value = levels[0]
-                        elif value > levels[1]: value = levels[1]
-
-                        adjusted_value = (value - levels[0]) / (levels[1] - levels[0])
-                        color_indicator = color_map.map(adjusted_value)
-
-                        spot_dic = {'pos': (j, i), 'size': size[i, j] / 60,
-                                    'pen': {'color': 'w', 'width': size[i, j] / 60},
-                                    'brush': pg.mkColor(color_indicator)}  # TODO fix coloring
-
-                        # used to be 'brush': pg.intColor(color_indicator, 100)
-                    # adding spot_dic in the list of spots
-                    spots.append(spot_dic)
-
-            self.first_time_plotting = False
-
-            self.charts["arrayMap"].clear()
-            scatter.addPoints(spots)  # adding spots to the scatter plot
-            self.charts["arrayMap"].addItem(scatter)  # adding scatter plot to the plot window
-
-            # add squares around electrodes currently being recorded from + visualized in spike trace
-            scatter2 = pg.ScatterPlotItem(pxMode=False)
-            current_recording_electrodes = []
-            for i in range(len(self.trace_channels_info)):
-                chan_idx = self.trace_channels_info[i]['chan_idx']
-                row, col = idx2map(chan_idx)
-                spot_dict = {'pos': (col, row), 'size': 1,
-                             'pen': {'color': pg.mkColor(themes[CURRENT_THEME]['blue1']), 'width': 3},
-                             'brush': QColor(255,0,255,0),
-                             'symbol': 's'}
-                current_recording_electrodes.append(spot_dict)
-            scatter2.addPoints(current_recording_electrodes)
-            self.charts["arrayMap"].addItem(scatter2)
-
-            # add a square around electrodes displayed in the minimap
-            minimap_square_indicator = pg.QtGui.QGraphicsRectItem(self.settings['cursor_row'] - 4.5,
-                                                                  self.settings['cursor_col'] - 2.5, 8, 4)
-            minimap_square_indicator.setPen(pg.mkPen(themes[CURRENT_THEME]['blue3']))
-            minimap_square_indicator.setBrush(QColor(255,0,255,0))
-            self.charts["arrayMap"].addItem(minimap_square_indicator)
-
-
-    def colorBarLevelsChanged(self):
-        self.charts["arrayMap"].clear()
-
-        colors = self.LoadedData.array_stats['spike_avg']
-        data = colors.T # for old pixel-based data
-
-        max_dot = 75
-        # AX1) Size by Number of Samples
-        spike_cnt = self.LoadedData.array_stats['spike_cnt']
-        scale1 = (max_dot - 15) / (np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0]))
-        b_add = max_dot - (np.max(spike_cnt) * scale1)
-        size = np.round(spike_cnt * scale1 + b_add)
-        size[size < 15] = 10  # TODO fix saturation point
-
-        # Set pxMode=False to allow spots to transform with the view
-        scatter = pg.ScatterPlotItem(pxMode=False)
-
-        # creating empty list for spots
-        spots = []
-
-        # color modulated by amplitude
-        cmap = plt.cm.get_cmap("jet")
-
-        for i in range(32):
-            for j in range(32):
-                # creating  spot position which get updated after each iteration
-                # of color which also get updated
-
-                if self.first_time_plotting is True:
-                    spot_dic = {'pos': (i, j), 'size': random.random() * 0.5 + 0.5,
-                                'pen': {'color': 'w', 'width': 2},
-                                'brush': pg.intColor(i * 10 + j, 100)}
-                else:
-                    color_map = self.arrayMap_colorbar.colorMap()
-                    levels = self.arrayMap_colorbar.levels()
-
-                    value = colors[i, j]
-                    if value < levels[0]:
-                        value = levels[0]
-                    elif value > levels[1]:
-                        value = levels[1]
-
-                    adjusted_value = (value - levels[0]) / (levels[1] - levels[0])
-                    color_indicator = color_map.map(adjusted_value)
-
-                    spot_dic = {'pos': (j, i), 'size': size[i, j] / 60,
-                                'pen': {'color': 'w', 'width': size[i, j] / 60},
-                                'brush': pg.mkColor(color_indicator)}  # TODO fix coloring
-
-                    # used to be 'brush': pg.intColor(color_indicator, 100)
-
-                # adding spot_dic in the list of spots
-                spots.append(spot_dic)
-
-        self.charts["arrayMap"].clear()
-        scatter.addPoints(spots)  # adding spots to the scatter plot
-        self.charts["arrayMap"].addItem(scatter)  # adding scatter plot to the plot window
-
-    def updateNoiseHeatMap(self, debug = False):
-
-        plot = self.charts["noiseHeatMap"]
-        plot.clear()
-
-        font = pg.QtGui.QFont()
-        font.setPixelSize(20)
-        plot.getAxis("bottom").tickFont = font
-        plot.getAxis("bottom").setStyle(tickTextOffset=1)
-
-        if self.first_time_plotting is False:
-            data = self.LoadedData.array_stats["noise_std"]
-            data = data.T
-        else:
-            data = None
-
-
-        img = pg.ImageItem(data)
-        cm = pg.colormap.get('plasma', source='matplotlib')
-        plot.addItem(img)
-
-        if self.noiseHeatMap_colorbar is None:
-            self.noiseHeatMap_colorbar = self.charts["noiseHeatMap"].addColorBar(img, colorMap = cm, label = "Noise SD",
-                                                                                 values = (0,10))
-        else:
-            self.noiseHeatMap_colorbar.setImageItem(img)
-
-        self.first_time_plotting = False
-
-        if debug:
-            print("Data" + str(data))
-
-    def updateChannelTracePlot(self, trace_plots):
-        """
-        This function updates the data for the trace plots when a new packet arrives. The plots are updated even faster
-        through 'continuouslyUpdateTracePlotData()', which scans through the packet slowly to visualize data as realtime.
-        Args:
-            trace_plots:
-
-        Returns:
-        """
-        len_data = len(self.LoadedData.filtered_data)
-
-
-        self.trace_channels_info = []
-        # Generate subplots
-        for m, plt in enumerate(trace_plots):
-
-            if m < int(self.settings['numChannels']): #TODO stopgap actually implement num of trace plots for simult recordings
-                plt.clear()
-                idx_of_channel_order = len_data + (m - int(self.LoadedData.data_processing_settings["simultaneousChannelsRecordedPerPacket"]))
-
-                chan_idx = self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']
-                row, col = idx2map(chan_idx)
-
-                x = self.LoadedData.filtered_data[idx_of_channel_order]['times']
-                y = self.LoadedData.filtered_data[idx_of_channel_order]['data']
-                noise_mean = self.LoadedData.array_stats['noise_mean'][row, col]
-                noise_std = self.LoadedData.array_stats['noise_std'][row, col]
-
-                if noise_std == 0:
-                    plt.setAutoVisible(y=True)
-                else:
-                    plt.setAutoVisible(y=True)
-                    #plt.setYRange(- 3 * noise_std, 3 * noise_std, padding=0)
-
-                begin_time = x[0]
-                end_time = x[-1]
-                tooltip_text = '<html>Trace signal of electrode #' + str(chan_idx) + \
-                               '<br>Row ' + str(row) + ', Column ' + str(col) + \
-                               '<br>From time ' + str(round(begin_time, 2)) + 's to ' + str(round(end_time, 2)) + \
-                               's after this recording started.' + \
-                               '<\html>'
-
-                plt.setToolTip(tooltip_text)
-
-                LEN_BUFFER = len(self.LoadedData.filtered_data[idx_of_channel_order]['data'])
-                NUM_TIME_IN_WINDOW = 2000
-                if NUM_TIME_IN_WINDOW > LEN_BUFFER:
-                    NUM_TIME_IN_WINDOW = LEN_BUFFER
-
-                plot_dict = {'linked_plot': plt, 'chan_idx': chan_idx,
-                             'x': self.LoadedData.filtered_data[idx_of_channel_order]['times'],
-                             'y': self.LoadedData.filtered_data[idx_of_channel_order]['data'], 'len_buffer': LEN_BUFFER,
-                             'NUM_TIME_IN_WINDOW': NUM_TIME_IN_WINDOW, 'len_time_in': NUM_TIME_IN_WINDOW,
-                             'curr_x': list(x[0:NUM_TIME_IN_WINDOW]), 'curr_y': list(y[0:NUM_TIME_IN_WINDOW]),
-                             'noise_mean': self.LoadedData.array_stats['noise_mean'][row, col],
-                             'noise_std': self.LoadedData.array_stats['noise_std'][row, col], 'tooltip_text': tooltip_text,
-                             'pause': False}
-
-                plot_dict['test'] = plt.plot(plot_dict['curr_x'] , plot_dict['curr_y'],
-                                             pen=pg.mkPen(themes[CURRENT_THEME]['blue1']))
-                self.trace_channels_info.append(plot_dict)
-
-                plt.setLabel('left', '#' + str(self.LoadedData.filtered_data[idx_of_channel_order]['channel_idx']))
-                plt.getAxis("left").setTextPen(themes[CURRENT_THEME]['dark1'])
-
-
-    def pausePlotting(self):
-        # for now, just pause all plots
-        for i in range(len(self.trace_channels_info)):
-            self.trace_channels_info[i]["pause"] = not self.trace_channels_info[i]["pause"]
-
-
-    def continouslyUpdateTracePlotData(self):
-
-        # TODO update for traces that are recorded one at a time, but 4 channels per packet
-        SPEED = 1
-
-        if len(self.trace_channels_info) > 0:
-            NUM_SAMPS_REFRESHED = int(self.trace_channels_info[0]['len_buffer'] * (SPEED / 1000))
-
-            time_in = self.trace_channels_info[0]['len_time_in']
-            length_of_buffer = self.trace_channels_info[0]['len_buffer']
-
-            if time_in + NUM_SAMPS_REFRESHED + 1 < length_of_buffer:
-                for plot_dict in self.trace_channels_info:
-                    plot_dict['len_time_in'] += NUM_SAMPS_REFRESHED
-                    refresh_time_begin = plot_dict['len_time_in'] - NUM_SAMPS_REFRESHED
-                    refresh_time_end = plot_dict['len_time_in']
-                    new_x = plot_dict['x'][refresh_time_begin:refresh_time_end]
-                    new_y = plot_dict['y'][refresh_time_begin:refresh_time_end]
-                    plot_dict['curr_x'] = np.concatenate([plot_dict['curr_x'][NUM_SAMPS_REFRESHED:], new_x])
-                    plot_dict['curr_y'] = np.concatenate([plot_dict['curr_y'][NUM_SAMPS_REFRESHED:], new_y])
-                    plot_dict['test'].setData(plot_dict['curr_x'], plot_dict['curr_y'])
-
-    def updateNoiseHistogramPlot(self, debug=False, colored=True):
-        """
-        @param debug: if true, prints helpful infomration
-        @param colored: if true, plots normal range of histogram and colors according to bin. false plots single
-        color with larger range, used primarily for debugging array_stats
-        @return:
-        """
-
-        self.charts["noiseHistogram"].clear()
-
-        vals = self.LoadedData.array_stats['noise_std']
-
-        vals = vals[np.nonzero(vals)]
-
-        cm = pg.colormap.get('plasma', source='matplotlib')
-
-        if debug:
-            print("updating noise histogram plot")
-            print("vals: " + str(vals))
-
-        if colored:
-            y, x = np.histogram(vals, bins=np.linspace(0, 20, 50))
-
-            colors = cm.getColors()
-
-            scale = (int(len(colors) / 10))
-
-            for i in range(len(x) - 1):
-                bins = [x[i], x[i + 1]]
-                values = [y[i]]
-
-                color = int(scale*x[i])
-
-                if color > 255:
-                    color = 255
-
-                curve = pg.PlotCurveItem(bins, values, stepMode=True, fillLevel=0,
-                                         brush=colors[color])
-
-                self.charts["noiseHistogram"].addItem(curve)
-        else:
-            y, x = np.histogram(vals, bins=np.linspace(0, 50, 100))
-            curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
-            self.charts["noiseHistogram"].addItem(curve)
-
-    def updateSpikeRatePlot(self, debug = False):
-        self.charts["spikeRatePlot"].clear()
-        if self.LoadedData is not None:
-            avg_spike_rate_times = self.LoadedData.array_stats["array spike rate times"]
-            x = np.cumsum(avg_spike_rate_times)
-            y = self.LoadedData.array_stats["array spike rate"]
-
-            if debug:
-                print("x: " + str(x))
-                print("y: " + str(y))
-            self.charts["spikeRatePlot"].setLimits(xMin=0, yMin=-5, minXRange=5)
-            self.charts["spikeRatePlot"].enableAutoRange(axis='x')
-            self.charts["spikeRatePlot"].setYRange(0, max(y) + 50, padding=0.1)
-            self.charts["spikeRatePlot"].plot(x, y, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
-
-    def updateMiniMapPlot(self):
-        self.charts["miniMap"].clear()
-        BAR_LENGTH = 4
-        MAX_SPIKES = 16 # can't draw every spike or gui will crash -> group spikes together
-
-        for row in range(self.settings['cursor_row']-4, self.settings['cursor_row']+4):
-            for col in range(self.settings['cursor_col']-2, self.settings['cursor_col']+2):
-                if (row > -2) and (col > -2):
-                    spike_indicator_base = pg.QtGui.QGraphicsRectItem(row*5, col*5, BAR_LENGTH, 0.2)
-                    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
-                    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
-
-                    elec_idx = str(map2idx(col, row))
-                    spike_indicator_text = pg.TextItem(elec_idx,
-                                                       'k',
-                                                       anchor=(0,0))
-                    spike_indicator_text.setPos(row*5, col*5)
-                    spike_indicator_text.setParentItem(spike_indicator_base)
-
-                    self.charts["miniMap"].addItem(spike_indicator_base)
-                    self.charts["miniMap"].addItem(spike_indicator_text)
-                    '''
-                    #times = [0, 1, 3, 5, 10, 11, 14]
-                    if np.random.random() > 0.5:
-                        times = np.random.randint(0, 20, (3,), dtype='int64')
-                        for i in times:
-                            spike_indicator = pg.QtGui.QGraphicsRectItem(row*5 + i/5, col*5, 0.1, 1.5)
-                            spike_indicator.setPen(pg.mkPen((0, 0, 0, 100)))
-                            spike_indicator.setBrush(pg.mkBrush((50, 50, 200)))
-                            spike_indicator.setParentItem(spike_indicator_base)
-                            self.charts["miniMap"].addItem(spike_indicator)
-    
-                    self.charts["miniMap"].addItem(spike_indicator_base)
-                    self.charts["miniMap"].addItem(spike_indicator_text)
-                    '''
-        LAST_N_BUFFER_DATA = 100
-        to_search = self.LoadedData.preprocessed_data[-LAST_N_BUFFER_DATA:]
-        spikes_within_view = []
-        for data_packet in to_search:
-            chan_idx = data_packet['channel_idx']
-            c, r = idx2map(chan_idx)
-            if (self.settings['cursor_row'] - 4 <= r) & (r < self.settings['cursor_row'] + 4) & \
-                    (self.settings['cursor_col'] - 2 <= c) & (c < self.settings['cursor_col'] + 2):
-                spikes_within_view.append(data_packet)
-
-        for data_packet in spikes_within_view:
-            chan_idx = data_packet['channel_idx']
-            row, col = idx2map(chan_idx)
-            spikeBins = data_packet['spikeBins']
-            spikeBinsMaxAmp = data_packet['spikeBinsMaxAmp']
-            spikeLocs = np.argwhere(spikeBins == True)
-
-            num_bins = data_packet['num_bins_in_buffer']
-            for i in spikeLocs:
-                spike_loc_on_vis_bar = (i / num_bins) * BAR_LENGTH
-                spike_height_on_vis_bar = spikeBinsMaxAmp[i] / 50
-                spike_indicator = pg.QtGui.QGraphicsRectItem(col * 5 + spike_loc_on_vis_bar, row * 5, 0.1, spike_height_on_vis_bar)
-                spike_indicator.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
-                spike_indicator.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
-                spike_indicator.setParentItem(spike_indicator_base)
-                self.charts["miniMap"].addItem(spike_indicator)
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Up:
-            self.setMiniMapLoc(self.settings['cursor_row'], self.settings['cursor_col']+1)
-        if event.key() == Qt.Key_Down:
-            self.setMiniMapLoc(self.settings['cursor_row'], self.settings['cursor_col']-1)
-        if event.key() == Qt.Key_Right:
-            self.setMiniMapLoc(self.settings['cursor_row']+1, self.settings['cursor_col'])
-        if event.key() == Qt.Key_Left:
-            self.setMiniMapLoc(self.settings['cursor_row']-1, self.settings['cursor_col'])
-
-    def closeEvent(self, event):
-        quit_msg = "Are you sure you want to exit the program?"
-        reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
-                                               QtWidgets.QMessageBox.Cancel | QtWidgets.QMessageBox.Ok)
-        if reply == QtWidgets.QMessageBox.Ok:
-            event.accept()
-        else:
-            event.ignore()

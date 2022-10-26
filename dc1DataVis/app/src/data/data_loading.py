@@ -4,12 +4,35 @@ Functions for loading data files into form that can be read by GUI
 """''
 import os
 import scipy.io as sio
+
+from .spike_detection import *
 from ..data.filters import *
+
+def load_first_buffer_info(app):
+    data_run = os.path.basename(app.settings["path"])
+    file_dir = app.settings["path"] +  "/" + data_run + "_" + str(0) + ".mat"
+    first_file_params = {
+        "file_dir": file_dir,
+        "filter_type": app.settings["filter"],
+        "packet_idx": 0,
+        "SPIKING_THRESHOLD": app.settings["spikeThreshold"],
+        "BIN_SIZE": app.settings["binSize"]
+    }
+    packet = load_one_mat_file(first_file_params)
+    app.data.to_serialize.put(packet)
+    app.curr_buf_idx = 1
+
+    NUM_CHANNELS_PER_BUFFER = len(packet["packet_data"])
+
+    return NUM_CHANNELS_PER_BUFFER
+
 
 def load_one_mat_file(params):
     # this is designed to be multi-processed
     file_dir = params["file_dir"]
     filter_type = params["filter_type"]
+    SPIKING_THRESHOLD = params["SPIKING_THRESHOLD"]
+    BIN_SIZE = params["BIN_SIZE"]
 
     mat_contents = sio.loadmat(file_dir)
     dataRaw = mat_contents['gmem1'][0][:]
@@ -17,22 +40,53 @@ def load_one_mat_file(params):
 
     # Note: this code does not timestamp data bc that cannot be parallelized properly
     packet_data = preprocess_raw_data(data_real, cnt_real, N)
-    packet_data = filter_preprocessed_data(packet_data, filter_type=filter_type)
-    packet_data = calculate_channel_stats(packet_data)
 
-    return packet_data
+    packet = {
+        "packet_data": packet_data,
+        "packet_idx": params["packet_idx"],
+        "file_dir": params["file_dir"],
+        "filter_type": params["filter_type"]
+    }
 
-def calculate_channel_stats(packet_data):
-    for idx, channel_data in enumerate(packet_data):
+    packet = filter_preprocessed_data(packet, filter_type=filter_type)
+    packet = calculate_channel_stats(packet, SPIKING_THRESHOLD, BIN_SIZE)
+
+    return packet
+
+def calculate_channel_stats(packet, SPIKING_THRESHOLD, BIN_SIZE):
+    for idx, channel_data in enumerate(packet["packet_data"]):
+        channel_data["stats_avg+unfiltered+amp"] = np.mean(channel_data["preprocessed_data"])
+        channel_data["stats_cnt"] = len(channel_data["filtered_data"])
         channel_data["stats_noise+mean"] = np.mean(channel_data["filtered_data"])
         channel_data["stats_noise+std"] = np.std(channel_data["filtered_data"])
-    return packet_data
+        channel_data["stats_buf+recording+len"] = channel_data["stats_cnt"] * 0.05 # assuming 20 khZ sampling rate
 
-def filter_preprocessed_data(packet_data, filter_type="Modified Hierlemann"):
-    for idx, channel_data in enumerate(packet_data):
+        # TODO [later] add GMM spikes
+        SPIKE_DETECTION_METHOD = "threshold"
+        if SPIKE_DETECTION_METHOD == "threshold":
+            incom_spike_idx, incom_spike_amplitude = getAboveThresholdActivity(channel_data["filtered_data"],
+                                                                               channel_data["stats_noise+mean"],
+                                                                               channel_data["stats_noise+std"],
+                                                                               SPIKING_THRESHOLD)
+            spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER = binSpikeTimes(channel_data["stats_buf+recording+len"],
+                                                                           incom_spike_idx,
+                                                                           incom_spike_idx,
+                                                                           BIN_SIZE)
+
+            channel_data["stats_spikes+cnt"] = sum(spikeBins)
+            channel_data["stats_spikes+avg+amp"] = np.mean(spikeBinsMaxAmp)
+            channel_data["stats_spikes+std"] = np.std(spikeBinsMaxAmp)
+            channel_data["spike_bins"] = spikeBins
+            channel_data["spike_bins_max_amps"] = spikeBinsMaxAmp
+            channel_data["stats_num+spike+bins+in+buffer"] = NUM_BINS_IN_BUFFER
+
+    return packet
+
+def filter_preprocessed_data(packet, filter_type="Modified Hierlemann"):
+    for idx, channel_data in enumerate(packet["packet_data"]):
         filtered_data = applyFilterToChannelData(channel_data['preprocessed_data'], filtType=filter_type)
-        packet_data[idx]["filtered_data"] = filtered_data
-    return packet_data
+        packet["packet_data"][idx]["filtered_data"] = filtered_data
+    return packet
 
 def preprocess_raw_data(data_real, cnt_real, N, SAMPLING_PERIOD=0.05):
     # Determine time estimate and sample counts for the total combined buffers
@@ -73,7 +127,6 @@ def preprocess_raw_data(data_real, cnt_real, N, SAMPLING_PERIOD=0.05):
         packet_data.append(channel_data)
 
     return packet_data
-
 
 """
 ========================================
@@ -211,6 +264,7 @@ def idx2map(ch_idx: int):
     """
     if ch_idx > 1023 or ch_idx < 0:
         print('Chan num out of range')
+        return -1
     else:
         ch_row = int(ch_idx/32)
         ch_col = int(ch_idx - ch_row*32)

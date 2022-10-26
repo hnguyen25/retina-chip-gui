@@ -1,120 +1,28 @@
 import numpy as np
 import time
-from ..data.data_loading import *
+
+from dc1DataVis.app.src.data.data_loading import *
+
 from ..data.filters import *
 import warnings
+import queue
 
 class DC1DataContainer:
     """
     Container for holding recording data for the DC1 retina chip. Each container is designed to hold all
     the relevant information extracted from data collected from a SINGLE recording, of any particular type.
 
-    This container holds three main data objects (in addition to calculated statistics based on this data):
-    (1) raw data -> (2) recorded_data -> (3) filtered_data
-    raw_data: the data as-is extracted directly from the .mat files
-    recorded_data: the data within raw_data with minimal pre-processing necessary to fix hardware related
-        issues (i.e. double counts), as well as managed into a more helpful format
-    filtered_data: the data which has been filtered, can be rerun multiple times with different filter types
-
     To-Dos:
     ----------
     TODO figure out time alignment of the data / the actual sampling rate / check for dropped packets
-    TODO fuse code in identify_relevant_channelxfs with this file
     TODO figure out time budget for data processing + filtering
-    TODO make filtering of data async -> specifically, only filter the data that is directly needed for the analysis gui
-    TODO decompose update_array_stats() to make it more readable
     """
-
-    """
-    
-    New proposed data flow (8.31.22)
-    1. Raw data is converted into preprocessed data in append_raw_data
-    2. This preprocessed data is turned into filtered data in update_filtered_data. This data
-    is added to a 32x32 matrix holding all the data for the array during the recording, but isn't
-    used during live plotting. The filtered data from the last buffer is used to plot and calculate stats
-    3. array_stats is updated using the filtered data from the last buffer, then clears that list
-    
-    """
-
-    # data processing settings
-    data_processing_settings = {
-        "filter": None, # for use in filtered_data, see full list in filters.py
-        "spikeThreshold": 4,  # How many standard deviations above noise to find spikes
-        "binSize": 1, # 1ms
-        "simultaneousChannelsRecordedPerPacket": 4
-    }
-
-    # metadata information
-    recording_info = {
-        "recording_full_path": "",
-        "recording_data": "",
-        "recording_piece": "",
-        "recording_type": "",
-        "numChannelsRecordedPerPacket": None
-    }
-
-    recording_type_dict = {
-        "full_bandwidth_1_channel": {"num_channels_at_once": 1,
-                                     "compression": False},
-        "full_bandwidth_2_channels": {"num_channels_at_once": 2,
-                                      "compression": False},
-        "full_bandwidth_4_channels": {"num_channels_at_once": 4,
-                                      "compression": False},
-        "full_bandwidth_8_channels": {"num_channels_at_once": 8,
-                                      "compression": False},
-        "full_bandwidth_16_channels": {"num_channels_at_once": 16,
-                                       "compression": False},
-        "full_bandwidth_32_channels": {"num_channels_at_once": 32,
-                                       "compression": False}
-    }
 
     # +++++ CONSTANTS +++++
     # DC1/RC1.5 is a multi-electrode array (MEA) with 32 x 32 channels (1024 total)
     ARRAY_NUM_ROWS, ARRAY_NUM_COLS = 32, 32
 
-    # number of samples that numpy arrays containing preprocessed_data and filtered_data can hold
-    # once the capacity has been reached, DATA_CONTAINER_MAX_SAMPLES will double, this variable
-    # capacity is designed to limit the maximum memory taken up by these data containers
-    DATA_CONTAINER_MAX_SAMPLES = 1000
-
-    # (1) raw_data <> data loaded directly from .mat files
-    # Split into three different related data containers:
-    # - 'raw_data':
-    # - 'counts':
-    # - 'times':
-    raw_data = None
-    counts = None
-    times = None
-    count_track = None
-    time_track = None
-
-    # (2) preprocessed_data <> raw data which has been converted to a more easily accessible format
-    #   A list of dictionaries, where each dictionary contains all necessary data related to
-    #   the recording at ONE electrode at ONE point in time, ordered chronologically by
-    #   recording time.
-    #   Each dictionary has the following keys:
-    #   - 'channel_idx': the channel from which the 'data' in this dictionary is recorded from
-    #   - 'start_idx': TODO figure out what this is
-    #   - 'data':
-    #   - 'times':
-    preprocessed_data = []
-    count_track_processed = None
-    time_track_processed = None
-
-    # (3) filtered_data <> data container which holds all raw data that has been filtered
-    #   A list of dictionaries, structured exactly as in preprocessed_data (see above), however,
-    #   the 'data' is filtered with a filter specified by the user. Moreover, the data must
-    #   be filtered based off of recorded_data, so the number of items in filtered_data may
-    #   lag behind.
-    filtered_data = []
-    count_track_filtered = None
-    time_track_filtered = None
-
-
-    # NEW FILTERED DATA that will hold all filtered data, not just what we are plotting
-    # a 32x32 matrix with each entry containing a list of dictionaries with data for that electrode. Each pass through
-    # that electrode will produce another dictionary in the list.
-    array_filtered_data = np.zeros((32,32))
+    count_track, time_track = None, None
 
     # calculated statistics
     spike_data = {
@@ -122,507 +30,132 @@ class DC1DataContainer:
         'amplitude': np.zeros((32, 32))
     }
 
-    array_stats = {}
+    # new data structs
+    to_serialize, to_show = None, None
 
-    def __init__(self, recording_info={}, data_processing_settings={}):
-        self.time_track = 0
-        self.count_track = 0
-        self.count_track_processed = 0
-        self.time_track_processed = 0
+    avg_spike_rate_x = []
+    avg_spike_rate_y = []
 
-        self.raw_data = np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS,
-                                  self.DATA_CONTAINER_MAX_SAMPLES))
-        self.counts = np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS,
-                                self.DATA_CONTAINER_MAX_SAMPLES))
-        self.times = np.zeros((self.DATA_CONTAINER_MAX_SAMPLES,))
+    def __init__(self, app, recording_info={}, data_processing_settings={}):
+        self.app = app  # reference to MainWindow
+        self.time_track, self.count_track = 0, 0
+        self.time_track_processed, self.count_track_processed = 0, 0
 
-        self.array_stats = {
+        # channel-level information
+        # indexed via row, col of array
+        # value: a dict containing all info for a certain electrode
+        self.array_indexed = {
+            "start_time": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "start_count": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "packet_idx": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)],
             "size": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS, 0)),  # For each dot, size by # of samples
-            "num_sam": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS, 1)),  # Temp variable to allow sample counting
+            "stats_cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS, 1)),  # sample counting
             "colors": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS, 0)),  # For each dot, color by avg amplitude
-            "avg_val": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS, 1)),  # Temp variable for calculating average amplitude
-            "noise_mean": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "noise_std": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "noise_cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "spike_avg": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "spike_std": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "spike_cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)), # number of SPIKES
-            "size": None,
-            "times": None,
-            "array spike rate times": [],  # x
-            "array spike rate": []  # y
+            "avg_amp": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS, 1)),  # for calculating avg amp
+            "stats_noise+mean": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "stats_noise+std": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "stats_buf+recording+len": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "stats_avg+unfiltered+amp": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "stats_spikes+avg+amp": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "stats_spikes+std": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "stats_spikes+cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "stats_num+spike+bins+in+buffer": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "spike_bins": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)],
+            "spike_bins_max_amps": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)]
+
         }
 
-    def setSpikeThreshold(self, threshold):
-        self.data_processing_settings["spikeThreshold"] = threshold
+        # =====================
+        # buffer-level information
+        # indexed via key: buffer number (0 - MAX_NUMBER_OF_BUFFERS)
+        # value:
+        self.buffer_indexed = []
+        self.to_serialize = queue.Queue()
+        self.to_show = queue.Queue()
 
-    def setNumChannels(self, numChannels):
-        self.data_processing_settings["simultaneousChannelsRecordedPerPacket"] =  numChannels
+    def append_buf(self, buf):
 
-    def extend_data_containers(self):
-        """Change data containers dynamically to accommodate longer time windows of data
-        by doubling the capacity of data containers when the max has been reached
-        """
-        padding_data = np.zeros(self.raw_data.shape)
-        padding_cnt = np.zeros(self.counts.shape)
-        padding_times = np.zeros(self.times.shape)
-        self.raw_data = np.concatenate((self.raw_data, padding_data), axis=2)
-        self.counts = np.concatenate((self.counts, padding_cnt), axis=2)
-        self.times = np.concatenate((self.times, padding_times))
-        self.DATA_CONTAINER_MAX_SAMPLES *= 2
+        packet_idx = buf['packet_idx']
+        channel_idxs = []  # for buffer_indexed data struct
 
-    # TODO: need to have electrodes that had data appended
-    def append_raw_data(self, data_real, cnt_real, N, sampling_period=0.05, filtType = "Modified Hierlemann", debug = False):
-        """
-        appends raw data in buffer to end of data container, append nonzero data to recorded_data
-
-        Args:
-            data_real:
-            cnt_real:
-            N:
-            sampling_period:
-
-        Returns:
-
-        """
-        electrodeList = []
-
-        while self.raw_data.shape[2] < self.count_track + N:
-            self.extend_data_containers()
-
-        self.raw_data[:, :, self.count_track:self.count_track + N] = data_real[:, :, :N]
-        self.counts[:, :, self.count_track:self.count_track + N] = cnt_real[:, :, :N]
-
-        # Determine time estimate and sample counts for the total combined buffers
-        # ===============================
-        # (note this does not take into account communication delays - hence an estimate)
-        end_time = N * sampling_period  # 20kHz sampling rate, means time_recording (ms) = num_sam * 0.05ms
-
-        # For the first buffer, we assume the first sample comes in at time 0
-        if self.time_track == 0:
-            new_times = np.linspace(0, end_time, N + 1)
-            self.times[0:len(new_times)] = new_times
-        # For buffers after the first, we place these values directly after the previous buffer
-        else:
-            new_times = np.linspace(self.time_track, self.time_track + end_time, N)
-            self.times[self.count_track:self.count_track + N] = new_times
-
-        # identify relevant, nonzero channels, and then append only this data into recorded_data
-        num_channels, channel_map, channel_id, start_idx, find_coords, recorded_channels = identify_relevant_channels(data_real)
-
-
-        for i in range(recorded_channels.shape[0]):
-            channel_idx = int(recorded_channels[i][0])
-            electrodeList.append(channel_idx)
-            start_idx = recorded_channels[i][0]
-            x, y = idx2map(channel_idx)
-
-            # prune the times in the packet where nothing is recorded aka when data = 0
-            channel_data = data_real[x, y, start_idx:N]
-            channel_times = self.times[self.count_track + start_idx: self.count_track+N]
-            # actual_recording_times = (channel_data != 0)
-            #
-            # channel_times = channel_times[actual_recording_times]
-            # channel_data = channel_data[actual_recording_times]
-
-            channel_data = {
-                'channel_idx': channel_idx,
-                'start_idx': int(self.count_track + start_idx),  # start_idx is based only on buffer, so need to add time from previous buffers
-                'data': channel_data,
-                'times': channel_times
-            }
-            #  Add this data to preprocessed data
-            self.preprocessed_data.append(channel_data)
-
-            # TODO: the following lines are not a long term fix -- once we fix pipeline from
-            # TODO: append_raw_data --> filter --> update array stats, this will happen in the update array stats part
-
-            # Filter data, run spike detection
-            self.update_filtered_data(filtType)
-            filtered = True
-            if filtType == "None":
-                filtered = False
-
-            self.filtered_data[-1] = self.calculate_realtime_spike_info_for_channel_in_buffer(self.filtered_data[-1],
-                                                                                              filtered = filtered)
-
-            # add spike count to array stats
-            self.array_stats["spike_cnt"][x][y] += sum(self.filtered_data[-1]["spikeBins"])
-
-            if debug:
-                print("spike cnt: " + str(self.array_stats["spike_cnt"]))
-                print("sum of spike cnt: " + str(sum(self.array_stats["spike_cnt"])))
-
-        self.time_track += end_time
+        # calculate times
+        N = buf["packet_data"][0]["N"]
+        len_packet_time = N * 0.05  # 20kHz sampling rate, means time_recording (ms) = num_sam*0.05ms
+        next_times = np.linspace(self.time_track, self.time_track + len_packet_time, N)
+        self.time_track += len_packet_time
         self.count_track += N
 
-        return electrodeList
+        avg_packet_spike_count = 0
+        packet_data = buf['packet_data']
+        for packet in packet_data:
 
-        # TODO this shouldn't call update_filtered_data -> should be async, and threaded
+            # load data
+            # packet keys: 'data_real', 'cnt_real', 'N',
+            #   'channel_idx', 'preprocessed_data', 'filtered_data',
+            #   'stats_cnt', 'stats_noise+mean', 'stats_noise+std'
+            this_channel_idx = packet['channel_idx']
 
-# TODO : the problem right now with this function is that when the data is unfiltered, it tries to use
-# TODO : values from array stats to calculate spike info, but we haven't calculated that yet.
+            # for buffer_indexed data struct
+            channel_idxs.append(this_channel_idx)
 
-    def update_filtered_data(self, filtType='Modified Hierlemann', num_threads=4, debug = False):
-        # subtract recorded_data by filtered_data
-        len_preprocessed_data = len(self.preprocessed_data)
-        len_filtered_data = len(self.filtered_data)
-        # TODO parallelize filtering
-        if len_filtered_data < len_preprocessed_data:
-            while len_filtered_data < len_preprocessed_data:
-                to_filter_idx = len_filtered_data
-                to_filter_data = self.preprocessed_data[to_filter_idx]['data']
-                filtered_data = applyFilterToChannelData(to_filter_data, filtType=filtType)
-                filtered_data = {
-                    'channel_idx': self.preprocessed_data[to_filter_idx]['channel_idx'],
-                    'start_idx': self.preprocessed_data[to_filter_idx]['start_idx'],
-                    # start_idx is based only on buffer, so need to add time from previous buffers
-                    'data': filtered_data,  # TODO make this accurate
-                    'times': self.preprocessed_data[to_filter_idx]['times']
-                }
+            # reformatting packet for to_show data struct
+            packet["times"] = next_times
 
-                self.filtered_data.append(filtered_data)
-                len_filtered_data += 1
+            # for array_indexed data struct
+            r, c = idx2map(this_channel_idx)
 
+            # TODO make this adapt for when multiple packets record from the same channel
+            # use formula Maddy gave
+            self.array_indexed["stats_cnt"][r][c] += packet["stats_cnt"]
+            self.array_indexed["stats_avg+unfiltered+amp"][r][c] = packet["stats_avg+unfiltered+amp"] # of unfiltered data
+            self.array_indexed["stats_noise+mean"][r][c] = packet["stats_noise+mean"]
+            self.array_indexed["stats_noise+std"][r][c] = packet["stats_noise+std"]
+            self.array_indexed["stats_buf+recording+len"][r][c] = packet["stats_buf+recording+len"]
+            self.array_indexed["stats_spikes+cnt"][r][c] = packet["stats_spikes+cnt"]
+            self.array_indexed["stats_spikes+avg+amp"][r][c] = packet["stats_spikes+avg+amp"]
+            self.array_indexed["stats_spikes+std"][r][c] = packet["stats_spikes+std"]
+            self.array_indexed["stats_num+spike+bins+in+buffer"][r][c] = packet["stats_num+spike+bins+in+buffer"]
+            # TODO bug with generator object
+            #self.array_indexed["spike_bins"][r][c] = packet["spike_bins"]
+            #self.array_indexed["spike_bins_max_amps"][r][c] = packet["spike_bins_max_amps"]
+            avg_packet_spike_count += packet["stats_spikes+cnt"]
+        # buffer-level information
+        buffer_indexed_dict = {
+            "file_dir": buf["file_dir"],
+            "filter_type": buf["filter_type"],
+            "N": N,
+            "time_elapsed": len_packet_time, # TODO check if this is accurate for all recording types
+            "channel_idxs": channel_idxs,
+            "num_detected_spikes": avg_packet_spike_count / len(packet_data) # for spike rate plot
+        }
+        self.buffer_indexed.append(buffer_indexed_dict)
 
+        self.calculate_moving_spike_rate_avg()
 
+        self.to_show.put(buf)
 
-    # TODO: this function should replace the above update_filtered_data with the new filtered data format (32x32 matrix)
-    def update_array_filtered_data(self, filtType = "Modified Hierlemann", debug = False):
-        """
+        # return the channels in the buffer
+        return buffer_indexed_dict["channel_idxs"]
 
-        @param filtType:
-        @param debug:
-        @return:
-        """
-        # subtract recorded_data by filtered_data
-        len_preprocessed_data = len(self.preprocessed_data)
-        len_filtered_data = len(self.filtered_data)
-        # TODO parallelize filtering
-        if len_filtered_data < len_preprocessed_data:
-            while len_filtered_data < len_preprocessed_data:
-                to_filter_idx = len_filtered_data
-                to_filter_data = self.preprocessed_data[to_filter_idx]['data']
-                filtered_data = applyFilterToChannelData(to_filter_data, filtType=filtType)
-                filtered_data = {
-                    'channel_idx': self.preprocessed_data[to_filter_idx]['channel_idx'],
-                    'start_idx': self.preprocessed_data[to_filter_idx]['start_idx'],
-                    # start_idx is based only on buffer, so need to add time from previous buffers
-                    'data': filtered_data,  # TODO make this accurate
-                    'times': self.preprocessed_data[to_filter_idx]['times']
-                }
+    def calculate_moving_spike_rate_avg(self):
+        avg_spike_rate = 0
+        time_elapsed = 0
 
-                self.filtered_data.append(filtered_data)
-                len_filtered_data += 1
-
-                # add filtered data to the 32x32 matrix to store long term
-                row, col = idx2map(filtered_data["channel_idx"])
-                self.array_filtered_data[row][col].append(filtered_data)
-
-    def calculate_realtime_spike_info_for_channel_in_buffer(self, channel_data, filtered=True, debug=False):
-        """
-
-        @param channel_data: dictionary with keys "channel_idx", "start_idx", "data", "times"
-        @param filtered:
-        @param debug:
-        @return: channel_data with new keys "incom_spike_times", "incom_spike_amp", "spikeBins",
-        "spikeBinsMaxAmp", "num_bins_in_buffer"
-
-        """
-
-        row, col = idx2map(channel_data['channel_idx'])
-
-        if filtered is True:
-            noise_mean = 0
-            noise_std = np.std(channel_data['data'])
-            if debug:
-                print("filtered is true activated, std : " + str(noise_std))
-        else: # Note: these array stats values aren't good right now.
-            #noise_mean = self.array_stats["noise_mean"][row, col]
-            #noise_std = self.array_stats["noise_std"][row, col]
-            noise_mean = np.mean(channel_data["data"])
-            noise_std = np.std(channel_data["data"])
-            if debug:
-                print("filtered is false activated, std : " + str(noise_std) + ", mean: " + str(noise_mean) +
-                  ", row: " + str(row) + " col: " + str(col))
-
-
-        incom_spike_times, incom_spike_amplitude = self.getAboveThresholdActivity(channel_data['data'],
-                                                                                  channel_data['times'],
-                                                                                  noise_mean, noise_std,
-                                                                                  self.data_processing_settings['spikeThreshold'],
-                                                                                  filtered,
-                                                                                  row, col)
-        channel_data["incom_spike_times"] = incom_spike_times
-        channel_data["incom_spike_amp"] = incom_spike_amplitude
-
-        spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER = self.binSpikeTimes(channel_data['times'], incom_spike_times, incom_spike_amplitude)
-        channel_data["spikeBins"] = spikeBins
-        channel_data["spikeBinsMaxAmp"] = spikeBinsMaxAmp
-        channel_data["num_bins_in_buffer"] = NUM_BINS_IN_BUFFER
-
-        if debug:
-            print("channel idx: " + str(channel_data["channel_idx"]))
-            print("noise mean: " + str(noise_mean))
-            print("noise std: " + str(noise_std))
-            print("threshold: " + str(self.data_processing_settings["spikeThreshold"]))
-            print("num spikes for channel " + str(channel_data["channel_idx"]) + ": " + str(sum(channel_data['spikeBins'])))
-            print("incoming spike times: " + str(incom_spike_times))
-            print('spikeBins', channel_data['spikeBins'])
-            print("channel data: " + str(channel_data))
-
-        return channel_data
-
-    def getAboveThresholdActivity(self, data, times, channel_noise_mean, channel_noise_std,
-                                  spike_threshold, filtered=False, row=0, col=0, debug = False):
-
-        if filtered:
-            below_threshold = 0 + spike_threshold * channel_noise_std # filtered data -> makes mean 0
-            above_threshold_activity = (data <= -below_threshold)
-
+        SPIKE_RATE_WINDOW_SIZE = 4
+        if len(self.buffer_indexed) < SPIKE_RATE_WINDOW_SIZE:
+            for buffer in self.buffer_indexed:
+                avg_spike_rate += buffer["num_detected_spikes"]
+                time_elapsed += buffer["time_elapsed"]
         else:
-            below_threshold = channel_noise_mean - (spike_threshold * channel_noise_std)
-            above_threshold_activity = (data <= below_threshold)
+            for buffer in self.buffer_indexed[-1 - SPIKE_RATE_WINDOW_SIZE: -1]:
+                avg_spike_rate += buffer["num_detected_spikes"]
+                time_elapsed += buffer["time_elapsed"]
 
-            if debug:
-                print("Row: " + str(row) + ", Col: " + str(col) + ", below_threshold: " + str(below_threshold) +
-                ", above_threshold_activity: " + str(above_threshold_activity) +
-                ", sum of above threshold: " + str(sum(above_threshold_activity)))
+        print('avg spike rate before division', avg_spike_rate)
+        avg_spike_rate /= time_elapsed
 
-        incom_spike_idx = np.argwhere(above_threshold_activity).flatten()
-        incom_spike_times = times[incom_spike_idx]
-        incom_spike_amplitude = data[incom_spike_idx]
+        x = self.time_track
+        y = avg_spike_rate
 
-        return incom_spike_times, incom_spike_amplitude
-
-    # TODO vectorize binning, this is not the most efficient way of doing this
-    def binSpikeTimes(self, times, incom_spike_times, incom_spike_amps):
-        start_time = times[0]
-        end_time = times[-1]
-        buf_recording_len = end_time - start_time
-        binSize = self.data_processing_settings["binSize"]
-        import math
-        NUM_BINS_IN_BUFFER = math.floor(buf_recording_len / binSize)
-
-        # initialize an array of spike bins, with no spikes detected
-        spikeBins = np.zeros(NUM_BINS_IN_BUFFER, dtype=bool)
-        spikeBinsMaxAmp = np.zeros(NUM_BINS_IN_BUFFER, dtype=float)
-
-        for bin_idx in range(int(buf_recording_len / binSize)):
-            bin_start = start_time + bin_idx * binSize
-            bin_end = start_time + (bin_idx + 1) * binSize
-
-            spikes_within_bin = (bin_start <= incom_spike_times) & (
-                        incom_spike_times < bin_end)
-
-            if np.count_nonzero(spikes_within_bin) != 0:
-                spikeBins[bin_idx] = True
-                spiking_amps = incom_spike_amps[spikes_within_bin]
-                spikeBinsMaxAmp[bin_idx] = np.max(spiking_amps)
-
-        return spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER
-
-    def update_array_stats(self, data_real, N, electrodeList, individualChannel = False, row = 0, col = 0):
-        """
-
-        @param data_real:
-        @param N:
-        @param electrodeList: list of electrodes that just had data appended, may be used in
-        calculate_incoming_{noise,spike}_statistics_filtered_data
-        @param individualChannel: True if function called from gui_individualchannel for debugging purposes
-        @param row, col: When individual channel is true, row and col ar used to access array stats for a row and col
-        @return:
-        """
-        # AX1,AX3,AX4) Finding average ADC of samples per electrode
-
-        # only some of the channels are actually recording, check for all which are false
-        mask = np.copy(data_real)
-        mask[mask == 0] = np.nan
-
-        incom_cnt, incom_mean, incom_std = self.calculate_incoming_noise_statistics(data_real, mask)
-        self.update_array_noise_statistics(incom_cnt, incom_mean, incom_std, individualChannel, row, col)
-        incom_spike_cnt, incom_spike_avg, incom_spike_std = self.calculate_incoming_array_spike_statistics(data_real, mask)
-        self.update_array_spike_statistics(incom_spike_cnt, incom_spike_avg, incom_spike_std, N)
-
-# TODO : next two functions should hopefully replace their unfiltered counterparts
-    def calculate_incoming_noise_statistics_filtered_data(self, filtered_data, electrodesToUpdate, debug = False):
-        """
-        Function to calculate the incoming noise count, noise mean, and noise standard deviation
-        given filtered data
-        @param filtered_data: list of dictionaries with keys "channel_idx", "start_idx", "data", "times"
-        @param electrodesToUpdate: List of electrode numbers to analyze data to update statistics for. This will
-        receive electrodeList from update_array_stats. may or may not be used
-        @param debug:
-        @return: incom_cnt, incom_mean, incom_std
-        """
-        incom_cnt = np.zeros((32, 32))
-        incom_mean = np.zeros((32, 32))
-        incom_std = np.zeros((32, 32))
-
-        for electrode in filtered_data:
-            row, col = idx2map(electrode["channel_idx"])
-
-            # access the latest data for the electrode
-            electrode_data = electrode["data"]
-
-            # TODO remove the spikes from the electrode data
-            spikeless_data = electrode_data[electrode_data]
-
-            # calculate values
-            incom_cnt[row][col] = len(spikeless_data)
-            incom_mean[row][col] = np.mean(spikeless_data)
-            incom_std[row][col] = np.std(spikeless_data)
-
-        return incom_cnt, incom_mean, incom_std
-
-    def calculate_incoming_spike_statistics_filtered_data(self, filtered_data, electrodesToUpdate, debug = False):
-        """
-        Function to calculate the incoming spike count, spike amplitude mean, and standard deviation of spike amplitudes
-        given filtered data that was just loaded.
-
-        @param filtered_data: list of dictionaries with keys "channel_idx", "start_idx", "data", "times"
-
-        @param electrodesToUpdate: List of electrodes numbers to analyze data to update statistics for. may or may not
-        be used
-        @param debug:
-        @return: incom_spike_cnt, incom_spike_avg, incom_spike_std
-        """
-
-        incom_spike_cnt = np.zeros((32, 32))
-        incom_spike_avg = np.zeros((32, 32))
-        incom_spike_std = np.zeros((32, 32))
-
-        for electrode in filtered_data:
-            row, col = idx2map(electrode["channel_idx"])
-
-            # get spike data
-            spike_data = electrode
-            spike_data = self.calculate_realtime_spike_info_for_channel_in_buffer(spike_data) # add keys needed
-
-            # calculate values
-            incom_spike_cnt[row][col] = sum(spike_data["spikeBins"])
-            incom_spike_avg[row][col] = spike_data["incom_spike_amp"]
-            incom_spike_std[row][col] = np.std(spike_data["incom_spike_amp"])
-
-        return incom_spike_cnt, incom_spike_avg, incom_spike_std
-
-
-# TODO: this should become obsolete
-    def calculate_incoming_noise_statistics(self, data_real, mask, debug = False):
-        # AX1,AX3,AX4) Sample Counting (Note: Appends are an artifact from previous real time codes)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RuntimeWarning)
-            self.array_stats['num_sam'][:, :, 0] = np.count_nonzero(data_real, axis=2)
-            incom_cnt = self.array_stats['num_sam'][:, :, 0]
-
-            self.array_stats['avg_val'][:, :, 0] = np.nanmean(mask, axis=2)
-            avg_val = np.nan_to_num(self.array_stats['avg_val'], nan=0)
-            incom_mean = avg_val[:, :, 0]
-
-            if debug:
-                print("incom_mean: " + str(incom_mean))
-
-            # AX3,AX4) Finding standard deviation ADC of samples per electrode
-            incom_std = np.nanstd(mask, axis=2)
-            incom_std = np.nan_to_num(incom_std, nan=0)
-            #print("incom_cnt: " + str(incom_cnt))
-        return incom_cnt, incom_mean, incom_std
-
-# TODO: clean this up
-    def update_array_noise_statistics(self, incom_cnt, incom_mean, incom_std, individualChannel, row, col):
-        # AX3,AX4) Building standard deviation of samples per electrode as buffers come in
-        pre_mean = np.copy(self.array_stats["noise_mean"])
-        pre_std = np.copy(self.array_stats["noise_std"])
-        pre_cnt = np.copy(self.array_stats["noise_cnt"])
-        cnt_div = pre_cnt + incom_cnt
-        cnt_div[cnt_div == 0] = np.nan
-
-        # Update noise mean, std using previous values and new values
-        self.array_stats["noise_mean"] = np.nan_to_num((pre_cnt * pre_mean + incom_cnt * incom_mean) / (cnt_div), nan=0)
-        self.array_stats["noise_std"] = np.sqrt(
-            np.nan_to_num((pre_cnt * (pre_std ** 2 + (pre_mean - self.array_stats["noise_mean"]) ** 2) + incom_cnt * (
-                    incom_std ** 2 + (incom_mean - self.array_stats["noise_mean"]) ** 2)) / (cnt_div), nan=0))
-        self.array_stats["noise_cnt"] = np.nan_to_num(pre_cnt + incom_cnt, nan=0)
-        #print("noise cnt: " + str(self.array_stats["noise_cnt"]))
-
-        if individualChannel:
-            print(self.array_stats["noise_std"][row][col])
-
-# TODO: this should become obsolete
-    def calculate_incoming_array_spike_statistics(self, data_real, mask):
-        chan_cnt = np.count_nonzero(self.array_stats['num_sam'])
-        chan_elec = np.zeros((chan_cnt, 2))
-        chan_ind = np.argsort(self.array_stats['num_sam'].flatten())[-chan_cnt:]
-        chan_elec[:, 0] = (chan_ind[:] / 32).astype(int)
-        chan_elec[:, 1] = chan_ind[:] - (chan_elec[:, 0] * 32)
-        chan_elec = chan_elec.astype(int)
-
-        incom_spike_cnt = np.zeros((32, 32))
-        incom_spike_avg = np.zeros((32, 32))
-        incom_spike_std = np.zeros((32, 32))
-        mask2 = np.copy(data_real)
-
-        for x in range(len(chan_ind)):
-            row = chan_elec[x, 0]
-            col = chan_elec[x, 1]
-
-            incom_spike_cnt[row][col] = self.array_stats["spike_cnt"][row][col]
-            #print("row: " + str(row) + " col: " + str(col) + " " + str(incom_spike_cnt))
-
-            # above_threshold = self.array_stats["noise_mean"][row, col] + \
-            #                   self.data_processing_settings["spikeThreshold"] * self.array_stats["noise_std"][row, col]
-            # above_threshold_activity = (mask[row, col, :] >= above_threshold)
-            #
-            # incom_spike_cnt[row, col] = np.count_nonzero(above_threshold_activity)
-            #
-            # #print("incom spike cnt: " + str(incom_spike_cnt[row,col]) + " ,r: " + str(row) + " ,c: " + str(col))
-            # mask2[row, col, mask2[row, col, :] <= above_threshold] = np.nan
-
-        self.array_stats["incom_spike_cnt"] = incom_spike_cnt
-
-        #self.array_stats["incom_spike_times"] = incom_spike_times
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RuntimeWarning)
-            incom_spike_avg = np.nanmean(mask2, axis=2)
-            incom_spike_avg = np.nan_to_num(incom_spike_avg, nan=0)
-            incom_spike_std = np.nanstd(mask2, axis=2)
-            incom_spike_std = np.nan_to_num(incom_spike_std, nan=0)
-
-        return incom_spike_cnt, incom_spike_avg, incom_spike_std
-
-# TODO: clean this up
-    def update_array_spike_statistics(self, incom_spike_cnt, incom_spike_avg, incom_spike_std, N, debug = False):
-        pre_spike_avg = np.copy(self.array_stats["spike_avg"])
-        pre_spike_std = np.copy(self.array_stats["spike_std"])
-        pre_spike_cnt = np.copy(self.array_stats["spike_cnt"])
-
-        new_spike_cnt = pre_spike_cnt + incom_spike_cnt
-        new_spike_cnt[new_spike_cnt == 0] = np.nan
-
-        self.array_stats["spike_avg"] = np.nan_to_num(
-            (pre_spike_cnt * pre_spike_avg + incom_spike_cnt * incom_spike_avg) / (new_spike_cnt),
-            nan=0)
-        self.array_stats["spike_std"] = np.sqrt(np.nan_to_num((pre_spike_cnt * (
-                pre_spike_std ** 2 + (pre_spike_avg - self.array_stats["spike_avg"]) ** 2) + incom_spike_cnt * (
-                                                                       incom_spike_std ** 2 + (
-                                                                       incom_spike_avg - self.array_stats[
-                                                                   "spike_avg"]) ** 2)) / (
-                                                                  new_spike_cnt), nan=0))
-        #self.array_stats["spike_cnt"] = np.nan_to_num(new_spike_cnt, nan=0)
-
-
-        # AX2) Determine the Time of Each Sample
-        total_time = N * 0.05  # Sampling rate 1/0.05 ms
-        self.array_stats["times"] = np.linspace(0, total_time, N)
-
-        self.array_stats["array spike rate times"].append(total_time)
-
-        # Buffer time is ~500 ms, divided by number of channels to give time recorded for the last set of packets
-        # Divide the total number of spikes from the last recorded channels by this time, x1000 --> spikes/sec
-        self.array_stats["array spike rate"].append(
-            1000*(np.sum(incom_spike_cnt)/(500/int(self.data_processing_settings["simultaneousChannelsRecordedPerPacket"]))))
-
-        if debug:
-            print(self.array_stats["spike_cnt"])
-
-        return incom_spike_cnt, incom_spike_avg, incom_spike_std
+        self.avg_spike_rate_x.append(x)
+        self.avg_spike_rate_y.append(y)
