@@ -8,17 +8,30 @@ nav:
   - To Dos: 'todo.md'
   - Change Log: 'changelog.md'
   - Source:
-      - Analysis: 'analysis.md'
+      - Run Script: 'run.md'
+      - Main Window: 'main-window.md'
       - Data:
         - Data Container: 'DC1DataContainer.md'
         - Data Loading: 'data-loading.md'
         - Filters: 'filters.md'
         - Preprocessing: 'preprocessing.md'
+        - Multithreading: 'python-thread-worker.md'
       - GUI:
-        - Base: 'gui-base.md'
-        - Interactivity: 'gui-interactivity.md'
-        - Layout: 'gui-layout.md'
-      - viz_graphs: 'vis_graphs.md'
+          - External Windows:
+            - Session Startup: 'session-parameters.md'
+            - Electrode info table: 'electrode-info.md'
+            - Individual channel: 'individual-channel.md'
+            - Profiler: 'profiler.md'
+          - Full Bandwidth Plots:
+              - Array Map: 'array-map.md'
+              - Litke Minimap: 'Litke-minimap.md'
+              - Noise: 'noise.md'
+              - Spike Rate: 'spike-rate.md'
+              - Traces: 'traces.md'
+              - Per Electrode Rendering: 'per-electrode-rendering.md'
+              - Chart Setup: 'setup-charts.md'
+              - Themes: 'themes.md'
+          - Compression Plots (Coming soon!): 'compression-plots.md'
 
 plugins:
   - search
