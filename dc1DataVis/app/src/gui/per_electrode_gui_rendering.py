@@ -46,9 +46,9 @@ class PGPlotPerElectrodeRendering():
         self.plot_ref = plot_ref
         self.gui_update_fn = gui_update_fn
 
-        self.update_map_bounds(16, 16)  # 16/32, 16/32
         self.WIDTH = WIDTH
         self.HEIGHT = HEIGHT
+        self.update_map_bounds(16, 16)  # 16/32, 16/32
 
         data_dict = {key: -1 for key in data_keys}
         self.data = [data_dict for i in range(NUM_TOTAL_ROWS * NUM_TOTAL_COLS)]
@@ -89,46 +89,6 @@ class PGPlotPerElectrodeRendering():
         for idx in self.LIST_OF_ELECTRODES_WITHIN_BOUNDS:
             self.update_vis_electrode(plot, idx)
 
-def array_gui_update_fn(x, y, data):
-    size, color = data["size"], data["color"]
-
-    # draw a circle with a certain size and color
-    circle_ref = pg.QtGui.QGraphicsEllipseItem(x, y, size, size)  # x, y, width, height
-    circle_ref.setPen(pg.mkPen(color))
-    circle_ref.setBrush(pg.mkBrush(color))
-    return {'circle_ref': circle_ref}
-
-bar_color = QColor(100, 0, 0, 100)
-spike_color = QColor(0, 100, 0, 100)
-def minimap_gui_update_fn(x, y, data):
-    spike_times, spike_amps, elec_idx = data["spike_times_normed"], data["spike_amps_normed"], data["idx"]
-
-    # draw a horizontal bar at the bottom with the index of the electrode
-    bar_ref = pg.QtGui.QGraphicsRectItem(x, y,
-                                         4, 0.5)  # width, height
-    bar_ref.setPen(pg.mkPen(data["themes"][data["CURRENT_THEME"]]['bar_color']))
-    bar_ref.setBrush(pg.mkPen(data["themes"][data["CURRENT_THEME"]]['bar_color']))
-
-    # draw a number next to the bar
-    elec_idx = data["idx"]
-    bar_text_ref = pg.TextItem(elec_idx,
-                                       data["themes"][data["CURRENT_THEME"]]['font_color'],
-                                       anchor=(0, 0))
-    bar_text_ref.setPos(x, y)
-    bar_text_ref.setParentItem(bar_ref)
-
-    # and then draw the spikes
-    BAR_LENGTH = 2
-    list_of_spike_refs = []
-    for (spike_time, spike_amp) in zip(spike_times, spike_amps):
-        spike_ref = pg.QtGui.QGraphicsRectItem(x + spike_time * BAR_LENGTH, y,
-                                               0.5, spike_amp)
-        spike_ref.setPen(pg.mkPen(spike_color))
-        spike_ref.setBrush(pg.mkBrush(spike_color))
-        list_of_spike_refs.append(spike_ref)
-
-    shape_refs = {'bar': bar_ref, 'bar_text': bar_text_ref, 'spikes': list_of_spike_refs}
-    return shape_refs
 
 def idx2map(ch_idx: int):
     """ Given a channel index, return the channel's row and col

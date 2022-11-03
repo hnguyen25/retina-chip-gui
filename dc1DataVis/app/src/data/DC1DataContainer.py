@@ -6,6 +6,7 @@ from dc1DataVis.app.src.data.data_loading import *
 from ..data.filters import *
 import warnings
 import queue
+## import pandas as pd  # TODO make a pandas dataframe for array info
 
 class DC1DataContainer:
     """
@@ -44,6 +45,8 @@ class DC1DataContainer:
         # channel-level information
         # indexed via row, col of array
         # value: a dict containing all info for a certain electrode
+        # self.array_indexed_df = pd.Dataframe() # TODO make array-indexed pandas df to replace below
+
         self.array_indexed = {
             "start_time": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
             "start_count": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
@@ -59,6 +62,7 @@ class DC1DataContainer:
             "stats_spikes+avg+amp": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
             "stats_spikes+std": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
             "stats_spikes+cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+            "stats_spikes+cumulative_cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
             "stats_num+spike+bins+in+buffer": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
             "spike_bins": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)],
             "spike_bins_max_amps": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)]
@@ -112,6 +116,7 @@ class DC1DataContainer:
             self.array_indexed["stats_noise+std"][r][c] = packet["stats_noise+std"]
             self.array_indexed["stats_buf+recording+len"][r][c] = packet["stats_buf+recording+len"]
             self.array_indexed["stats_spikes+cnt"][r][c] = packet["stats_spikes+cnt"]
+            self.array_indexed["stats_spikes+cumulative_cnt"][r][c] += packet["stats_spikes+cnt"]
             self.array_indexed["stats_spikes+avg+amp"][r][c] = packet["stats_spikes+avg+amp"]
             self.array_indexed["stats_spikes+std"][r][c] = packet["stats_spikes+std"]
             self.array_indexed["stats_num+spike+bins+in+buffer"][r][c] = packet["stats_num+spike+bins+in+buffer"]

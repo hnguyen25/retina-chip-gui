@@ -20,7 +20,7 @@ class ElectrodeListInformation(QWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi("./src/gui/AllChannelsList.ui", self)
+        uic.loadUi("./src/layouts/AllChannelsList.ui", self)
 
         self.chooseSortOption.activated.connect(self.setSortOption)
 
@@ -48,8 +48,6 @@ class ElectrodeListInformation(QWidget):
         ]
         self.model = TableModel(data)
         self.electrodeTable.setModel(self.model)
-
-
 
 
     def setSessionParent(self, session_parent):

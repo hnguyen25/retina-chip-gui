@@ -6,11 +6,13 @@ import os, sys
 
 from pyqtgraph import PlotWidget
 
-from dc1DataVis.app.src.gui.update_charts import *
-from dc1DataVis.app.src.gui.array_map import *
-from dc1DataVis.app.src.gui.spike_rate import *
+from dc1DataVis.app.src.gui.plot_arraymap import *
+from dc1DataVis.app.src.gui.plot_spikerate import *
 from dc1DataVis.app.src.gui.spike_search import *
-from dc1DataVis.app.src.gui.noise import *
+from dc1DataVis.app.src.gui.plot_noise import *
+from dc1DataVis.app.src.gui.plot_minimap import *
+from dc1DataVis.app.src.gui.plot_noise import *
+from dc1DataVis.app.src.gui.plot_traces import *
 
 def setup_layout(app, layout: str, CURRENT_THEME: str, themes: dict, NUM_CHANNELS_PER_BUFFER: int):
     """ Runs initial setup to load all the charts and their basic information for a given layout
@@ -43,6 +45,7 @@ def setup_layout(app, layout: str, CURRENT_THEME: str, themes: dict, NUM_CHANNEL
         app.actionIndividualChannelInfo.triggered.connect(app.viewNewIndividualChannelInformation)
         app.actionListElectrodesInfo.triggered.connect(app.viewChannelListInformation)
         app.actionAnalysisParameters.triggered.connect(app.viewGUIPreferences)
+        app.actionGUIProfiler.triggered.connect(app.viewGUIProfiler)
         if app.settings["visStyle"] == "Spike Search":
             app.resetButton.clicked.connect(app.resetSpikeSearchPlotParams)
             app.nextButton.clicked.connect(app.nextPage)
@@ -85,8 +88,7 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
         "spikeRatePlot": update_spike_rate_plot,
         "noiseHistogram": update_noise_histogram_plot,
         "channelTraces": update_channel_trace_plot,
-        "arrayMap": update_array_map_plot,
-        "noiseHeatMap": update_noise_heat_map
+        "arrayMap": update_array_map_plot
     }
     app.chart_update_extra_params = {
         "miniMap": None,
@@ -120,11 +122,10 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     app.charts["arrayMapHover"] = HoverRegion(app.charts["arrayMap"], app.showArrayLocOnStatusBar,
                                               app.setMiniMapLoc)
     setupArrayMap(app, app.charts["arrayMap"], CURRENT_THEME, themes)
-    setupMiniMapPlot(app.charts["miniMap"], CURRENT_THEME, themes)
+    setupMiniMapPlot(app, app.charts["miniMap"], CURRENT_THEME, themes)
     setupSpikeRatePlot(app.charts["spikeRatePlot"], CURRENT_THEME, themes)
     setupNoiseHistogramPlot(app.charts["noiseHistogram"], CURRENT_THEME, themes)
     setupSpikeTrace(app.charts["channelTraces"], CURRENT_THEME, themes)
-
 
 def setup_trace_search(app):
     uic.loadUi("./src/layouts/TraceSearch.ui", app)
@@ -146,9 +147,7 @@ def setup_trace_search(app):
     # app.buttons["atTimeWindowButton"] = app.atTimeWindowButton
 
     app.charts.clear()
-
     app.FigureLabel.setText("Figure: " + str(app.pageNum))
-
     CURRENT_THEME = 'light'
 
     for i in range(0, 6):
@@ -180,36 +179,7 @@ def setup_noise_plots(app ):
 def setup_diagnostic_plots():
     pass
 
-def setupMiniMapPlot(plot_widget, CURRENT_THEME, themes, center_row=16, center_col=16):
-    plot_widget.showGrid(x=True, y=True, alpha=0)
-    plot_widget.getPlotItem().hideAxis('bottom')
-    plot_widget.getPlotItem().hideAxis('left')
-    plot_widget.enableAutoRange(axis='x', enable=True)
-    plot_widget.enableAutoRange(axis='y', enable=True)
-    plot_widget.setAspectLocked()
 
-def setupSpikeTrace(list_of_plots, CURRENT_THEME, themes):
-    for plot in list_of_plots:
-        plot.getAxis("left").setTextPen(themes[CURRENT_THEME]['font_color'])
-        plot.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['font_color'])
-        plot.getAxis('top').setTextPen(themes[CURRENT_THEME]['font_color'])
-        plot.setLabel('left', '# ???')
-        plot.setLabel('bottom', 'Time (ms)')
-
-def setupNoiseHistogramPlot(plot_widget, CURRENT_THEME, themes):
-    plot_widget.getAxis("left").setTextPen(themes[CURRENT_THEME]['font_color'])
-    plot_widget.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['font_color'])
-    plot_widget.getAxis('top').setTextPen(themes[CURRENT_THEME]['font_color'])
-    plot_widget.setLabel('left', "Num Channels")
-    plot_widget.setLabel('bottom', "Standard Deviations")
-    plot_widget.setTitle('Channel Noise', size='14pt', color=themes[CURRENT_THEME]['font_color'])
-
-    plot_widget.setLimits(xMin=0, yMin=0)
-    font = pg.Qt.QtGui.QFont()
-    font.setPixelSize(20)
-    plot_widget.getAxis("bottom").tickFont = font
-    plot_widget.getAxis("bottom").setStyle(tickTextOffset=1)
-    plot_widget.getPlotItem().hideAxis('top')
 
 def map2idx(ch_row: int, ch_col: int):
     """ Given a channel's row and col, return channel's index

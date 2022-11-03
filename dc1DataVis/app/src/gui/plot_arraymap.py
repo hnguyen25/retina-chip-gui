@@ -2,6 +2,7 @@ import numpy as np
 import pyqtgraph as pg
 import math
 from PyQt5.QtGui import QColor
+from dc1DataVis.app.src.gui.per_electrode_gui_rendering import *
 
 class HoverRegion():
     window = None
@@ -59,6 +60,32 @@ class HoverRegion():
        # print('entering click func')
         self.ClickFunc(self.last_mouse_x, self.last_mouse_y)
 
+def get_array_map_data(app):
+    app.charts["arrayMap"].clear()
+    colors = app.data.array_indexed['stats_spikes+avg+amp']
+    max_dot = 50
+
+    # AX1) Size by Number of Samples
+    spike_cnt = app.data.array_indexed['stats_spikes+cnt']
+    scaling_den = np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0])
+    if scaling_den == 0:
+        scale1 = 1
+    else:
+        scale1 = (max_dot - 15) / (np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0]))
+    b_add = max_dot - (np.max(spike_cnt) * scale1)
+    sizes = np.round(spike_cnt * scale1 + b_add)
+    sizes[sizes < 15] = 10  # TODO fix saturation point
+    return colors, sizes
+
+def array_gui_update_fn(x, y, data):
+    size, color = data["size"], data["color"]
+
+    # draw a circle with a certain size and color
+    circle_ref = pg.QtGui.QGraphicsEllipseItem(x, y, size, size)  # x, y, width, height
+    circle_ref.setPen(pg.mkPen(color))
+    circle_ref.setBrush(pg.mkBrush(color))
+    return {'circle_ref': circle_ref}
+
 def setupArrayMap(app, plot_widget, CURRENT_THEME, themes):
     plot_widget.showGrid(x=False, y=False, alpha=0)
     plot_widget.setAspectLocked()
@@ -84,6 +111,9 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME, themes):
     app.array_map_color_bar.sigLevelsChanged.connect(on_color_bar_levels_changed)
     app.charts["arrayMapHover"].region.setClipItem(image)
 
+    PGPlotPerElectrodeRendering(app, plot_widget, 32, 32,
+                                ["colors", "sizes"],
+                                array_gui_update_fn)
 
 def update_array_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
     print('update array map indicators()')
@@ -128,23 +158,6 @@ def update_minimap_indicator(app, CURRENT_THEME, themes):
     minimap_square_indicator.setPen(pg.mkPen(themes[CURRENT_THEME]['blue3']))
     minimap_square_indicator.setBrush(QColor(255, 0, 255, 0))
     app.charts["arrayMap"].addItem(minimap_square_indicator)
-
-def get_array_map_data(app):
-    app.charts["arrayMap"].clear()
-    colors = app.data.array_indexed['stats_spikes+avg+amp']
-    max_dot = 50
-
-    # AX1) Size by Number of Samples
-    spike_cnt = app.data.array_indexed['stats_spikes+cnt']
-    scaling_den = np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0])
-    if scaling_den == 0:
-        scale1 = 1
-    else:
-        scale1 = (max_dot - 15) / (np.max(spike_cnt) - np.min(spike_cnt[spike_cnt != 0]))
-    b_add = max_dot - (np.max(spike_cnt) * scale1)
-    sizes = np.round(spike_cnt * scale1 + b_add)
-    sizes[sizes < 15] = 10  # TODO fix saturation point
-    return colors, sizes
 
 def update_array_map_data(app, colors, sizes):
     # Set pxMode=False to allow spots to transform with the view

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1272</width>
-    <height>656</height>
+    <height>628</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -77,6 +77,8 @@
     </property>
     <addaction name="actionIndividualChannelInfo"/>
     <addaction name="actionListElectrodesInfo"/>
+    <addaction name="separator"/>
+    <addaction name="actionGUIProfiler"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -432,6 +434,11 @@
   <action name="actionListElectrodesInfo">
    <property name="text">
     <string>List of electrodes info...</string>
+   </property>
+  </action>
+  <action name="actionGUIProfiler">
+   <property name="text">
+    <string>GUI Profiler...</string>
    </property>
   </action>
  </widget>

@@ -10,7 +10,6 @@ from PyQt5 import QtWidgets, QtCore
 from dc1DataVis.app.src.data.DC1DataContainer import *
 from dc1DataVis.app.src.data.python_thread_worker import *  # multithreading
 from dc1DataVis.app.src.gui.setup_charts import *
-from dc1DataVis.app.src.gui.update_charts import *
 from dc1DataVis.app.src.data.data_loading import *
 
 from dc1DataVis.app.src.gui.gui_individualchannel import IndividualChannelInformation
@@ -340,7 +339,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def viewChannelListInformation(self):
         """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant data
         for sorting all the electrodes on the array. """
-        from gui.gui_electrodelist import ElectrodeListInformation
+        from dc1DataVis.app.src.gui.gui_electrodelist import ElectrodeListInformation
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
@@ -348,9 +347,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIPreferences(self):
-        from gui.gui_sessionparameters import GUIPreferences
+        from dc1DataVis.app.src.gui.gui_sessionparameters import GUIPreferences
         new_window = GUIPreferences()
         new_window.label = QLabel("GUI Preferences")
+        new_window.show()
+        new_window.exec()
+        self.external_windows.append(new_window)
+
+    def viewGUIProfiler(self):
+        from dc1DataVis.app.src.gui.gui_profiler import GUIProfiler
+        new_window = GUIProfiler()
+        new_window.label = QLabel("GUI Profiler")
         new_window.show()
         new_window.exec()
         self.external_windows.append(new_window)

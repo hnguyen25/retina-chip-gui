@@ -45,9 +45,7 @@ class IndividualChannelInformation(QWidget):
 
     def setSessionParent(self, session_parent):
         self.session_parent = session_parent
-        self.setupCharts()
-
-
+        # self.setupCharts() TODO figure why this was here
 
     # Note: do NOT change name from "update"
     def update(self, debug=False):
