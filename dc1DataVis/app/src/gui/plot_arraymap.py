@@ -35,7 +35,7 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME, themes):
     # bound the LinearRegionItem to the plotted data
     app.charts["arrayMap"].addItem(image)
     app.array_map_color_bar = app.charts["arrayMap"].addColorBar(image, colorMap=cm, label="Spike Amplitude",
-                                                                 values=(0, 150))  # values=(0, np.max(data)))
+                                                                 values=(0, 30))  # values=(0, np.max(data)))
     app.array_map_color_bar.sigLevelsChanged.connect(lambda: on_color_bar_levels_changed(app))
     #app.charts["arrayMapHover"].region.setClipItem(image)
 
@@ -88,7 +88,6 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params)
     # update the dot information (color and size)
     idxs_to_change = []
     if dot_scaling_changed:  # all recalculate colors and sizes
-        recalculate_all_colors(app)
         recalculate_all_sizes(app)
     else:  # calculate only for specific elecs in current buffer
         for i in range(len(next_packet['packet_data'])):
@@ -103,7 +102,11 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params)
         for col in range(NUM_TOTAL_COLS):
             from ..data.data_loading import map2idx
             idx = map2idx(row, col)
-            color = color_map.map(app.data.df.at[idx, "array_dot_color"])
+
+            array_dot_color_idx = app.data.df.at[idx, "array_dot_color"]
+            #if array_dot_color_idx > 0:
+            #    print('ar dot color idx:', 'r', row, 'c', col, '/', array_dot_color_idx)
+            color = color_map.map(array_dot_color_idx)
 
             default_elec_dict = {'pos': (col, row), 'size': app.data.df.at[idx, "array_dot_size"],
                                  'pen': color,
@@ -135,9 +138,9 @@ def calculate_one_elec_color_and_size(app, idx):
 def recalculate_all_colors(app):
     spikes_avg_amp = np.array(app.data.df["spikes_avg_amp"])
     levels = app.array_map_color_bar.levels()
-
-    spikes_avg_amp = np.clip(spikes_avg_amp, levels[0], levels[1])
+    spikes_avg_amp = np.clip(np.abs(spikes_avg_amp), levels[0], levels[1])
     spikes_avg_amp = (spikes_avg_amp - levels[0]) / (levels[1] - levels[0])
+
     app.data.df["array_dot_color"] = spikes_avg_amp
 
 
@@ -146,8 +149,6 @@ def recalculate_all_sizes(app):
     sizes = (spikes_cnt / app.data.stats["largest_spike_cnt"]) * app.settings["max_dot_size"]
     sizes = np.clip(sizes, app.settings["min_dot_size"], app.settings["max_dot_size"])
     app.data.df["array_dot_size"] = sizes
-
-
 
     if app.arrayMapHoverCoords is not None:
         x, y = app.arrayMapHoverCoords

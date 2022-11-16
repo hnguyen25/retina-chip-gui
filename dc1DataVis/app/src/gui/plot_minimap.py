@@ -80,20 +80,16 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
     for row in range(app.settings['cursor_row'] - 4, app.settings['cursor_row'] + 4):
         for col in range(app.settings['cursor_col'] - 2, app.settings['cursor_col'] + 2):
             if (row > -2) and (col > -2):
-
                 from ..data.data_loading import map2idx
                 elec_idx = str(map2idx(col, row))
-
                 spike_indicator_base = pg.QtGui.QGraphicsRectItem(row * 5, col * 5, BAR_LENGTH, 0.2)
 
                 if elec_idx not in curr_idxs:
                     spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
                     spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
                 else:
-                    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['purple']))
-                    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['purple']))
-
-
+                    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['orange']))
+                    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['orange']))
 
                 spike_indicator_text = pg.TextItem(elec_idx,
                                                    themes[CURRENT_THEME]['font_color'],
@@ -109,8 +105,6 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
 
                 spikeLocs = np.argwhere(spike_bins == True)
                 num_bins = len(spike_bins)
-
-
 
                 for i in spikeLocs:
                     spike_loc_on_vis_bar = (i / num_bins) * BAR_LENGTH

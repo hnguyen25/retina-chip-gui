@@ -49,6 +49,7 @@ class ElectrodeListInformation(QWidget):
         # TODO set theme of electrode list
 
 
+
 # from this stack overflow post:
 # https://stackoverflow.com/questions/44603119/how-to-display-a-pandas-data-frame-with-pyqt5-pyside2
 class DataFrameModel(QtCore.QAbstractTableModel):

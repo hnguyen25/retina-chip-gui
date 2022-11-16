@@ -60,7 +60,7 @@ class DC1DataContainer:
                                      0., 0., 0., 0.,
                                      0., 0., 0., 0., 0.,
                                      0., 0., 0., 0., 0.,
-                                     "", 0.])
+                                     0., 0.])
         self.df = pd.DataFrame(initial_data, columns=df_columns)
 
         self.stats = {"largest_spike_cnt": 0}

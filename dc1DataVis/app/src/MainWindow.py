@@ -256,6 +256,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.curr_buf_idx < self.NUM_TOTAL:
                 data_run = os.path.basename(self.settings["path"])
                 next_file = self.settings["path"] + "/" + data_run + "_" + str(self.curr_buf_idx) + ".mat"
+
                 packet_params = {
                     "file_dir": next_file,
                     "filter_type": self.settings["filter"],
@@ -484,7 +485,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def OnPlay(self):
         print('play')
         self.is_paused = not self.is_paused
-        print('Paused?', self.is_paused)
+        if self.is_paused is True:
+            self.statusBar().showMessage("Paused!")
+        else:
+            self.statusBar().showMessage("Un-paused!")
         pass
 
     def OnFastForward(self):

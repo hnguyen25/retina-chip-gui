@@ -86,7 +86,7 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
 
     if app.noise_heat_map_color_bar is None:
         app.noise_heat_map_color_bar = app.charts["noiseHeatMap"].addColorBar(img, colorMap=cm, label="Noise SD",
-                                                                                values=(0, 10))
+                                                                                values=(0, 5))
     else:
         app.noise_heat_map_color_bar.setImageItem(img)
 
@@ -119,7 +119,7 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
 
     if app.noise_heat_map_color_bar is None:
         app.noise_heat_map_color_bar = app.charts["noiseHeatMap"].addColorBar(img, colorMap=cm, label="Noise SD",
-                                                                                values=(0, 10))
+                                                                                values=(0, 5))
     else:
         app.noise_heat_map_color_bar.setImageItem(img)
 

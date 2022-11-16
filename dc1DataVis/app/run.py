@@ -30,22 +30,21 @@ DEBUG_SETTINGS = {
     'is_true_realtime': True,  # indicates if the program is continuously reading the LAST available data packet
     # initial location of cursor on the array map
     'cursor_row': 4, 'cursor_col': 2,
-    'filter': "Modified Hierlemann",
-    'spikeThreshold': 4,
+    #'filter': "Modified Hierlemann", # this will override the session startup settings
     'binSize': 4,
     'simultaneousChannelsRecordedPerPacket': 4,
     'debug_threads': False,
 
     # array map
-    'min_dot_size': 0.2,
-    'max_dot_size': 2,
+    'min_dot_size': 0.1,
+    'max_dot_size': 1.5,
     'spike_cnt_for_dot_size_saturation': 50
 
 }
 
 # Session Startup Panel
 DEBUG_STARTUP = {
-    'threshold_min': 0.5, 'threshold_max': 6, 'threshold_default': 4,
+    'threshold_min': 1, 'threshold_max': 8, 'threshold_default': 4,
     'default_dataset_path': 'debugData/2022-02-18-0/data001'
 }
 
@@ -74,6 +73,7 @@ if __name__ == "__main__":
     if session_startup.exec():  # continue running app only if user has successfully completed startup window
 
         SESSION_SETTINGS = session_startup.settings
+        print("SESSION_SETTINGS", SESSION_SETTINGS)
         settings = {**SESSION_SETTINGS, **DEBUG_SETTINGS} # get all settings, both from user and developer
 
         # start analysis window of choice
