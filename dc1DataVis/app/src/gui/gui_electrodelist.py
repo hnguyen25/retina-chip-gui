@@ -9,6 +9,7 @@ import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 import pandas as pd
+from natsort import natsorted, index_natsorted, order_by_index
 
 class ElectrodeListInformation(QWidget):
 
@@ -23,40 +24,18 @@ class ElectrodeListInformation(QWidget):
         super().__init__(*args, **kwargs)
         uic.loadUi("./src/layouts/AllChannelsList.ui", self)
 
+        self.sort_by = "row"
         self.chooseSortOption.activated.connect(self.setSortOption)
-
-        data = [
-            [4, 9, 2],
-            [1, 0, 0],
-            [3, 5, 0],
-            [3, 3, 2],
-            [7, 8, 9],
-            [4, 9, 2],
-            [1, 0, 0],
-            [3, 5, 0],
-            [3, 3, 2],
-            [7, 8, 9],
-            [4, 9, 2],
-            [1, 0, 0],
-            [3, 5, 0],
-            [3, 3, 2],
-            [7, 8, 9],
-            [4, 9, 2],
-            [1, 0, 0],
-            [3, 5, 0],
-            [3, 3, 2],
-            [7, 8, 9]
-        ]
-        self.data = pd.DataFrame(data)
-        self.model = DataFrameModel(data)
-        self.electrodeTable.setModel(self.model)
-
 
     def setSessionParent(self, session_parent):
         self.app = session_parent
+        self.model = DataFrameModel(self.app.data.df)
+        self.electrodeTable.setModel(self.model)
+        self.setTheme()
 
     def update(self):
         self.model = DataFrameModel(self.app.data.df)
+        self.model.sort(1)
         self.electrodeTable.setModel(self.model)
 
     def setSortOption(self):
@@ -64,7 +43,10 @@ class ElectrodeListInformation(QWidget):
         print("SORT OPTION: " + self.sortOption)
         self.update()
 
-
+    def setTheme(self):
+        #background_color = self.settings[""]
+        #self.electrodeTable.setBackground(background_color)
+        # TODO set theme of electrode list
 
 
 # from this stack overflow post:
@@ -130,3 +112,4 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             DataFrameModel.ValueRole: b'value'
         }
         return roles
+

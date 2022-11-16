@@ -94,6 +94,25 @@ class MainWindow(QtWidgets.QMainWindow):
         charts_list = self.chart_update_function_mapping.keys()
         self.gui_charts_time_counter = {chart: 100 for chart in charts_list}
 
+        profiling_columns = [
+            "buffer_idx",
+            "gui_refresh",
+            "parallelized_loop",
+            "serial_loop",
+            "array_map",
+            "minimap",
+            "spike_rate",
+            "noise",
+            "trace"
+        ]
+
+        initial_data = []
+        for i in range(300):
+            initial_data.append([
+                i, -1, -1, -1, -1, -1, -1, -1, -1
+            ])
+
+        self.profiling_df = pd.DataFrame(initial_data, columns=profiling_columns)
         self.exec_multithreading()
 
     last_gui_refresh_time = time.time()
@@ -137,7 +156,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # start a gui refresh loop
         self.timer = QTimer(self)
         self.timer.setSingleShot(False)
-        self.timer.setInterval(2000) # in milliseconds
+        self.timer.setInterval(1000) # in milliseconds
         self.timer.timeout.connect(self.gui_refresh_thread)
         self.timer.start()
 
@@ -217,7 +236,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         msg = "Viewing packet " + str(self.NUM_DISPLAYED) + "/" + str(self.NUM_TOTAL) + "  (" + str(self.NUM_PROCESSED) \
               + " loaded into memory,  " + str(self.NUM_GUI_QUEUE) + " waiting to be displayed). " +  \
-             "From data directory " + datarun
+             "From data directory " + datarun + "."
         self.statusBar().showMessage(msg)
         #self.statusBar().showMessage('||TOT' + str(self.NUM_TOTAL) + '|| UNPROC' + str(self.NUM_UNPROCESSED) + ' >> PROC' +
         #      str(self.NUM_PROCESSED) + ' >> GUIQ' + str(self.NUM_GUI_QUEUE) + ' >> DISP' + str(self.NUM_DISPLAYED))
@@ -298,7 +317,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     a = time.time()
                     extra_params = self.chart_update_extra_params[chart]
                     self.chart_update_function_mapping[chart](self, next_packet, self.settings["current_theme"], themes, extra_params)
-                    print('updating chart time', chart, time.time()-a)
+                    #print('updating chart time', chart, time.time()-a)
                 self.gui_charts_time_counter[chart] = time.time()
         return True
 
@@ -315,7 +334,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.arrayMapHoverCoords = (int_x, int_y)
 
     def onArrayMapClick(self, x, y):
-        print('set minimap loc()')
+
         """ Given an x, y coord as clicked on from the array map,
         reset the center of the electrode minimap to that location.
 
@@ -324,11 +343,8 @@ class MainWindow(QtWidgets.QMainWindow):
             y: x value on window as detected by mouse on click
         """
 
-
         self.settings['cursor_row'] = np.clip(int(x), 4, 28)
         self.settings['cursor_col'] = np.clip(int(y), 2, 30)
-
-        print('x', int(x), 'y', int(y))
 
         update_minimap_indicator(self, self.settings["current_theme"], themes)
         # TODO update minimap plot with new data
@@ -385,6 +401,9 @@ class MainWindow(QtWidgets.QMainWindow):
             elif chart_type is list:
                 for chart in self.charts[chart]:
                     chart.setBackground(background_color)
+
+        for window in self.external_windows:
+            window.setBackground(background_color)
 
     def toggle_dark_mode(self):
         if self.settings["current_theme"] == "light":

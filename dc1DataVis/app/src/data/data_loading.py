@@ -70,7 +70,7 @@ def calculate_channel_stats(packet, SPIKING_THRESHOLD, BIN_SIZE):
                                                                                SPIKING_THRESHOLD)
             spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER = binSpikeTimes(channel_data["stats_buf+recording+len"],
                                                                            incom_spike_idx,
-                                                                           incom_spike_idx,
+                                                                           incom_spike_amplitude,
                                                                            BIN_SIZE)
 
             channel_data["stats_spikes+cnt"] = sum(spikeBins)

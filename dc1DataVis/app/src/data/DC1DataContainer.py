@@ -65,25 +65,9 @@ class DC1DataContainer:
 
         self.stats = {"largest_spike_cnt": 0}
 
-        self.array_indexed = {
-            "start_time": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "start_count": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "packet_idx": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)],
-            "size": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS, 0)),  # For each dot, size by # of samples
-            "stats_cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS, 1)),  # sample counting
-            "colors": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS, 0)),  # For each dot, color by avg amplitude
-            "avg_amp": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS, 1)),  # for calculating avg amp
-            "stats_noise+mean": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "stats_noise+std": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "stats_buf+recording+len": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "stats_avg+unfiltered+amp": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "stats_spikes+avg+amp": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "stats_spikes+std": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "stats_spikes+cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "stats_spikes+cumulative_cnt": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "stats_num+spike+bins+in+buffer": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
-            "spike_bins": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)],
-            "spike_bins_max_amps": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)]
+        self.array_spike_times = {
+            "spike_bins": [[] for i in range(self.ARRAY_NUM_ROWS * self.ARRAY_NUM_COLS)],
+            "spike_bins_max_amps": [[] for i in range(self.ARRAY_NUM_ROWS * self.ARRAY_NUM_COLS)]
         }
 
         # =====================
@@ -127,12 +111,12 @@ class DC1DataContainer:
             # TODO make this adapt for when multiple packets record from the same channel
             # use formula Maddy gave
 
-
             df_columns = ["row", "col",  # indexing
                           "avg_filtered_amp", "avg_unfiltered_amp", "noise_mean", "noise_std",  # noise
                           "start_time", "start_count", "buf_recording_len", "N", "packet_idx",  # timing
                           "spikes_avg_amp", "spikes_cnt", "spikes_std", "spikes_cum_cnt",
                           "num_bins_per_buffer"]  # spikes
+
 
             self.df.at[this_channel_idx, "N"] += packet["stats_cnt"]
             self.df.at[this_channel_idx, "avg_unfiltered_amp"] = packet["stats_avg+unfiltered+amp"]
@@ -142,25 +126,26 @@ class DC1DataContainer:
             self.df.at[this_channel_idx, "buf_recording_len"] = packet["stats_buf+recording+len"]
             self.df.at[this_channel_idx, "avg_unfiltered_amp"] = packet["stats_avg+unfiltered+amp"]
 
-
             self.df.at[this_channel_idx, "spikes_cnt"] = packet["stats_spikes+cnt"]
             self.df.at[this_channel_idx, "spikes_cum_cnt"] += packet["stats_spikes+cnt"]
             self.df.at[this_channel_idx, "spikes_avg_amp"] += packet["stats_spikes+avg+amp"]
             self.df.at[this_channel_idx, "spikes_std"] += packet["stats_spikes+std"]
 
-            # self.array_indexed["stats_cnt"][r][c] += packet["stats_cnt"]
-            # self.array_indexed["stats_avg+unfiltered+amp"][r][c] = packet["stats_avg+unfiltered+amp"] # of unfiltered data
-            # self.array_indexed["stats_noise+mean"][r][c] = packet["stats_noise+mean"]
-            # self.array_indexed["stats_noise+std"][r][c] = packet["stats_noise+std"]
-            # self.array_indexed["stats_buf+recording+len"][r][c] = packet["stats_buf+recording+len"]
-            #self.array_indexed["stats_spikes+cnt"][r][c] = packet["stats_spikes+cnt"]
-            #self.array_indexed["stats_spikes+cumulative_cnt"][r][c] += packet["stats_spikes+cnt"]
-            # self.array_indexed["stats_spikes+avg+amp"][r][c] = packet["stats_spikes+avg+amp"]
-            # self.array_indexed["stats_spikes+std"][r][c] = packet["stats_spikes+std"]
-            # self.array_indexed["stats_num+spike+bins+in+buffer"][r][c] = packet["stats_num+spike+bins+in+buffer"]
-            # TODO bug with generator object
-            #self.array_indexed["spike_bins"][r][c] = packet["spike_bins"]
-            #self.array_indexed["spike_bins_max_amps"][r][c] = packet["spike_bins_max_amps"]
+
+            """
+            self.array_indexed = {
+                "stats_num+spike+bins+in+buffer": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
+                "spike_bins": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)],
+                "spike_bins_max_amps": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)]
+            }   
+            """
+            # TODO put spike bins here
+            #print('array spike times -> spike_bins', packet["spike_bins"])
+            #print('array spike times -> spike_bins_max_amp', packet["spike_bins_max_amps"])
+            self.array_spike_times["spike_bins"][this_channel_idx] = packet["spike_bins"]
+            self.array_spike_times["spike_bins_max_amps"][this_channel_idx] = packet["spike_bins_max_amps"]
+
+
             avg_packet_spike_count += packet["stats_spikes+cnt"]
         # buffer-level information
         buffer_indexed_dict = {

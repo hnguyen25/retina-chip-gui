@@ -28,7 +28,7 @@ def update_spike_rate_plot(app, next_packet, CURRENT_THEME, themes, extra_params
     app.charts["spikeRatePlot"].plot(app.data.avg_spike_rate_x,
                                      app.data.avg_spike_rate_y,
                                      pen=pg.mkPen(themes[CURRENT_THEME]['font_color'], width=5))
-    app.charts["spikeRatePlot"].setYRange(0, max(app.data.avg_spike_rate_y) + 5, padding=0.1)
+    #app.charts["spikeRatePlot"].setYRange(0, max(app.data.avg_spike_rate_y) + 5, padding=0.1)
 
 
 

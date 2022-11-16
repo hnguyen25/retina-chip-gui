@@ -44,27 +44,57 @@ def setupMiniMapPlot(app, plot_widget, CURRENT_THEME, themes, center_row=16, cen
     plot_widget.enableAutoRange(axis='y', enable=True)
     plot_widget.setAspectLocked()
 
-
-
 def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
-
-    # TODO update PGPlotPerElectrodeRendering
-
-    print('update mini map plot')
     app.charts["miniMap"].clear()
 
     BAR_LENGTH = 4
+
+    # same as self.settings['binSize'] but for the minimap.
+    # so that the gui doesn't freeze
+    # TODO
+    MIN_BIN_LENGTH = 4
     MAX_SPIKES = 16  # can't draw every spike or gui will crash -> group spikes together
 
+    curr_idxs = []
+    for packet in next_packet['packet_data']:
+        curr_idxs.append(packet['channel_idx'])
+
+    # make a legend
+    legend_loc_x = app.settings['cursor_row'] - 4 - 1.5
+    legend_loc_y = app.settings['cursor_col'] - 2
+
+    spike_indicator_base = pg.QtGui.QGraphicsRectItem(legend_loc_x * 5, legend_loc_y * 5, BAR_LENGTH, 0.2)
+    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
+    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
+
+    legend_text = str(round(app.data.buffer_indexed[0]["time_elapsed"], 0)) + " ms"
+    spike_indicator_text = pg.TextItem(legend_text,
+                                       themes[CURRENT_THEME]['font_color'],
+                                       anchor=(0, 0))
+    spike_indicator_text.setPos(legend_loc_x * 5, legend_loc_y * 5)
+    spike_indicator_text.setParentItem(spike_indicator_base)
+    app.charts["miniMap"].addItem(spike_indicator_base)
+    app.charts["miniMap"].addItem(spike_indicator_text)
+
+    # now visualize the selected electrodes in the window of the minimap
     for row in range(app.settings['cursor_row'] - 4, app.settings['cursor_row'] + 4):
         for col in range(app.settings['cursor_col'] - 2, app.settings['cursor_col'] + 2):
             if (row > -2) and (col > -2):
-                spike_indicator_base = pg.QtGui.QGraphicsRectItem(row * 5, col * 5, BAR_LENGTH, 0.2)
-                spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
-                spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
 
                 from ..data.data_loading import map2idx
                 elec_idx = str(map2idx(col, row))
+
+                spike_indicator_base = pg.QtGui.QGraphicsRectItem(row * 5, col * 5, BAR_LENGTH, 0.2)
+
+                if elec_idx not in curr_idxs:
+                    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
+                    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
+                else:
+                    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['purple']))
+                    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['purple']))
+
+
+
                 spike_indicator_text = pg.TextItem(elec_idx,
                                                    themes[CURRENT_THEME]['font_color'],
                                                    anchor=(0, 0))
@@ -74,36 +104,21 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
                 app.charts["miniMap"].addItem(spike_indicator_base)
                 app.charts["miniMap"].addItem(spike_indicator_text)
 
-    LAST_N_BUFFER_DATA = 100
-    # TODO add spike locs for minimap
-    """
-    to_search = app.data.preprocessed_data[-LAST_N_BUFFER_DATA:]
-    spikes_within_view = []
-    for data_packet in to_search:
-        chan_idx = data_packet['channel_idx']
+                spike_bins = app.data.array_spike_times["spike_bins"][int(elec_idx)]
+                spike_bins_max_amps = app.data.array_spike_times["spike_bins_max_amps"][int(elec_idx)]
 
-        from ..data.data_loading import idx2map
-        c, r = idx2map(chan_idx)
-        if (app.settings['cursor_row'] - 4 <= r) & (r < app.settings['cursor_row'] + 4) & \
-                (app.settings['cursor_col'] - 2 <= c) & (c < app.settings['cursor_col'] + 2):
-            spikes_within_view.append(data_packet)
+                spikeLocs = np.argwhere(spike_bins == True)
+                num_bins = len(spike_bins)
 
-    for data_packet in spikes_within_view:
-        chan_idx = data_packet['channel_idx']
-        from ..data.data_loading import idx2map
-        row, col = idx2map(chan_idx)
-        spikeBins = data_packet['spikeBins']
-        spikeBinsMaxAmp = data_packet['spikeBinsMaxAmp']
-        spikeLocs = np.argwhere(spikeBins == True)
 
-        num_bins = data_packet['num_bins_in_buffer']
-        for i in spikeLocs:
-            spike_loc_on_vis_bar = (i / num_bins) * BAR_LENGTH
-            spike_height_on_vis_bar = spikeBinsMaxAmp[i] / 50
-            spike_indicator = pg.QtGui.QGraphicsRectItem(col * 5 + spike_loc_on_vis_bar, row * 5, 0.1,
-                                                         spike_height_on_vis_bar)
-            spike_indicator.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
-            spike_indicator.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
-            spike_indicator.setParentItem(spike_indicator_base)
-            app.charts["miniMap"].addItem(spike_indicator)
-    """
+
+                for i in spikeLocs:
+                    spike_loc_on_vis_bar = (i / num_bins) * BAR_LENGTH
+                    spike_height_on_vis_bar = np.abs(spike_bins_max_amps[i] / 20)
+                    spike_indicator = pg.QtGui.QGraphicsRectItem(row * 5 + spike_loc_on_vis_bar, col * 5, 0.03,
+                                                                 spike_height_on_vis_bar)
+                    spike_indicator.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
+                    spike_indicator.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
+                    spike_indicator.setParentItem(spike_indicator_base)
+                    app.charts["miniMap"].addItem(spike_indicator)
+

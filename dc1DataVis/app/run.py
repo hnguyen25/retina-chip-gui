@@ -29,10 +29,10 @@ DEBUG_SETTINGS = {
     'is_live_plotting': True,  # indicates if the program is still continuously reading available data packets
     'is_true_realtime': True,  # indicates if the program is continuously reading the LAST available data packet
     # initial location of cursor on the array map
-    'cursor_row': 16, 'cursor_col': 16,
+    'cursor_row': 4, 'cursor_col': 2,
     'filter': "Modified Hierlemann",
     'spikeThreshold': 4,
-    'binSize': 1,
+    'binSize': 4,
     'simultaneousChannelsRecordedPerPacket': 4,
     'debug_threads': False,
 
