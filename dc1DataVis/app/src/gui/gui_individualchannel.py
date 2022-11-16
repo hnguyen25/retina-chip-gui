@@ -55,12 +55,13 @@ class IndividualChannelInformation(QWidget):
         self.updateAmplitudeHist()
         self.updateSpikeRate()
         self.updateChannelTrace()
+        idx = map2idx(self.current_row, self.current_col)
 
         if debug:
             print('std from array stats: ' +
-                  str(self.session_parent.LoadedData.array_indexed["noise_std"][self.current_row][self.current_col]))
+                  str(self.session_parent.LoadedData.df.at[idx, "noise_std"]))
             print("noise mean from array stats: " +
-                  str(self.session_parent.LoadedData.array_indexed["noise_mean"][self.current_row][self.current_col]))
+                  str(self.session_parent.LoadedData.df.at[idx, "noise_mean"]))
             print('std from direct calculation: ' + str(np.std(self.electrode_packets[0]["data"])))
 
         self.totalSamples.setText("Total number of samples: " + str(len(self.electrode_data)))
@@ -169,7 +170,7 @@ class IndividualChannelInformation(QWidget):
             t = [0 for i in range(numberOfUpdates)]
 
         self.SpikeRatePlot.plot(t, spike_rate, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
-
+        idx = map2idx(self.current_row, self.current_col)
         if debug:
             print("length of recording: " + str(len(self.electrode_times)) + " data points")
             print("electrode times: " + str(self.electrode_times[0]) + "-" + str(self.electrode_times[-1]))
@@ -177,8 +178,8 @@ class IndividualChannelInformation(QWidget):
             #print("double binned spikes: " + str(num_spikes))
             print("number of spike bins: " + str(len(self.electrode_spikes)))
             print("incoming spike times: " + str(self.electrode_spike_times))
-            print("noise mean: " + str(self.session_parent.LoadedData.array_indexed['noise_mean'][self.current_row, self.current_col]))
-            print("noise std: " + str(self.session_parent.LoadedData.array_indexed['noise_std'][self.current_row, self.current_col]))
+            print("noise mean: " + str(self.session_parent.LoadedData.df.at[idx, 'noise_mean']))
+            print("noise std: " + str(self.session_parent.LoadedData.df.at[idx, 'noise_std']))
 
     def updateChannelTrace(self):
         self.ChannelTracePlot.clear()

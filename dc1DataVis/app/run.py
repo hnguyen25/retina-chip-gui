@@ -33,7 +33,14 @@ DEBUG_SETTINGS = {
     'filter': "Modified Hierlemann",
     'spikeThreshold': 4,
     'binSize': 1,
-    'simultaneousChannelsRecordedPerPacket': 4
+    'simultaneousChannelsRecordedPerPacket': 4,
+    'debug_threads': False,
+
+    # array map
+    'min_dot_size': 0.2,
+    'max_dot_size': 2,
+    'spike_cnt_for_dot_size_saturation': 50
+
 }
 
 # Session Startup Panel
@@ -56,6 +63,12 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps)  # use high DPI icons
     app.setStyleSheet("QWidget { font: 14px; }")
+    app.setStyleSheet("""QToolTip { 
+                                   background-color: black; 
+                                   color: white; 
+                                   border: black solid 1px
+                                   }""")
+    app.setStyleSheet("QStatusBar{padding-left:8px;color:white;font-weight:bold;font-family:'Arial'}")
 
     session_startup = SessionStartupGUI(base_dir, DEBUG_STARTUP)  # load initial startup window where user can specify session
     if session_startup.exec():  # continue running app only if user has successfully completed startup window
@@ -69,6 +82,7 @@ if __name__ == "__main__":
         window.show()
         app.exec()
 
-
     print('Application completed. Killing process...')
-    sys.exit()
+    app.quit()
+    #sys.exit()
+

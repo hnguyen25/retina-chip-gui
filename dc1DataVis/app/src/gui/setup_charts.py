@@ -120,7 +120,7 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     app.FastForwardButton.clicked.connect(app.OnFastForward)
 
     app.charts["arrayMapHover"] = HoverRegion(app.charts["arrayMap"], app.showArrayLocOnStatusBar,
-                                              app.setMiniMapLoc)
+                                              app.onArrayMapClick)
     setupArrayMap(app, app.charts["arrayMap"], CURRENT_THEME, themes)
     setupMiniMapPlot(app, app.charts["miniMap"], CURRENT_THEME, themes)
     setupSpikeRatePlot(app.charts["spikeRatePlot"], CURRENT_THEME, themes)
@@ -178,8 +178,6 @@ def setup_noise_plots(app ):
 
 def setup_diagnostic_plots():
     pass
-
-
 
 def map2idx(ch_row: int, ch_col: int):
     """ Given a channel's row and col, return channel's index

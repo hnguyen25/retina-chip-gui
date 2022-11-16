@@ -8,10 +8,11 @@ import numpy as np
 import pyqtgraph as pg
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
+import pandas as pd
 
 class ElectrodeListInformation(QWidget):
 
-    session_parent = None
+    app = None
     current_elec = 0
     current_row = 0
     current_col = 0
@@ -46,45 +47,86 @@ class ElectrodeListInformation(QWidget):
             [3, 3, 2],
             [7, 8, 9]
         ]
-        self.model = TableModel(data)
+        self.data = pd.DataFrame(data)
+        self.model = DataFrameModel(data)
         self.electrodeTable.setModel(self.model)
 
 
     def setSessionParent(self, session_parent):
-        self.session_parent = session_parent
-        self.setupCharts()
-
-    def setupCharts(self):
-        pass
+        self.app = session_parent
 
     def update(self):
-        pass
+        self.model = DataFrameModel(self.app.data.df)
+        self.electrodeTable.setModel(self.model)
 
     def setSortOption(self):
         self.sortOption = self.chooseSortOption.currentText()
         print("SORT OPTION: " + self.sortOption)
         self.update()
 
-class TableModel(QtCore.QAbstractTableModel):
-    def __init__(self, data):
-        super(TableModel, self).__init__()
-        self._data = data
-
-    def data(self, index, role):
-        if role == Qt.DisplayRole:
-            # See below for the nested-list data structure.
-            # .row() indexes into the outer list,
-            # .column() indexes into the sub-list
-            return self._data[index.row()][index.column()]
-
-    def rowCount(self, index):
-        # The length of the outer list.
-        return len(self._data)
-
-    def columnCount(self, index):
-        # The following takes the first sub-list, and returns
-        # the length (only works if all rows are an equal length)
-        return len(self._data[0])
 
 
 
+# from this stack overflow post:
+# https://stackoverflow.com/questions/44603119/how-to-display-a-pandas-data-frame-with-pyqt5-pyside2
+class DataFrameModel(QtCore.QAbstractTableModel):
+    DtypeRole = QtCore.Qt.UserRole + 1000
+    ValueRole = QtCore.Qt.UserRole + 1001
+
+    def __init__(self, df=pd.DataFrame(), parent=None):
+        super(DataFrameModel, self).__init__(parent)
+        self._dataframe = df
+
+    def setDataFrame(self, dataframe):
+        self.beginResetModel()
+        self._dataframe = dataframe.copy()
+        self.endResetModel()
+
+    def dataFrame(self):
+        return self._dataframe
+
+    dataFrame = QtCore.pyqtProperty(pd.DataFrame, fget=dataFrame, fset=setDataFrame)
+
+    @QtCore.pyqtSlot(int, QtCore.Qt.Orientation, result=str)
+    def headerData(self, section: int, orientation: QtCore.Qt.Orientation, role: int = QtCore.Qt.DisplayRole):
+        if role == QtCore.Qt.DisplayRole:
+            if orientation == QtCore.Qt.Horizontal:
+                return self._dataframe.columns[section]
+            else:
+                return str(self._dataframe.index[section])
+        return QtCore.QVariant()
+
+    def rowCount(self, parent=QtCore.QModelIndex()):
+        if parent.isValid():
+            return 0
+        return len(self._dataframe.index)
+
+    def columnCount(self, parent=QtCore.QModelIndex()):
+        if parent.isValid():
+            return 0
+        return self._dataframe.columns.size
+
+    def data(self, index, role=QtCore.Qt.DisplayRole):
+        if not index.isValid() or not (0 <= index.row() < self.rowCount() \
+            and 0 <= index.column() < self.columnCount()):
+            return QtCore.QVariant()
+        row = self._dataframe.index[index.row()]
+        col = self._dataframe.columns[index.column()]
+        dt = self._dataframe[col].dtype
+
+        val = self._dataframe.iloc[row][col]
+        if role == QtCore.Qt.DisplayRole:
+            return str(val)
+        elif role == DataFrameModel.ValueRole:
+            return val
+        if role == DataFrameModel.DtypeRole:
+            return dt
+        return QtCore.QVariant()
+
+    def roleNames(self):
+        roles = {
+            QtCore.Qt.DisplayRole: b'display',
+            DataFrameModel.DtypeRole: b'dtype',
+            DataFrameModel.ValueRole: b'value'
+        }
+        return roles

@@ -2,11 +2,10 @@ import numpy as np
 import time
 
 from dc1DataVis.app.src.data.data_loading import *
-
 from ..data.filters import *
 import warnings
 import queue
-## import pandas as pd  # TODO make a pandas dataframe for array info
+import pandas as pd  # TODO make a pandas dataframe for array info
 
 class DC1DataContainer:
     """
@@ -47,6 +46,25 @@ class DC1DataContainer:
         # value: a dict containing all info for a certain electrode
         # self.array_indexed_df = pd.Dataframe() # TODO make array-indexed pandas df to replace below
 
+        df_columns = ["row", "col", # indexing
+                      "avg_filtered_amp", "avg_unfiltered_amp", "channel_noise_mean", "channel_noise_std", # noise
+                      "start_time", "start_count", "buf_recording_len", "N", "packet_idx", # timing
+                      "spikes_avg_amp", "spikes_cnt", "spikes_std", "spikes_cum_cnt", "num_bins_per_buffer", #spikes
+                      "array_dot_color", "array_dot_size"  # specific plot info
+                      ]
+
+        initial_data = []
+        for i in range(32):
+            for j in range(32):
+                initial_data.append([i, j,
+                                     0., 0., 0., 0.,
+                                     0., 0., 0., 0., 0.,
+                                     0., 0., 0., 0., 0.,
+                                     "", 0.])
+        self.df = pd.DataFrame(initial_data, columns=df_columns)
+
+        self.stats = {"largest_spike_cnt": 0}
+
         self.array_indexed = {
             "start_time": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
             "start_count": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
@@ -66,7 +84,6 @@ class DC1DataContainer:
             "stats_num+spike+bins+in+buffer": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
             "spike_bins": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)],
             "spike_bins_max_amps": [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)]
-
         }
 
         # =====================
@@ -78,7 +95,6 @@ class DC1DataContainer:
         self.to_show = queue.Queue()
 
     def append_buf(self, buf):
-
         packet_idx = buf['packet_idx']
         channel_idxs = []  # for buffer_indexed data struct
 
@@ -110,16 +126,38 @@ class DC1DataContainer:
 
             # TODO make this adapt for when multiple packets record from the same channel
             # use formula Maddy gave
-            self.array_indexed["stats_cnt"][r][c] += packet["stats_cnt"]
-            self.array_indexed["stats_avg+unfiltered+amp"][r][c] = packet["stats_avg+unfiltered+amp"] # of unfiltered data
-            self.array_indexed["stats_noise+mean"][r][c] = packet["stats_noise+mean"]
-            self.array_indexed["stats_noise+std"][r][c] = packet["stats_noise+std"]
-            self.array_indexed["stats_buf+recording+len"][r][c] = packet["stats_buf+recording+len"]
-            self.array_indexed["stats_spikes+cnt"][r][c] = packet["stats_spikes+cnt"]
-            self.array_indexed["stats_spikes+cumulative_cnt"][r][c] += packet["stats_spikes+cnt"]
-            self.array_indexed["stats_spikes+avg+amp"][r][c] = packet["stats_spikes+avg+amp"]
-            self.array_indexed["stats_spikes+std"][r][c] = packet["stats_spikes+std"]
-            self.array_indexed["stats_num+spike+bins+in+buffer"][r][c] = packet["stats_num+spike+bins+in+buffer"]
+
+
+            df_columns = ["row", "col",  # indexing
+                          "avg_filtered_amp", "avg_unfiltered_amp", "noise_mean", "noise_std",  # noise
+                          "start_time", "start_count", "buf_recording_len", "N", "packet_idx",  # timing
+                          "spikes_avg_amp", "spikes_cnt", "spikes_std", "spikes_cum_cnt",
+                          "num_bins_per_buffer"]  # spikes
+
+            self.df.at[this_channel_idx, "N"] += packet["stats_cnt"]
+            self.df.at[this_channel_idx, "avg_unfiltered_amp"] = packet["stats_avg+unfiltered+amp"]
+            self.df.at[this_channel_idx, "noise_mean"] = packet["stats_noise+mean"]
+            self.df.at[this_channel_idx, "noise_std"] = packet["stats_noise+std"]
+
+            self.df.at[this_channel_idx, "buf_recording_len"] = packet["stats_buf+recording+len"]
+            self.df.at[this_channel_idx, "avg_unfiltered_amp"] = packet["stats_avg+unfiltered+amp"]
+
+
+            self.df.at[this_channel_idx, "spikes_cnt"] = packet["stats_spikes+cnt"]
+            self.df.at[this_channel_idx, "spikes_cum_cnt"] += packet["stats_spikes+cnt"]
+            self.df.at[this_channel_idx, "spikes_avg_amp"] += packet["stats_spikes+avg+amp"]
+            self.df.at[this_channel_idx, "spikes_std"] += packet["stats_spikes+std"]
+
+            # self.array_indexed["stats_cnt"][r][c] += packet["stats_cnt"]
+            # self.array_indexed["stats_avg+unfiltered+amp"][r][c] = packet["stats_avg+unfiltered+amp"] # of unfiltered data
+            # self.array_indexed["stats_noise+mean"][r][c] = packet["stats_noise+mean"]
+            # self.array_indexed["stats_noise+std"][r][c] = packet["stats_noise+std"]
+            # self.array_indexed["stats_buf+recording+len"][r][c] = packet["stats_buf+recording+len"]
+            #self.array_indexed["stats_spikes+cnt"][r][c] = packet["stats_spikes+cnt"]
+            #self.array_indexed["stats_spikes+cumulative_cnt"][r][c] += packet["stats_spikes+cnt"]
+            # self.array_indexed["stats_spikes+avg+amp"][r][c] = packet["stats_spikes+avg+amp"]
+            # self.array_indexed["stats_spikes+std"][r][c] = packet["stats_spikes+std"]
+            # self.array_indexed["stats_num+spike+bins+in+buffer"][r][c] = packet["stats_num+spike+bins+in+buffer"]
             # TODO bug with generator object
             #self.array_indexed["spike_bins"][r][c] = packet["spike_bins"]
             #self.array_indexed["spike_bins_max_amps"][r][c] = packet["spike_bins_max_amps"]
@@ -156,7 +194,7 @@ class DC1DataContainer:
                 avg_spike_rate += buffer["num_detected_spikes"]
                 time_elapsed += buffer["time_elapsed"]
 
-        print('avg spike rate before division', avg_spike_rate)
+        #print('avg spike rate before division', avg_spike_rate)
         avg_spike_rate /= time_elapsed
 
         x = self.time_track
@@ -164,3 +202,20 @@ class DC1DataContainer:
 
         self.avg_spike_rate_x.append(x)
         self.avg_spike_rate_y.append(y)
+
+def map2idx(ch_row: int, ch_col: int):
+    """ Given a channel's row and col, return channel's index
+
+    Args:
+        ch_row: row index of channel in array (up to 32)
+        ch_col: column index of channel in array (up to 32)
+
+    Returns: numerical index of array
+    """
+    if ch_row > 31 or ch_row < 0:
+        print('Row out of range')
+    elif ch_col > 31 or ch_col < 0:
+        print('Col out of range')
+    else:
+        ch_idx = int(ch_row*32 + ch_col)
+    return ch_idx

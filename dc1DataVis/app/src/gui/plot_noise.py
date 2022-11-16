@@ -25,7 +25,8 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
 
     app.charts["noiseHistogram"].clear()
 
-    vals = app.data.array_indexed['stats_noise+std'].copy()
+    vals = np.array(app.data.df["noise_std"]).copy()
+    #vals = app.data.array_indexed['stats_noise+std'].copy()
     vals = vals[np.nonzero(vals)]
 
     cm = pg.colormap.get('plasma', source='matplotlib')
@@ -73,7 +74,8 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
     plot.getAxis("bottom").setStyle(tickTextOffset=1)
 
     if app.first_time_plotting is False:
-        data = app.data.array_indexed["stats_noise+std"]
+        data = app.data.df["noise_std"]
+        #data = app.data.array_indexed["stats_noise+std"]
         data = data.T
     else:
         data = None
@@ -105,7 +107,8 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
     plot.getAxis("bottom").setStyle(tickTextOffset=1)
 
     if app.first_time_plotting is False:
-        data = app.data.array_indexed["stats_noise+std"]
+        data = app.data.df["noise_std"]
+        #data = app.data.array_indexed["stats_noise+std"]
         data = data.T
     else:
         data = None
@@ -134,8 +137,8 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
     """
 
     app.charts["noiseHistogram"].clear()
-
-    vals = app.data.array_indexed['stats_noise+std'].copy()
+    vals = np.array(app.data.df["noise_std"])
+    #vals = app.data.array_indexed['stats_noise+std'].copy()
     vals = vals[np.nonzero(vals)]
 
     cm = pg.colormap.get('plasma', source='matplotlib')

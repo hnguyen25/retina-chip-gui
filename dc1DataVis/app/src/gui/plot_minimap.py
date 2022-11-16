@@ -44,9 +44,7 @@ def setupMiniMapPlot(app, plot_widget, CURRENT_THEME, themes, center_row=16, cen
     plot_widget.enableAutoRange(axis='y', enable=True)
     plot_widget.setAspectLocked()
 
-    PGPlotPerElectrodeRendering(app, plot_widget, 8, 4,
-                                ["spike_times", "spike_amps", "elec_idx"],
-                                minimap_gui_update_fn)
+
 
 def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
 

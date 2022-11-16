@@ -20,6 +20,7 @@ class MainWindow(QtWidgets.QMainWindow):
     to start and run GUI elements.
     """
     ### PROGRAM VARS ###
+    running = True
     is_paused = False
     first_time_plotting = True  # toggles to false when all the charts are setup for the first time
     settings = {}  # session parameters created through user input from the startup pane
@@ -59,7 +60,16 @@ class MainWindow(QtWidgets.QMainWindow):
     arrayMapHoverCoords = None
     array_map_channels_to_update = []
 
+    #### NEW STRUCTS
+    subplot_elements = {}
+    def update_subplot_element(self, chart, key, value):
+        if key in self.subplot_elements:
+            self.charts[chart].removeItem(self.subplot_elements[key])
+        self.charts[chart].addItem(value)
+        self.subplot_elements[key] = value
+
     def __init__(self, *args, **kwargs):
+
         super(MainWindow, self).__init__()
         if "settings" in kwargs:
             self.settings = kwargs["settings"]
@@ -74,7 +84,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.data = DC1DataContainer(self)
         self.settings["num_channels"] = load_first_buffer_info(self)
         self.data_loading_serialized_loop()
-        print(self.data.array_indexed["stats_spikes+cnt"])
 
         if not setup_layout(self, self.settings['visStyle'],
                             self.settings["current_theme"], themes,
@@ -96,6 +105,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def exec_multithreading(self):
         print('setup multithreading')
 
+        self.running = True
         # Set up PyQt multithreading
         self.threadpool = QThreadPool()
         if self.settings['is_mode_multithreading']:
@@ -133,11 +143,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # this is one separate thread running a multiprocessing
     def data_loading_parallelized_thread(self, progress_callback, gui_callback,  NUM_SIMULTANEOUS_PROCESSES=6):
-        print("START: parallel thread")
+        if self.settings['debug_threads']: print("START: parallel thread")
         pool = multiprocessing.Pool(processes=NUM_SIMULTANEOUS_PROCESSES)
 
-        while True:
-            print('Thread-Parallel >> Time elapsed', round(time.time() - self.last_gui_refresh_time, 2))
+        while self.running is True:
+            if self.settings['debug_threads']: print('Thread-Parallel >> Time elapsed', round(time.time() - self.last_gui_refresh_time, 2))
 
             # update counters
             buf_dir = os.listdir(self.settings["path"])
@@ -155,15 +165,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 time.sleep(5)
 
     def data_loading_serialized_thread(self, progress_callback, gui_callback):
-        print("START: serial thread")
-        while True:
+        if self.settings['debug_threads']: print("START: serial thread")
+        while self.running is True:
             buf_dir = os.listdir(self.settings["path"])
             self.NUM_TOTAL = len(buf_dir)
             self.NUM_UNPROCESSED = self.NUM_TOTAL - self.NUM_PROCESSED - self.NUM_GUI_QUEUE - self.NUM_DISPLAYED
             self.NUM_PROCESSED = self.data.to_serialize.qsize()
             self.NUM_GUI_QUEUE = self.data.to_show.qsize()
 
-            print('Thread-Serial >> Time elapsed', round(time.time() - self.last_gui_refresh_time, 2))
+            if self.settings['debug_threads']: print('Thread-Serial >> Time elapsed', round(time.time() - self.last_gui_refresh_time, 2))
             if self.NUM_PROCESSED > 0:
                 packet_successfully_added = self.data_loading_serialized_loop()
 
@@ -185,25 +195,32 @@ class MainWindow(QtWidgets.QMainWindow):
     MIN_GUI_REFRESH_INTERVAL = 2
     # this loop is run by a QTimer in MainWindow.exec_multithread
     def gui_refresh_thread(self):
+
         buf_dir = os.listdir(self.settings["path"])
         self.NUM_TOTAL = len(buf_dir)
         self.NUM_UNPROCESSED = self.NUM_TOTAL - self.NUM_PROCESSED - self.NUM_GUI_QUEUE - self.NUM_DISPLAYED
         self.NUM_PROCESSED = self.data.to_serialize.qsize()
         self.NUM_GUI_QUEUE = self.data.to_show.qsize()
         time_elapsed = round(time.time() - self.last_gui_refresh_time, 2)
-        print('Thread-GUI >> Time elapsed:', time_elapsed)
-        print('======================')
-        print('||TOT', self.NUM_TOTAL, '|| UNPROC', self.NUM_UNPROCESSED, ' >> PROC',
-              self.NUM_PROCESSED, ' >> GUIQ', self.NUM_GUI_QUEUE, ' >> DISP', self.NUM_DISPLAYED)
-        print('======================')
-        print('NUM_GUI_QUEUE', 0, 'time_elapsed', time_elapsed)
+        if self.settings['debug_threads']: print('Thread-GUI >> Time elapsed:', time_elapsed)
         if (self.NUM_GUI_QUEUE > 0 and time_elapsed > self.MIN_GUI_REFRESH_INTERVAL) or \
             (self.NUM_GUI_QUEUE > 0 and self.NUM_DISPLAYED == 0):
-            print('refresh gui loop')
+            #print('refresh gui loop')
             self.last_gui_refresh_time = time.time()
             new_packet_displayed = self.gui_refresh_loop()
             if new_packet_displayed:
                 self.NUM_DISPLAYED += 1
+
+        split1 = os.path.split(self.settings['path'])
+        split2 = os.path.split(split1[0])
+        datarun = split2[1] + '/' + split1[1]
+
+        msg = "Viewing packet " + str(self.NUM_DISPLAYED) + "/" + str(self.NUM_TOTAL) + "  (" + str(self.NUM_PROCESSED) \
+              + " loaded into memory,  " + str(self.NUM_GUI_QUEUE) + " waiting to be displayed). " +  \
+             "From data directory " + datarun
+        self.statusBar().showMessage(msg)
+        #self.statusBar().showMessage('||TOT' + str(self.NUM_TOTAL) + '|| UNPROC' + str(self.NUM_UNPROCESSED) + ' >> PROC' +
+        #      str(self.NUM_PROCESSED) + ' >> GUIQ' + str(self.NUM_GUI_QUEUE) + ' >> DISP' + str(self.NUM_DISPLAYED))
 
     curr_buf_idx = 0
     def file_loading_parallelized_loop(self, pool, NUM_SIMULTANEOUS_PROCESSES):
@@ -255,8 +272,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.is_paused: return
         next_packet = self.data.to_serialize.get()
         channel_idxs = self.data.append_buf(next_packet)
-        self.array_map_channels_to_update += channel_idxs
-        print('array map channels to update', self.array_map_channels_to_update)
         return True
 
     CHART_MIN_TIME_TO_REFRESH = {
@@ -299,7 +314,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.arrayMapHoverCoords = (int_x, int_y)
 
-    def setMiniMapLoc(self, x, y):
+    def onArrayMapClick(self, x, y):
         print('set minimap loc()')
         """ Given an x, y coord as clicked on from the array map,
         reset the center of the electrode minimap to that location.
@@ -308,22 +323,16 @@ class MainWindow(QtWidgets.QMainWindow):
             x: x value on window as detected by mouse on click
             y: x value on window as detected by mouse on click
         """
-        self.settings['cursor_row'] = int(x)
-        if self.settings['cursor_row'] < 4:
-            self.settings['cursor_row'] = 4
-        elif self.settings['cursor_row'] > 26:
-            self.settings['cursor_row'] = 26
 
-        self.settings['cursor_col'] = int(y)
-        if self.settings['cursor_col'] < 2:
-            self.settings['cursor_col'] = 2
-        elif self.settings['cursor_col'] > 29:
-            self.settings['cursor_col'] = 29
 
-        # TODO update on mouse click functionality for mini map plot
-        #self.update_mini_map_plot()
-        # TODO clear prior indicators
+        self.settings['cursor_row'] = np.clip(int(x), 4, 28)
+        self.settings['cursor_col'] = np.clip(int(y), 2, 30)
+
+        print('x', int(x), 'y', int(y))
+
         update_minimap_indicator(self, self.settings["current_theme"], themes)
+        # TODO update minimap plot with new data
+        #self.update_mini_map_plot()
 
     def viewNewIndividualChannelInformation(self):
         """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
@@ -423,18 +432,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage(message)
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Up:
-            self.setMiniMapLoc(self.settings['cursor_row'], self.settings['cursor_col']+1)
+            self.onArrayMapClick(self.settings['cursor_row'], self.settings['cursor_col']+1)
         if event.key() == Qt.Key_Down:
-            self.setMiniMapLoc(self.settings['cursor_row'], self.settings['cursor_col']-1)
+            self.onArrayMapClick(self.settings['cursor_row'], self.settings['cursor_col']-1)
         if event.key() == Qt.Key_Right:
-            self.setMiniMapLoc(self.settings['cursor_row']+1, self.settings['cursor_col'])
+            self.onArrayMapClick(self.settings['cursor_row']+1, self.settings['cursor_col'])
         if event.key() == Qt.Key_Left:
-            self.setMiniMapLoc(self.settings['cursor_row']-1, self.settings['cursor_col'])
+            self.onArrayMapClick(self.settings['cursor_row']-1, self.settings['cursor_col'])
     def closeEvent(self, event):
         quit_msg = "Are you sure you want to exit the program?"
         reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
                                                QtWidgets.QMessageBox.Cancel | QtWidgets.QMessageBox.Ok)
         if reply == QtWidgets.QMessageBox.Ok:
+            self.running = False
             event.accept()
         else:
             event.ignore()

@@ -89,7 +89,6 @@ class PGPlotPerElectrodeRendering():
         for idx in self.LIST_OF_ELECTRODES_WITHIN_BOUNDS:
             self.update_vis_electrode(plot, idx)
 
-
 def idx2map(ch_idx: int):
     """ Given a channel index, return the channel's row and col
     Args:

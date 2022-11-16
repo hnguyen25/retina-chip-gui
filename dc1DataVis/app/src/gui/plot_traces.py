@@ -55,8 +55,11 @@ def update_channel_trace_plot(app, next_packet, CURRENT_THEME, themes, extra_par
         #              begin_time + center_time + WIDTH_OF_TIME_TO_DISPLAY/2,
         #              padding=0)
 
-        channel_noise_mean = app.data.array_indexed["stats_noise+mean"][row][col]
-        channel_noise_std = app.data.array_indexed["stats_noise+std"][row][col]
+
+        channel_noise_mean = app.data.df.at[chan_idx, "noise_mean"]
+        channel_noise_std = app.data.df.at[chan_idx, "noise_std"]
+        # channel_noise_mean = app.data.array_indexed["stats_noise+mean"][row][col]
+        # channel_noise_std = app.data.array_indexed["stats_noise+std"][row][col]
         plt.setYRange(channel_noise_mean - 10 * channel_noise_std,
                       channel_noise_mean + 10 * channel_noise_std,
                       padding=0)
