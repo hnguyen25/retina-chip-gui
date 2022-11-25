@@ -1,12 +1,12 @@
 """
 @authors Maddy Hays, Huy Nguyen, John Bailey (2022)
-Functions for loading data files into form that can be read by GUI
+Functions for loading model files into form that can be read by GUI
 """''
 import os
 import scipy.io as sio
 
 from .spike_detection import *
-from ..data.filters import *
+from ..model.filters import *
 
 def load_first_buffer_info(app):
     data_run = os.path.basename(app.settings["path"])
@@ -38,7 +38,7 @@ def load_one_mat_file(params):
     dataRaw = mat_contents['gmem1'][0][:]
     data_real, cnt_real, N = removeMultipleCounts(dataRaw)
 
-    # Note: this code does not timestamp data bc that cannot be parallelized properly
+    # Note: this code does not timestamp model bc that cannot be parallelized properly
     packet_data = preprocess_raw_data(data_real, cnt_real, N)
 
     packet = {
@@ -97,7 +97,7 @@ def preprocess_raw_data(data_real, cnt_real, N, SAMPLING_PERIOD=0.05):
     # and time tracking must be done in sequence
     times = np.linspace(0, end_time, N + 1)
 
-    # identify relevant, nonzero channels, and then append only this data into recorded_data
+    # identify relevant, nonzero channels, and then append only this model into recorded_data
     num_channels, channel_map, channel_id, start_idx, find_coords, recorded_channels = identify_relevant_channels(data_real)
 
     packet_data = []
@@ -110,7 +110,7 @@ def preprocess_raw_data(data_real, cnt_real, N, SAMPLING_PERIOD=0.05):
 
         channel_data = data_real[x, y, start_idx:N]
         # channel_times = self.times[self.count_track + start_idx: self.count_track+N] can't do
-        # prune the times in the packet where nothing is recorded (aka when data == 0)
+        # prune the times in the packet where nothing is recorded (aka when model == 0)
         # TODO turn on
         # actual_recording_times = (channel_data != 0]
         # channel_times = channel_times[actual_recording_times]
@@ -171,7 +171,7 @@ def removeMultipleCounts(dataRaw):
         (32, 32, len(dataRaw) - 2))  # Initialize to max possible length. Note: Throw out first two values b/c garbo
     cnt_real = np.zeros((32, 32, len(dataRaw) - 2))
 
-    # Convert data and remove double/triple counts
+    # Convert model and remove double/triple counts
     for i in range(2, len(dataRaw) - 1):
         # Convert bit number into binary
         word = (np.binary_repr(dataRaw[i], 32))
@@ -196,7 +196,7 @@ def removeMultipleCounts(dataRaw):
             cnt_pre = cnt
             chan_index_pre = chan_index
 
-            # Record pertinent data
+            # Record pertinent model
             data_real[row][col][N] = int(word[14:22], 2)
             cnt_real[row][col][N] = cnt
 
@@ -204,18 +204,18 @@ def removeMultipleCounts(dataRaw):
 
 def identify_relevant_channels(raw_data: np.array):
     """ Only n number of channels can be recorded at a given time due to bandwidth concerns--the rest are shut off.
-    For given data recorded at during a certain window, find which channels were recorded.
+    For given model recorded at during a certain window, find which channels were recorded.
 
     Args:
-        raw_data_all: unprocessed data in a given time window (num_channels_X x num_channels_Y x time_len)
+        raw_data_all: unprocessed model in a given time window (num_channels_X x num_channels_Y x time_len)
 
     Returns:
-        num_channels: number of channels that were found to have been recorded for given data
+        num_channels: number of channels that were found to have been recorded for given model
         channel_map: list of channels that were recorded, i.e. nonzero (x/y_coords, num_channels)
         channel_id: list of channels that were recorded, but identified by a single numerical ID
         start_idx:
 
-    @param raw_data: all the raw data loaded thus far from files
+    @param raw_data: all the raw model loaded thus far from files
     """
     # This bit takes the longest. ~ 30 sec for whole array 4 channel recording
     num_samples = np.count_nonzero(raw_data, axis=2)

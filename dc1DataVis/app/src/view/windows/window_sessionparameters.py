@@ -1,6 +1,6 @@
 def openSessionParams():
     session_dialog = QDialog()
-    uic.loadUi("./src/gui/SessionStartupGUI.ui", session_dialog)
+    uic.loadUi("./src/view/SessionStartupGUI.ui", session_dialog)
     session_dialog.setWindowTitle("Set Session Parameters...")
     session_dialog.exec()
 
@@ -18,5 +18,5 @@ from PyQt5.QtCore import Qt
 class GUIPreferences(QDialog):
     def __init__(self, *args, **kwargs):
         super(QtWidgets.QDialog, self).__init__(*args, **kwargs)
-        uic.loadUi("./src/gui/GUIPreferences.ui", self)
+        uic.loadUi("./src/view/GUIPreferences.ui", self)
 

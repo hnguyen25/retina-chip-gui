@@ -2,7 +2,6 @@ import numpy as np
 import pyqtgraph as pg
 import math
 from PyQt5.QtGui import QColor
-from dc1DataVis.app.src.gui.per_electrode_gui_rendering import *
 
 bar_color = QColor(100, 0, 0, 100)
 spike_color = QColor(0, 100, 0, 100)
@@ -50,10 +49,10 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
     BAR_LENGTH = 4
 
     # same as self.settings['binSize'] but for the minimap.
-    # so that the gui doesn't freeze
+    # so that the view doesn't freeze
     # TODO
     MIN_BIN_LENGTH = 4
-    MAX_SPIKES = 16  # can't draw every spike or gui will crash -> group spikes together
+    MAX_SPIKES = 16  # can't draw every spike or view will crash -> group spikes together
 
     curr_idxs = []
     for packet in next_packet['packet_data']:
@@ -80,7 +79,7 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
     for row in range(app.settings['cursor_row'] - 4, app.settings['cursor_row'] + 4):
         for col in range(app.settings['cursor_col'] - 2, app.settings['cursor_col'] + 2):
             if (row > -2) and (col > -2):
-                from ..data.data_loading import map2idx
+                from dc1DataVis.app.src.model.data_loading import map2idx
                 elec_idx = str(map2idx(col, row))
                 spike_indicator_base = pg.QtGui.QGraphicsRectItem(row * 5, col * 5, BAR_LENGTH, 0.2)
 

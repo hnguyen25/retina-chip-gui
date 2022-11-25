@@ -7,7 +7,7 @@ Huy Nguyen, John Bailey, Maddy Hays (2022)
 
 """
 
-from ..gui.setup_charts import *
+from ..view.init_charts import *
 import numpy as np
 import math
 from sklearn.mixture import GaussianMixture
@@ -19,7 +19,7 @@ def findSpikesGMM(electrode_data, channel_idx, debug = False):
 
     @param chan_idx: Index of electrode channel
 
-    @param debug: Prints data if True
+    @param debug: Prints model if True
 
     @return: spikeMeanGMM, spikeStdGMM, noiseMeanGMM, noiseStdGMM
     """
@@ -29,7 +29,7 @@ def findSpikesGMM(electrode_data, channel_idx, debug = False):
     spikeStdGMM = 0
     noiseStdGMM = 0
 
-    # Get data and perform GM
+    # Get model and perform GM
     y = electrode_data
     gmSam = np.reshape(y,(len(y),1))
     gm = GaussianMixture(n_components = 2).fit(gmSam)

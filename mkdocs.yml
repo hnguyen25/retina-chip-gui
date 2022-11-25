@@ -12,7 +12,7 @@ nav:
       - Main Window: 'main-window.md'
       - Data:
         - Data Container: 'DC1DataContainer.md'
-        - Data Loading: 'data-loading.md'
+        - Data Loading: 'model-loading.md'
         - Filters: 'filters.md'
         - Preprocessing: 'preprocessing.md'
         - Multithreading: 'python-thread-worker.md'

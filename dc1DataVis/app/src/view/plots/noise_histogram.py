@@ -26,7 +26,7 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
     app.charts["noiseHistogram"].clear()
 
     vals = np.array(app.data.df["noise_std"]).copy()
-    #vals = app.data.array_indexed['stats_noise+std'].copy()
+    #vals = app.model.array_indexed['stats_noise+std'].copy()
     vals = vals[np.nonzero(vals)]
 
     cm = pg.colormap.get('plasma', source='matplotlib')
@@ -62,72 +62,6 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         app.charts["noiseHistogram"].addItem(curve)
 
-
-def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params, debug=False):
-    plot = app.charts["noiseHeatMap"]
-    plot.clear()
-
-    font = pg.QtGui.QFont()
-    font.setPixelSize(20)
-
-    plot.getAxis("bottom").tickFont = font
-    plot.getAxis("bottom").setStyle(tickTextOffset=1)
-
-    if app.first_time_plotting is False:
-        data = app.data.df["noise_std"]
-        #data = app.data.array_indexed["stats_noise+std"]
-        data = data.T
-    else:
-        data = None
-
-    img = pg.ImageItem(data)
-    cm = pg.colormap.get('plasma', source='matplotlib')
-    plot.addItem(img)
-
-    if app.noise_heat_map_color_bar is None:
-        app.noise_heat_map_color_bar = app.charts["noiseHeatMap"].addColorBar(img, colorMap=cm, label="Noise SD",
-                                                                                values=(0, 5))
-    else:
-        app.noise_heat_map_color_bar.setImageItem(img)
-
-    app.first_time_plotting = False
-
-    if debug:
-        print("Data" + str(data))
-
-
-def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params, debug=False):
-    plot = app.charts["noiseHeatMap"]
-    plot.clear()
-
-    font = pg.QtGui.QFont()
-    font.setPixelSize(20)
-
-    plot.getAxis("bottom").tickFont = font
-    plot.getAxis("bottom").setStyle(tickTextOffset=1)
-
-    if app.first_time_plotting is False:
-        data = app.data.df["noise_std"]
-        #data = app.data.array_indexed["stats_noise+std"]
-        data = data.T
-    else:
-        data = None
-
-    img = pg.ImageItem(data)
-    cm = pg.colormap.get('plasma', source='matplotlib')
-    plot.addItem(img)
-
-    if app.noise_heat_map_color_bar is None:
-        app.noise_heat_map_color_bar = app.charts["noiseHeatMap"].addColorBar(img, colorMap=cm, label="Noise SD",
-                                                                                values=(0, 5))
-    else:
-        app.noise_heat_map_color_bar.setImageItem(img)
-
-    app.first_time_plotting = False
-
-    if debug:
-        print("Data" + str(data))
-
 def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=False, colored=True):
     """
     @param debug: if true, prints helpful information
@@ -138,7 +72,7 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
 
     app.charts["noiseHistogram"].clear()
     vals = np.array(app.data.df["noise_std"])
-    #vals = app.data.array_indexed['stats_noise+std'].copy()
+    #vals = app.model.array_indexed['stats_noise+std'].copy()
     vals = vals[np.nonzero(vals)]
 
     cm = pg.colormap.get('plasma', source='matplotlib')

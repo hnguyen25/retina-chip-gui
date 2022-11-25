@@ -2,7 +2,6 @@ import numpy as np
 import pyqtgraph as pg
 import math
 from PyQt5.QtGui import QColor
-from dc1DataVis.app.src.gui.per_electrode_gui_rendering import *
 
 def setupSpikeTrace(list_of_plots, CURRENT_THEME, themes):
     for plot in list_of_plots:
@@ -14,8 +13,8 @@ def setupSpikeTrace(list_of_plots, CURRENT_THEME, themes):
 
 def update_channel_trace_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
     """
-    This function updates the data for the trace plots when a new packet arrives. The plots are updated even faster
-    through 'continuouslyUpdateTracePlotData()', which scans through the packet slowly to visualize data as realtime.
+    This function updates the model for the trace plots when a new packet arrives. The plots are updated even faster
+    through 'continuouslyUpdateTracePlotData()', which scans through the packet slowly to visualize model as realtime.
     Args:
         trace_plots:
 
@@ -32,15 +31,15 @@ def update_channel_trace_plot(app, next_packet, CURRENT_THEME, themes, extra_par
 
         chan_idx = next_packet["packet_data"][m]["channel_idx"]
 
-        from ..data.data_loading import idx2map
+        from dc1DataVis.app.src.model.data_loading import idx2map
         row, col = idx2map(chan_idx)
 
-        # crop to area where data != 0
+        # crop to area where model != 0
         nonzero_data = np.where(data != 0.)[0]
         first_nonzero_index = nonzero_data[0]
         last_nonzero_index = nonzero_data[-1]
 
-        # TODO [later] check why the dims of times and data don't match
+        # TODO [later] check why the dims of times and model don't match
         # crop to range
         data = data[first_nonzero_index:last_nonzero_index]
         times = times[first_nonzero_index:last_nonzero_index]
@@ -58,8 +57,8 @@ def update_channel_trace_plot(app, next_packet, CURRENT_THEME, themes, extra_par
 
         channel_noise_mean = app.data.df.at[chan_idx, "noise_mean"]
         channel_noise_std = app.data.df.at[chan_idx, "noise_std"]
-        # channel_noise_mean = app.data.array_indexed["stats_noise+mean"][row][col]
-        # channel_noise_std = app.data.array_indexed["stats_noise+std"][row][col]
+        # channel_noise_mean = app.model.array_indexed["stats_noise+mean"][row][col]
+        # channel_noise_std = app.model.array_indexed["stats_noise+std"][row][col]
         plt.setYRange(channel_noise_mean - 10 * channel_noise_std,
                       channel_noise_mean + 10 * channel_noise_std,
                       padding=0)

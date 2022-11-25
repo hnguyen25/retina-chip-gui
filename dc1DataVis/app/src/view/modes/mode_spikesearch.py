@@ -87,7 +87,7 @@ def update_spike_search_plots(app, next_packet, CURRENT_THEME, themes, extra_par
 
     pen = pg.mkPen(color=themes[CURRENT_THEME]['tracePlotting'])
 
-    # Third, fill in plots with what data you have
+    # Third, fill in plots with what model you have
     for elec in app.getTracesToPlot():
         individualChannel.current_elec = elec
         individualChannel.updateElectrodeData()

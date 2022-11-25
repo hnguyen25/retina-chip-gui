@@ -3,17 +3,11 @@ Huy Nguyen, John Bailey (2022)
 Contains the base app framework for loading up the GUI.
 """
 
-import math
+from dc1DataVis.app.src.model.DC1DataContainer import *
+from dc1DataVis.app.src.model.python_thread_worker import *  # multithreading
+from PyQt5 import QtWidgets
+from dc1DataVis.app.src.view.gui_themes import *
 import multiprocessing
-from PyQt5 import QtWidgets, QtCore
-
-from dc1DataVis.app.src.data.DC1DataContainer import *
-from dc1DataVis.app.src.data.python_thread_worker import *  # multithreading
-from dc1DataVis.app.src.gui.setup_charts import *
-from dc1DataVis.app.src.data.data_loading import *
-
-from dc1DataVis.app.src.gui.gui_individualchannel import IndividualChannelInformation
-from dc1DataVis.app.src.gui.themes import *
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Inherited from PyQt main window class. Contains all the functions necessary
@@ -24,21 +18,21 @@ class MainWindow(QtWidgets.QMainWindow):
     is_paused = False
     first_time_plotting = True  # toggles to false when all the charts are setup for the first time
     settings = {}  # session parameters created through user input from the startup pane
-    loading_dict = {}  # contains details of the data run currently being analyzed
-    LoadedData = None  # contains all neural data loaded from specified data run
+    loading_dict = {}  # contains details of the model run currently being analyzed
+    LoadedData = None  # contains all neural model loaded from specified model run
     profile_data = {
         'appendRawData': [], 'filterData': [], 'calculateArrayStats': [], 'arrayMap': [],
         'noiseHeatMap': [], 'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [],
         'miniMap': [], 'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
-    }  # contains information about how long different gui functions took to run
+    }  # contains information about how long different view functions took to run
     charts = {}  # keys=name of every possible chart, value=reference to chart in GUI, None if not in it
     chart_update_function_mapping = {}  # keys=names of charts, value=related functions to update respective charts
     chart_update_extra_params = {}
     external_windows = []  # reference to windows that have been generated outside of this MainWindow
     basedir = None  # base directory of where the program is loaded up, acquired from run.py script
 
-    # list of length DC1DataContainer.settings["simultaneousChannelsRecordedPerPacket"] with data and
-    # information to plot every channel in the latest data packet processed
+    # list of length DC1DataContainer.settings["simultaneousChannelsRecordedPerPacket"] with model and
+    # information to plot every channel in the latest model packet processed
     # list contains a dictionary for every channel, with keys
     # 'x': all times in packet
     # 'y': all electrode amp values in packets, correlated with x
@@ -48,10 +42,10 @@ class MainWindow(QtWidgets.QMainWindow):
     trace_channels_info = []
 
     ### MISCELLANEOUS ###
-    pageNum = 0  # used for knowing which traces to display in spike search mode. Zero-indexed
-    timeStep = 0  # used for stepping through trace plots in spike search mode. Zero-indexed
-    numberOfTimeSteps = 4  # how many segments to divide trace plots into per view in spike search mode
-    timeZoom = True  # bool for spike search mode. True if plots display in time steps divided into numberOfTimeSteps,
+    pageNum = 0  # used for knowing which traces to display in spike search modes. Zero-indexed
+    timeStep = 0  # used for stepping through trace plots in spike search modes. Zero-indexed
+    numberOfTimeSteps = 4  # how many segments to divide trace plots into per view in spike search modes
+    timeZoom = True  # bool for spike search modes. True if plots display in time steps divided into numberOfTimeSteps,
                      # if false the entire trace displays on spike search
     tracesToPlot = []
     p = None
@@ -137,13 +131,13 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             last_file_idx = loadingDict["num_of_buf"] - 2
         """
-        # (1) set up thread for handling the parallelized part of data loading
+        # (1) set up thread for handling the parallelized part of model loading
         data_loading_parallelized_worker = Worker(self.data_loading_parallelized_thread)
         data_loading_parallelized_worker.signals.progress.connect(self.updateStatusBar)
         # TODO GUI refresh loop cannot be a separate worker
         data_loading_parallelized_worker.signals.gui_callback.connect(self.gui_refresh_loop)
 
-        # (2) set up thread for handling the serialized part of data loading
+        # (2) set up thread for handling the serialized part of model loading
         data_loading_serialized_worker = Worker(self.data_loading_serialized_thread)
         data_loading_serialized_worker.signals.progress.connect(self.updateStatusBar)
         data_loading_serialized_worker.signals.gui_callback.connect(self.gui_refresh_loop)
@@ -153,7 +147,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.threadpool.start(data_loading_parallelized_worker)
         self.threadpool.start(data_loading_serialized_worker)
 
-        # start a gui refresh loop
+        # start a view refresh loop
         self.timer = QTimer(self)
         self.timer.setSingleShot(False)
         self.timer.setInterval(1000) # in milliseconds
@@ -175,7 +169,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.NUM_PROCESSED = self.data.to_serialize.qsize()
             self.NUM_GUI_QUEUE = self.data.to_show.qsize()
 
-            # run when there isn't enough processed data to display + there is data left to process
+            # run when there isn't enough processed model to display + there is model left to process
             if self.NUM_GUI_QUEUE < 3 and self.NUM_UNPROCESSED > 1:
                 num_packets_processed = self.file_loading_parallelized_loop(pool, NUM_SIMULTANEOUS_PROCESSES)
                 if num_packets_processed == 0:
@@ -224,7 +218,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.settings['debug_threads']: print('Thread-GUI >> Time elapsed:', time_elapsed)
         if (self.NUM_GUI_QUEUE > 0 and time_elapsed > self.MIN_GUI_REFRESH_INTERVAL) or \
             (self.NUM_GUI_QUEUE > 0 and self.NUM_DISPLAYED == 0):
-            #print('refresh gui loop')
+            #print('refresh view loop')
             self.last_gui_refresh_time = time.time()
             new_packet_displayed = self.gui_refresh_loop()
             if new_packet_displayed:
@@ -236,7 +230,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         msg = "Viewing packet " + str(self.NUM_DISPLAYED) + "/" + str(self.NUM_TOTAL) + "  (" + str(self.NUM_PROCESSED) \
               + " loaded into memory,  " + str(self.NUM_GUI_QUEUE) + " waiting to be displayed). " +  \
-             "From data directory " + datarun + "."
+             "From model directory " + datarun + "."
         self.statusBar().showMessage(msg)
         #self.statusBar().showMessage('||TOT' + str(self.NUM_TOTAL) + '|| UNPROC' + str(self.NUM_UNPROCESSED) + ' >> PROC' +
         #      str(self.NUM_PROCESSED) + ' >> GUIQ' + str(self.NUM_GUI_QUEUE) + ' >> DISP' + str(self.NUM_DISPLAYED))
@@ -348,14 +342,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings['cursor_col'] = np.clip(int(y), 2, 30)
 
         update_minimap_indicator(self, self.settings["current_theme"], themes)
-        # TODO update minimap plot with new data
+        # TODO update minimap plot with new model
         #self.update_mini_map_plot()
 
     def viewNewIndividualChannelInformation(self):
         """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
         for analyzing individual channels on DC1. """
 
-        from dc1DataVis.app.src.gui.gui_individualchannel import IndividualChannelInformation
+        from dc1DataVis.app.src.view.windows.window_individualchannel import IndividualChannelInformation
         new_window = IndividualChannelInformation()
         new_window.label = QLabel("Individual Channel Analysis")
         new_window.setSessionParent(self)
@@ -363,9 +357,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
 
     def viewChannelListInformation(self):
-        """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant data
+        """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant model
         for sorting all the electrodes on the array. """
-        from dc1DataVis.app.src.gui.gui_electrodelist import ElectrodeListInformation
+        from dc1DataVis.app.src.view.windows.window_electrodelist import ElectrodeListInformation
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
@@ -373,7 +367,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIPreferences(self):
-        from dc1DataVis.app.src.gui.gui_sessionparameters import GUIPreferences
+        from dc1DataVis.app.src.view.windows.window_sessionparameters import GUIPreferences
         new_window = GUIPreferences()
         new_window.label = QLabel("GUI Preferences")
         new_window.show()
@@ -381,7 +375,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIProfiler(self):
-        from dc1DataVis.app.src.gui.gui_profiler import GUIProfiler
+        from dc1DataVis.app.src.view.windows.window_profiler import GUIProfiler
         new_window = GUIProfiler()
         new_window.label = QLabel("GUI Profiler")
         new_window.show()

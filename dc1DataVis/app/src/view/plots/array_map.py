@@ -4,7 +4,8 @@ import math
 
 from PyQt5 import QtGui
 from PyQt5.QtGui import QColor
-from dc1DataVis.app.src.gui.per_electrode_gui_rendering import *
+
+NUM_TOTAL_ROWS, NUM_TOTAL_COLS = 32, 32
 
 def setupArrayMap(app, plot_widget, CURRENT_THEME, themes):
     plot_widget.showGrid(x=False, y=False, alpha=0)
@@ -29,13 +30,13 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME, themes):
     # so we make it, and set it off the screen
     tr = QtGui.QTransform()  # prepare ImageItem transformation:
     tr.translate(200, 200)  # scoot image out of view
-    image = pg.ImageItem(colors.T)  # for old pixel-based data
+    image = pg.ImageItem(colors.T)  # for old pixel-based model
     image.setTransform(tr)
 
-    # bound the LinearRegionItem to the plotted data
+    # bound the LinearRegionItem to the plotted model
     app.charts["arrayMap"].addItem(image)
     app.array_map_color_bar = app.charts["arrayMap"].addColorBar(image, colorMap=cm, label="Spike Amplitude",
-                                                                 values=(0, 30))  # values=(0, np.max(data)))
+                                                                 values=(0, 30))  # values=(0, np.max(model)))
     app.array_map_color_bar.sigLevelsChanged.connect(lambda: on_color_bar_levels_changed(app))
     #app.charts["arrayMapHover"].region.setClipItem(image)
 
@@ -62,7 +63,7 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params)
     for i in range(len(next_packet['packet_data'])):
         # get packet info
         chan_idx = next_packet['packet_data'][i]['channel_idx']
-        from ..data.data_loading import idx2map
+        from dc1DataVis.app.src.model.data_loading import idx2map
         row, col = idx2map(chan_idx)
 
         # add squares around electrodes currently being recorded from + visualized in spike trace
@@ -100,7 +101,7 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params)
     color_map = app.array_map_color_bar.colorMap()
     for row in range(NUM_TOTAL_ROWS):
         for col in range(NUM_TOTAL_COLS):
-            from ..data.data_loading import map2idx
+            from dc1DataVis.app.src.model.data_loading import map2idx
             idx = map2idx(row, col)
 
             array_dot_color_idx = app.data.df.at[idx, "array_dot_color"]
@@ -128,7 +129,7 @@ def calculate_one_elec_color_and_size(app, idx):
     color = spike_avg_amp
     app.data.df.at[idx, "array_dot_color"] = color
 
-    # calculate the dot size from electrode's average spike cou t
+    # calculate the dot size from electrode's average spike count
     spikes_cnt = app.data.df.at[idx, "spikes_cnt"]
     size = (spikes_cnt / app.data.stats["largest_spike_cnt"]) * app.settings["max_dot_size"]
     size = np.clip(size, app.settings["min_dot_size"], app.settings["max_dot_size"])
@@ -143,7 +144,6 @@ def recalculate_all_colors(app):
 
     app.data.df["array_dot_color"] = spikes_avg_amp
 
-
 def recalculate_all_sizes(app):
     spikes_cnt = np.array(app.data.df["spikes_cnt"])
     sizes = (spikes_cnt / app.data.stats["largest_spike_cnt"]) * app.settings["max_dot_size"]
@@ -153,12 +153,12 @@ def recalculate_all_sizes(app):
     if app.arrayMapHoverCoords is not None:
         x, y = app.arrayMapHoverCoords
         if 0 <= x <= 31 and 0 <= y <= 31:
-            from dc1DataVis.app.src.data.DC1DataContainer import map2idx
+            from dc1DataVis.app.src.model.DC1DataContainer import map2idx
             idx = map2idx(x, y)
             spike_cnt = app.data.df.at[idx, "spikes_cnt"]
             spike_amp = app.data.df.at[idx, "spikes_avg_amp"]
-            # spike_cnt = app.data.array_indexed['stats_spikes+cnt'][y][x + 1]
-            # spike_amp = app.data.array_indexed['stats_spikes+avg+amp'][y][x + 1]
+            # spike_cnt = app.model.array_indexed['stats_spikes+cnt'][y][x + 1]
+            # spike_amp = app.model.array_indexed['stats_spikes+avg+amp'][y][x + 1]
             from ..data.data_loading import map2idx
             channel_idx = map2idx(y, x)
             tooltip_text = "<html>" + "Electrode Channel #" + str(channel_idx) + "<br>" + \
@@ -174,7 +174,7 @@ def on_color_bar_levels_changed(app):
     color_map = app.array_map_color_bar.colorMap()
     for row in range(NUM_TOTAL_ROWS):
         for col in range(NUM_TOTAL_COLS):
-            from ..data.data_loading import map2idx
+            from dc1DataVis.app.src.model.data_loading import idx2map
             idx = map2idx(row, col)
             color = color_map.map(app.data.df.at[idx, "array_dot_color"])
 

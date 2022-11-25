@@ -7,7 +7,7 @@ class SessionStartupGUI(QtWidgets.QDialog):
 
     def __init__(self, basedir, DEBUG_SETTINGS):
         super(QtWidgets.QDialog, self).__init__()
-        uic.loadUi("./src/layouts/SessionStartupGUI.ui", self)
+        uic.loadUi("./src/view/layouts/SessionStartupGUI.ui", self)
         self.THRESHOLD_MIN = DEBUG_SETTINGS['threshold_min']
         self.THRESHOLD_MAX = DEBUG_SETTINGS['threshold_max']
         self.THRESHOLD_DEFAULT = DEBUG_SETTINGS['threshold_default']

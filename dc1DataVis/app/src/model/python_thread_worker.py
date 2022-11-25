@@ -17,13 +17,13 @@ class WorkerSignals(QObject):
     Supported signals are:
 
     finished
-        No data
+        No model
 
     error
         tuple (exctype, value, traceback.format_exc() )
 
     result
-        object data returned from processing, anything
+        object model returned from processing, anything
 
     progress
         int indicating % progress

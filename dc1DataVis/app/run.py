@@ -9,7 +9,7 @@ import os, sys
 import multiprocessing as mp
 
 from PyQt5 import QtWidgets, QtCore
-from dc1DataVis.app.src.gui.SessionStartupGUI import SessionStartupGUI
+from dc1DataVis.app.src.view.windows.window_sessionstartup import SessionStartupGUI
 
 from dc1DataVis.app.src.MainWindow import MainWindow
 
@@ -24,10 +24,10 @@ DEBUG_SETTINGS = {
     'is_mode_profiling': False,  # if on, measures how long different aspects of the GUI takes to compute
     'is_mode_multithreading': False,  # if on, enables multiprocessing capability. may be easier to debug if off
     # GUI play/pause
-    'first_time_plotting': True,  # indicates if the first packet of data has not been processed yet,
+    'first_time_plotting': True,  # indicates if the first packet of model has not been processed yet,
     # (useful to know for setting up PyQtGraph charts)
-    'is_live_plotting': True,  # indicates if the program is still continuously reading available data packets
-    'is_true_realtime': True,  # indicates if the program is continuously reading the LAST available data packet
+    'is_live_plotting': True,  # indicates if the program is still continuously reading available model packets
+    'is_true_realtime': True,  # indicates if the program is continuously reading the LAST available model packet
     # initial location of cursor on the array map
     'cursor_row': 4, 'cursor_col': 2,
     #'filter': "Modified Hierlemann", # this will override the session startup settings

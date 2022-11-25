@@ -3,7 +3,6 @@ import numpy as np
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 
-
 class MyApp(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
@@ -22,7 +21,7 @@ class MyApp(QtGui.QWidget):
         self.num = 6
         self.check_boxes = [QtGui.QCheckBox(f"Box {i + 1}") for i in range(self.num)]
 
-        # Here will be the data of the plot
+        # Here will be the model of the plot
         self.plot_data = [None for _ in range(self.num)]
 
         # Now we build the entire GUI
@@ -38,7 +37,7 @@ class MyApp(QtGui.QWidget):
         # For optimization let's create a list with the states of the boxes
         self.state = [False for _ in range(self.num)]
 
-        # Make a list to save the data of each box
+        # Make a list to save the model of each box
         self.box_data = [[[0], [0]] for _ in range(self.num)]
         x = np.linspace(0, 3.14, 100)
         self.add_data(x, np.sin(x), 0)

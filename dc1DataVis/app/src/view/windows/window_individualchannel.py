@@ -7,8 +7,8 @@ import os
 import numpy as np
 import pyqtgraph as pg
 import time
-from ..data.spike_detection import *
-from ..data.DC1DataContainer import *
+from dc1DataVis.app.src.model.spike_detection import *
+from dc1DataVis.app.src.model.DC1DataContainer import *
 
 class IndividualChannelInformation(QWidget):
 
@@ -19,8 +19,8 @@ class IndividualChannelInformation(QWidget):
     recordedTime = None
     has_data = None
 
-    # List of dictionaries containing data packets with electrode info (data, times, spikes, etc).
-    # Each packet is for the same electrode, but may have data from different times within recording session
+    # List of dictionaries containing model packets with electrode info (model, times, spikes, etc).
+    # Each packet is for the same electrode, but may have model from different times within recording session
     electrode_packets = []
 
     # Lists containing values stored in the associated key in electrode_packets dictionaries
@@ -34,7 +34,7 @@ class IndividualChannelInformation(QWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi("./src/layouts/IndividualChannelWindow.ui", self)
+        uic.loadUi("./src/view/layouts/IndividualChannelWindow.ui", self)
 
         self.updateElectrodeNum.clicked.connect(self.setElecNum)
         self.updateRC.clicked.connect(self.setRC)
@@ -62,7 +62,7 @@ class IndividualChannelInformation(QWidget):
                   str(self.session_parent.LoadedData.df.at[idx, "noise_std"]))
             print("noise mean from array stats: " +
                   str(self.session_parent.LoadedData.df.at[idx, "noise_mean"]))
-            print('std from direct calculation: ' + str(np.std(self.electrode_packets[0]["data"])))
+            print('std from direct calculation: ' + str(np.std(self.electrode_packets[0]["model"])))
 
         self.totalSamples.setText("Total number of samples: " + str(len(self.electrode_data)))
         self.timeRecorded.setText("Total time recording electrode: "
@@ -86,27 +86,27 @@ class IndividualChannelInformation(QWidget):
         match = False
         len_filtered_data = len(self.session_parent.LoadedData.filtered_data)
 
-        # Create a list of dictionaries of data packets for the selected electrode
+        # Create a list of dictionaries of model packets for the selected electrode
         for i in range(len_filtered_data):
             if self.session_parent.LoadedData.filtered_data[i]['channel_idx'] == self.current_elec:
                 self.electrode_packets.append(self.session_parent.LoadedData.filtered_data[i])
                 match = True
         if debug:
             if not match:
-                print("No data from this electrode yet")
+                print("No model from this electrode yet")
 
         filtered = True
         if self.session_parent.settings["filter"] == "None":
             filtered = False
 
-        # Get lists of times and data from each packet for the selected electrode
+        # Get lists of times and model from each packet for the selected electrode
         for i in range(len(self.electrode_packets)):
             self.session_parent.LoadedData.\
                 calculate_realtime_spike_info_for_channel_in_buffer(self.electrode_packets[i], filtered)
             self.electrode_spikes.extend(self.electrode_packets[i]["spikeBins"])
             self.electrode_spike_times.extend(self.electrode_packets[i]["incom_spike_times"])
             self.electrode_times.extend(self.electrode_packets[i]['times'])
-            self.electrode_data.extend(self.electrode_packets[i]['data'])
+            self.electrode_data.extend(self.electrode_packets[i]['model'])
 
         self.recordedTime = round((len(self.electrode_data)) * 0.05, 2)
 
@@ -126,9 +126,9 @@ class IndividualChannelInformation(QWidget):
         windowSize: Size of moving average window in milliseconds
 
         numberOfUpdates: How many times you want to update the spike rate if not doing moving average.
-        Function divides the range of data into numberOfUpdates bins to time average spikes.
+        Function divides the range of model into numberOfUpdates bins to time average spikes.
 
-        debug: Print helpful data.
+        debug: Print helpful model.
         """
         self.SpikeRatePlot.clear()
 
@@ -156,7 +156,7 @@ class IndividualChannelInformation(QWidget):
                 t = np.linspace(self.electrode_times[0],self.electrode_times[-1],len(spikeList)-windowSize+1)
                 spike_rate = moving_averages
 
-            # Window mode
+            # Window modes
             else:
                 num_spikes = []
                 for i in range(numberOfUpdates):
@@ -172,7 +172,7 @@ class IndividualChannelInformation(QWidget):
         self.SpikeRatePlot.plot(t, spike_rate, pen=pg.mkPen(themes[CURRENT_THEME]['blue1'], width=5))
         idx = map2idx(self.current_row, self.current_col)
         if debug:
-            print("length of recording: " + str(len(self.electrode_times)) + " data points")
+            print("length of recording: " + str(len(self.electrode_times)) + " model points")
             print("electrode times: " + str(self.electrode_times[0]) + "-" + str(self.electrode_times[-1]))
             print("spikes: " + str(self.electrode_spikes))
             #print("double binned spikes: " + str(num_spikes))

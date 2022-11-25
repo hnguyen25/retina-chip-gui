@@ -22,7 +22,7 @@ class ElectrodeListInformation(QWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi("./src/layouts/AllChannelsList.ui", self)
+        uic.loadUi("./src/view/layouts/AllChannelsList.ui", self)
 
         self.sort_by = "row"
         self.chooseSortOption.activated.connect(self.setSortOption)
@@ -47,9 +47,8 @@ class ElectrodeListInformation(QWidget):
         #background_color = self.settings[""]
         #self.electrodeTable.setBackground(background_color)
         # TODO set theme of electrode list
-
-
-
+        pass
+    
 # from this stack overflow post:
 # https://stackoverflow.com/questions/44603119/how-to-display-a-pandas-data-frame-with-pyqt5-pyside2
 class DataFrameModel(QtCore.QAbstractTableModel):

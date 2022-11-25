@@ -1,21 +1,21 @@
 import numpy as np
 import time
 
-from dc1DataVis.app.src.data.data_loading import *
-from ..data.filters import *
+from dc1DataVis.app.src.model.data_loading import *
+from ..model.filters import *
 import warnings
 import queue
 import pandas as pd  # TODO make a pandas dataframe for array info
 
 class DC1DataContainer:
     """
-    Container for holding recording data for the DC1 retina chip. Each container is designed to hold all
-    the relevant information extracted from data collected from a SINGLE recording, of any particular type.
+    Container for holding recording model for the DC1 retina chip. Each container is designed to hold all
+    the relevant information extracted from model collected from a SINGLE recording, of any particular type.
 
     To-Dos:
     ----------
-    TODO figure out time alignment of the data / the actual sampling rate / check for dropped packets
-    TODO figure out time budget for data processing + filtering
+    TODO figure out time alignment of the model / the actual sampling rate / check for dropped packets
+    TODO figure out time budget for model processing + filtering
     """
 
     # +++++ CONSTANTS +++++
@@ -30,7 +30,7 @@ class DC1DataContainer:
         'amplitude': np.zeros((32, 32))
     }
 
-    # new data structs
+    # new model structs
     to_serialize, to_show = None, None
 
     avg_spike_rate_x = []
@@ -80,7 +80,7 @@ class DC1DataContainer:
 
     def append_buf(self, buf):
         packet_idx = buf['packet_idx']
-        channel_idxs = []  # for buffer_indexed data struct
+        channel_idxs = []  # for buffer_indexed model struct
 
         # calculate times
         N = buf["packet_data"][0]["N"]
@@ -93,19 +93,19 @@ class DC1DataContainer:
         packet_data = buf['packet_data']
         for packet in packet_data:
 
-            # load data
+            # load model
             # packet keys: 'data_real', 'cnt_real', 'N',
             #   'channel_idx', 'preprocessed_data', 'filtered_data',
             #   'stats_cnt', 'stats_noise+mean', 'stats_noise+std'
             this_channel_idx = packet['channel_idx']
 
-            # for buffer_indexed data struct
+            # for buffer_indexed model struct
             channel_idxs.append(this_channel_idx)
 
-            # reformatting packet for to_show data struct
+            # reformatting packet for to_show model struct
             packet["times"] = next_times
 
-            # for array_indexed data struct
+            # for array_indexed model struct
             r, c = idx2map(this_channel_idx)
 
             # TODO make this adapt for when multiple packets record from the same channel

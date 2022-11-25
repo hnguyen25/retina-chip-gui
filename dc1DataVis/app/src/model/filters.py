@@ -3,7 +3,7 @@ import numpy as np
 import time
 
 """
-Contains functions to filter data.
+Contains functions to filter model.
 
 Each filter function is overloaded, with one version
 that uses just two inputs (default) and one with multiple more params ("Timed"). 
@@ -20,7 +20,7 @@ hObandpass = filtfilt, passband [250,4000], order = 5 (~40 min)
 Hierlemann = filtfilt,FIR,[100],75 taps (~4 min)
 Litke = filtfilt, [250,2000],order = 2 (~18 min)
 highpass = filtfilt, [250], order = 5 (~26 min)
-none = no filtering of data (~0 min)
+none = no filtering of model (~0 min)
 """
 
 

@@ -7,15 +7,15 @@ import os
 import numpy as np
 import pyqtgraph as pg
 import time
-from ..data.spike_detection import *
-from ..data.DC1DataContainer import *
+from dc1DataVis.app.src.model.spike_detection import *
+from dc1DataVis.app.src.model.DC1DataContainer import *
 
 class GUIProfiler(QWidget):
     session_parent = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        uic.loadUi("./src/layouts/GUIProfiler.ui", self)
+        uic.loadUi("./src/view/layouts/GUIProfiler.ui", self)
 
     def setSessionParent(self, session_parent):
         self.session_parent = session_parent
