@@ -52,7 +52,7 @@ def setup_layout(app, layout: str, CURRENT_THEME: str, themes: dict, NUM_CHANNEL
     # Load layout based on QtDesigner .ui file
     if layout == "Spike Finding": setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER)
     elif layout == "Trace Search": setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER)
-    elif layout == "Noise": setup_noise_plots(app, CURRENT_THEME, theme, NUM_CHANNELS_PER_BUFFER)
+    elif layout == "Noise": setup_noise_plots(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER)
     else: return False
 
     app.update_theme(CURRENT_THEME)
@@ -119,7 +119,7 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
         "noiseHistogram": None,
         "channelTraces": channel_traces,  # should be trace plots
         "arrayMap": None,
-        "noiseHeatMap": None
+        "noiseHeatMap": None,
     }
 
     setupArrayMap(app, app.charts["arrayMap"], CURRENT_THEME, themes)
@@ -156,10 +156,18 @@ def setup_noise_plots(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     uic.loadUi("./src/view/layouts/NoiseWindow.ui", app)
 
     # (2) set the functions to continually update charts in the GUI
+    app.charts = {
+
+    }
     app.chart_update_function_mapping = {
         "channelTraces": update_channel_trace_plot,
         "arrayMap": update_array_map_plot,
         "noiseHeatMap": update_noise_heat_map
+    }
+    app.chart_update_extra_params = {
+        "channelTraces": None,
+        "arrayMap": None,
+        "noiseHeatMap": None
     }
 
     app.charts["noiseHeatMap"] = app.noiseHeatMap
@@ -183,10 +191,17 @@ def setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     from dc1DataVis.app.src.view.modes.mode_spikesearch import update_spike_search_plots
 
     # (2) set the functions to continually update charts in the GUI
+    for i in range(0, 6):
+        for j in range(0, 6):
+            chart_name = "r" + str(i) + "c" + str(j)
+            app.charts[chart_name] = eval("app." + chart_name)
+
     app.chart_update_function_mapping = {
         "spikeSearch": update_spike_search_plots,
-        "channelTraces": update_channel_trace_plot,
-
+        #"channelTraces": update_channel_trace_plot
+    }
+    app.chart_update_extra_params = {
+        "spikeSearch": None
     }
 
     # (3) Set up additional functionality
@@ -198,10 +213,7 @@ def setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     # app.buttons["atTimeWindowButton"] = app.atTimeWindowButton
     app.FigureLabel.setText("Figure: " + str(app.pageNum))
 
-    for i in range(0, 6):
-        for j in range(0, 6):
-            chart_name = "r" + str(i) + "c" + str(j)
-            app.charts[chart_name] = eval("app." + chart_name)
+
 
 
 def setup_diagnostic_plots():

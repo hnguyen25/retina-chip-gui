@@ -294,7 +294,8 @@ class MainWindow(QtWidgets.QMainWindow):
         "noiseHistogram": 2,
         "channelTraces": 1,
         "arrayMap": 4, #4
-        "noiseHeatMap": 0.5
+        "noiseHeatMap": 0.5,
+        "spikeSearch": 0.5
     }
 
     def gui_refresh_loop(self):
