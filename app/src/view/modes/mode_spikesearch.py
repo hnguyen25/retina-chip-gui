@@ -1,4 +1,6 @@
 import pyqtgraph as pg
+import numpy as np
+import math
 
 def clearSpikeSearchPlots(app):
     for chart in app.charts:
@@ -12,10 +14,12 @@ def update_spike_search_plots(app, next_packet, CURRENT_THEME, themes, extra_par
     clearSpikeSearchPlots(app)
 
     # Second, set up the plot figures for every electrode on the page
-    for elec in getTracesToPlot(app):
-        row, col = electrodeToPlotGrid(app, elec)
-        setupOneSpikeTrace(app.charts["r" + str(row) + "c" + str(col)], elec, CURRENT_THEME)
+    # TODO make this code work
+    #for elec in getTracesToPlot(app):
+    #    row, col = electrodeToPlotGrid(app, elec)
+    #    setupOneSpikeTrace(app.charts["r" + str(row) + "c" + str(col)], elec, CURRENT_THEME)
 
+    from app.src.view.windows.window_individualchannel import IndividualChannelInformation
     individualChannel = IndividualChannelInformation()
     individualChannel.setSessionParent(app)
 

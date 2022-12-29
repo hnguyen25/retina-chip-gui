@@ -174,7 +174,7 @@ def on_color_bar_levels_changed(app):
     color_map = app.array_map_color_bar.colorMap()
     for row in range(NUM_TOTAL_ROWS):
         for col in range(NUM_TOTAL_COLS):
-            from app.src.model.data_loading import idx2map
+            from app.src.model.data_loading import map2idx
             idx = map2idx(row, col)
             color = color_map.map(app.data.df.at[idx, "array_dot_color"])
 
