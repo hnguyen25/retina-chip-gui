@@ -1,7 +1,7 @@
 # Retina Chip GUI
 maintained by Huy Nguyen (nguyen5h@stanford.edu), with contributions from Maddy Hays & John Bailey
 
-For full documentation: https://hnguyen25.github.io/artifical-retina-pipeline-guis/
+For full documentation: https://hnguyen25.github.io/retina-chip-gui/
 
 ## Status
 [![GUI Development Testing](https://github.com/hnguyen25/retina-chip-gui/actions/workflows/python-package-conda.yml/badge.svg?branch=testing)](https://github.com/hnguyen25/retina-chip-gui/actions/workflows/python-package-conda.yml)
