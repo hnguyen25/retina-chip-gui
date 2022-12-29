@@ -37,7 +37,6 @@ DEBUG_SETTINGS = {
     'min_dot_size': 0.1,
     'max_dot_size': 1.5,
     'spike_cnt_for_dot_size_saturation': 50
-
 }
 
 # Session Startup Panel
