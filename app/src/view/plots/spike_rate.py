@@ -1,7 +1,7 @@
 import pyqtgraph as pg
 
-from dc1DataVis.app.src.model.DC1DataContainer import *
-from dc1DataVis.app.src.MainWindow import *
+from app.src.model.DC1DataContainer import *
+from app.src.MainWindow import *
 
 def setupSpikeRatePlot(plot_widget, CURRENT_THEME, themes):
     plot_widget.getAxis("left").setTextPen(themes[CURRENT_THEME]['font_color'])

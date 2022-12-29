@@ -1,7 +1,7 @@
 import numpy as np
 import time
 
-from dc1DataVis.app.src.model.data_loading import *
+from app.src.model.data_loading import *
 from ..model.filters import *
 import warnings
 import queue

@@ -15,11 +15,11 @@ Contains one main function setup_layout, and a supporting function for each type
 (4) Diagnostic (not developed yet)
 """
 
-from dc1DataVis.app.src.view.plots.array_map import *
-from dc1DataVis.app.src.view.plots.spike_rate import *
-from dc1DataVis.app.src.view.plots.mini_map import *
-from dc1DataVis.app.src.view.plots.noise_histogram import *
-from dc1DataVis.app.src.view.plots.channel_trace import *
+from app.src.view.plots.array_map import *
+from app.src.view.plots.spike_rate import *
+from app.src.view.plots.mini_map import *
+from app.src.view.plots.noise_histogram import *
+from app.src.view.plots.channel_trace import *
 from PyQt5 import uic
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileDialog
@@ -188,7 +188,7 @@ def setup_noise_plots(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
 def setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     # (1) load the Qt Designer template
     uic.loadUi("./src/view/layouts/TraceSearch.ui", app)
-    from dc1DataVis.app.src.view.modes.mode_spikesearch import update_spike_search_plots
+    from src.view.modes.mode_spikesearch import update_spike_search_plots
 
     # (2) set the functions to continually update charts in the GUI
     for i in range(0, 6):

@@ -4,14 +4,12 @@ Huy Nguyen (2022)
 ----
 script to run entire application
 """
-
 import os, sys
 import multiprocessing as mp
-
 from PyQt5 import QtWidgets, QtCore
-from dc1DataVis.app.src.view.windows.window_sessionstartup import SessionStartupGUI
 
-from dc1DataVis.app.src.MainWindow import MainWindow
+from app.src.view.windows.window_sessionstartup import SessionStartupGUI
+from app.src.MainWindow import MainWindow
 
 # =============================
 # EDITABLE PARAMETERS

@@ -3,10 +3,10 @@ Huy Nguyen, John Bailey (2022)
 Contains the base app framework for loading up the GUI.
 """
 
-from dc1DataVis.app.src.model.DC1DataContainer import *
-from dc1DataVis.app.src.model.python_thread_worker import *  # multithreading
+from app.src.model.DC1DataContainer import *
+from app.src.model.python_thread_worker import *  # multithreading
 from PyQt5 import QtWidgets
-from dc1DataVis.app.src.view.gui_themes import *
+from app.src.view.gui_themes import *
 import multiprocessing
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -350,7 +350,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
         for analyzing individual channels on DC1. """
 
-        from dc1DataVis.app.src.view.windows.window_individualchannel import IndividualChannelInformation
+        from app.src.view.windows.window_individualchannel import IndividualChannelInformation
         new_window = IndividualChannelInformation()
         new_window.label = QLabel("Individual Channel Analysis")
         new_window.setSessionParent(self)
@@ -360,7 +360,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def viewChannelListInformation(self):
         """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant model
         for sorting all the electrodes on the array. """
-        from dc1DataVis.app.src.view.windows.window_electrodelist import ElectrodeListInformation
+        from app.src.view.windows.window_electrodelist import ElectrodeListInformation
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
@@ -368,7 +368,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIPreferences(self):
-        from dc1DataVis.app.src.view.windows.window_sessionparameters import GUIPreferences
+        from app.src.view.windows.window_sessionparameters import GUIPreferences
         new_window = GUIPreferences()
         new_window.label = QLabel("GUI Preferences")
         new_window.show()
@@ -376,7 +376,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIProfiler(self):
-        from dc1DataVis.app.src.view.windows.window_profiler import GUIProfiler
+        from app.src.view.windows.window_profiler import GUIProfiler
         new_window = GUIProfiler()
         new_window.label = QLabel("GUI Profiler")
         new_window.show()

@@ -7,8 +7,8 @@ import os
 import numpy as np
 import pyqtgraph as pg
 import time
-from dc1DataVis.app.src.model.spike_detection import *
-from dc1DataVis.app.src.model.DC1DataContainer import *
+from app.src.model.spike_detection import *
+from app.src.model.DC1DataContainer import *
 
 class IndividualChannelInformation(QWidget):
 

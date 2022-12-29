@@ -20,7 +20,7 @@ class SessionStartupGUI(QtWidgets.QDialog):
 
         self.chooseFilePath.clicked.connect(self.getFolderDir)
 
-        os.chdir(basedir)
+        # os.chdir(basedir)
         self.settings["path"] = os.path.join(os.getcwd(), self.DEFAULT_DATASET_PATH)
 
         self.chooseRealTime.activated.connect(self.setRealTime)
