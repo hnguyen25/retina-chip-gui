@@ -1,6 +1,9 @@
 name: GUI Development Testing
 
-on: [push]
+on:
+  push:
+    branches:
+      - 'testing'
 
 jobs:
   build-linux:
