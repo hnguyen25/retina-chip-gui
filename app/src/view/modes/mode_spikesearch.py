@@ -19,7 +19,7 @@ def update_spike_search_plots(app, next_packet, CURRENT_THEME, themes, extra_par
     #    row, col = electrodeToPlotGrid(app, elec)
     #    setupOneSpikeTrace(app.charts["r" + str(row) + "c" + str(col)], elec, CURRENT_THEME)
 
-    from app.src.view.windows.window_individualchannel import IndividualChannelInformation
+    from src.view.windows.window_individualchannel import IndividualChannelInformation
     individualChannel = IndividualChannelInformation()
     individualChannel.setSessionParent(app)
 

@@ -31,7 +31,7 @@ def update_channel_trace_plot(app, next_packet, CURRENT_THEME, themes, extra_par
 
         chan_idx = next_packet["packet_data"][m]["channel_idx"]
 
-        from app.src.model.data_loading import idx2map
+        from src.model.data_loading import idx2map
         row, col = idx2map(chan_idx)
 
         # crop to area where model != 0

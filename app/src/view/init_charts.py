@@ -15,11 +15,11 @@ Contains one main function setup_layout, and a supporting function for each type
 (4) Diagnostic (not developed yet)
 """
 
-from app.src.view.plots.array_map import *
-from app.src.view.plots.spike_rate import *
-from app.src.view.plots.mini_map import *
-from app.src.view.plots.noise_histogram import *
-from app.src.view.plots.channel_trace import *
+from src.view.plots.array_map import *
+from src.view.plots.spike_rate import *
+from src.view.plots.mini_map import *
+from src.view.plots.noise_histogram import *
+from src.view.plots.channel_trace import *
 from PyQt5 import uic
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileDialog
@@ -150,6 +150,8 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     app.RewindButton.clicked.connect(app.OnRewind)
     app.TogglePlayButton.clicked.connect(app.OnPlay)
     app.FastForwardButton.clicked.connect(app.OnFastForward)
+
+    app.actionUpdateSession.triggered.connect(app.OnNewSession)
 
 def setup_noise_plots(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     # (1) load the Qt Designer template

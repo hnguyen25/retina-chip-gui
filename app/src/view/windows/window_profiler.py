@@ -7,8 +7,8 @@ import os
 import numpy as np
 import pyqtgraph as pg
 import time
-from app.src.model.spike_detection import *
-from app.src.model.DC1DataContainer import *
+from src.model.spike_detection import *
+from src.model.DC1DataContainer import *
 
 class GUIProfiler(QWidget):
     session_parent = None

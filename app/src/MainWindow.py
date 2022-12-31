@@ -3,10 +3,10 @@ Huy Nguyen, John Bailey (2022)
 Contains the base app framework for loading up the GUI.
 """
 
-from app.src.model.DC1DataContainer import *
-from app.src.model.python_thread_worker import *  # multithreading
+from src.model.DC1DataContainer import *
+from src.model.python_thread_worker import *  # multithreading
 from PyQt5 import QtWidgets
-from app.src.view.gui_themes import *
+from src.view.gui_themes import *
 import multiprocessing
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -16,6 +16,8 @@ class MainWindow(QtWidgets.QMainWindow):
     ### PROGRAM VARS ###
     running = True
     is_paused = False
+    new_session = False
+
     first_time_plotting = True  # toggles to false when all the charts are setup for the first time
     settings = {}  # session parameters created through user input from the startup pane
     loading_dict = {}  # contains details of the model run currently being analyzed
@@ -350,7 +352,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
         for analyzing individual channels on DC1. """
 
-        from app.src.view.windows.window_individualchannel import IndividualChannelInformation
+        from src.view.windows.window_individualchannel import IndividualChannelInformation
         new_window = IndividualChannelInformation()
         new_window.label = QLabel("Individual Channel Analysis")
         new_window.setSessionParent(self)
@@ -360,7 +362,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def viewChannelListInformation(self):
         """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant model
         for sorting all the electrodes on the array. """
-        from app.src.view.windows.window_electrodelist import ElectrodeListInformation
+        from src.view.windows.window_electrodelist import ElectrodeListInformation
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
@@ -368,7 +370,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIPreferences(self):
-        from app.src.view.windows.window_sessionparameters import GUIPreferences
+        from src.view.windows.window_sessionparameters import GUIPreferences
         new_window = GUIPreferences()
         new_window.label = QLabel("GUI Preferences")
         new_window.show()
@@ -376,7 +378,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIProfiler(self):
-        from app.src.view.windows.window_profiler import GUIProfiler
+        from src.view.windows.window_profiler import GUIProfiler
         new_window = GUIProfiler()
         new_window.label = QLabel("GUI Profiler")
         new_window.show()
@@ -490,3 +492,17 @@ class MainWindow(QtWidgets.QMainWindow):
         print('>>')
         pass
 
+    def OnNewSession(self):
+
+        # (1) open dialog box verifying start of new session
+
+        """
+        from app.src.view.dialogs.confirmation import ConfirmationToStartNewSession
+        dlg = ConfirmationToStartNewSession()
+        if dlg.exec(): # Yes
+            # (2) send kill signal to current application, the run.py script should reinit w/ new instance
+            print("Success!")
+            self.running = False
+        """
+        self.new_session = True
+        self.close()

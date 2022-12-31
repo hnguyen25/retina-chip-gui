@@ -79,7 +79,7 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
     for row in range(app.settings['cursor_row'] - 4, app.settings['cursor_row'] + 4):
         for col in range(app.settings['cursor_col'] - 2, app.settings['cursor_col'] + 2):
             if (row > -2) and (col > -2):
-                from app.src.model.data_loading import map2idx
+                from src.model.data_loading import map2idx
                 elec_idx = str(map2idx(col, row))
                 spike_indicator_base = pg.QtGui.QGraphicsRectItem(row * 5, col * 5, BAR_LENGTH, 0.2)
 

@@ -1,2 +1,2 @@
 # Filters
-:::src.data.filters
+:::src.model.filters

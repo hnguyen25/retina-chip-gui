@@ -63,7 +63,7 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params)
     for i in range(len(next_packet['packet_data'])):
         # get packet info
         chan_idx = next_packet['packet_data'][i]['channel_idx']
-        from app.src.model.data_loading import idx2map
+        from src.model.data_loading import idx2map
         row, col = idx2map(chan_idx)
 
         # add squares around electrodes currently being recorded from + visualized in spike trace
@@ -101,7 +101,7 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params)
     color_map = app.array_map_color_bar.colorMap()
     for row in range(NUM_TOTAL_ROWS):
         for col in range(NUM_TOTAL_COLS):
-            from app.src.model.data_loading import map2idx
+            from src.model.data_loading import map2idx
             idx = map2idx(row, col)
 
             array_dot_color_idx = app.data.df.at[idx, "array_dot_color"]
@@ -153,7 +153,7 @@ def recalculate_all_sizes(app):
     if app.arrayMapHoverCoords is not None:
         x, y = app.arrayMapHoverCoords
         if 0 <= x <= 31 and 0 <= y <= 31:
-            from app.src.model.DC1DataContainer import map2idx
+            from src.model.DC1DataContainer import map2idx
             idx = map2idx(x, y)
             spike_cnt = app.data.df.at[idx, "spikes_cnt"]
             spike_amp = app.data.df.at[idx, "spikes_avg_amp"]
@@ -174,7 +174,7 @@ def on_color_bar_levels_changed(app):
     color_map = app.array_map_color_bar.colorMap()
     for row in range(NUM_TOTAL_ROWS):
         for col in range(NUM_TOTAL_COLS):
-            from app.src.model.data_loading import map2idx
+            from src.model.data_loading import map2idx
             idx = map2idx(row, col)
             color = color_map.map(app.data.df.at[idx, "array_dot_color"])
 

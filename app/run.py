@@ -8,8 +8,8 @@ import os, sys
 import multiprocessing as mp
 from PyQt5 import QtWidgets, QtCore
 
-from app.src.view.windows.window_sessionstartup import SessionStartupGUI
-from app.src.MainWindow import MainWindow
+from src.view.windows.window_sessionstartup import SessionStartupGUI
+from src.MainWindow import MainWindow
 
 # =============================
 # EDITABLE PARAMETERS
@@ -66,18 +66,25 @@ if __name__ == "__main__":
                                    }""")
     app.setStyleSheet("QStatusBar{padding-left:8px;color:white;font-weight:bold;font-family:'Arial'}")
 
-    session_startup = SessionStartupGUI(base_dir, DEBUG_STARTUP)  # load initial startup window where user can specify session
-    if session_startup.exec():  # continue running app only if user has successfully completed startup window
+    continue_running = True
+    while (continue_running):
+        continue_running = False
 
-        SESSION_SETTINGS = session_startup.settings
-        print("SESSION_SETTINGS", SESSION_SETTINGS)
-        settings = {**SESSION_SETTINGS, **DEBUG_SETTINGS} # get all settings, both from user and developer
+        session_startup = SessionStartupGUI(base_dir, DEBUG_STARTUP)  # load initial startup window where user can specify session
+        if session_startup.exec():  # continue running app only if user has successfully completed startup window
 
-        # start analysis window of choice
-        window = MainWindow(settings=settings, window_title=APP_TITLE)
-        window.resize(WINDOWED_APP_SIZE[0], WINDOWED_APP_SIZE[1])
-        window.show()
-        app.exec()
+            SESSION_SETTINGS = session_startup.settings
+            print("SESSION_SETTINGS", SESSION_SETTINGS)
+            settings = {**SESSION_SETTINGS, **DEBUG_SETTINGS} # get all settings, both from user and developer
+
+            # start analysis window of choice
+            window = MainWindow(settings=settings, window_title=APP_TITLE)
+            window.resize(WINDOWED_APP_SIZE[0], WINDOWED_APP_SIZE[1])
+            window.show()
+            app.exec()
+
+            if window.new_session:
+                continue_running = True
 
     print('Application completed. Killing process...')
     app.quit()
