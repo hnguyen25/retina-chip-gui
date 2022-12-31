@@ -1,5 +1,6 @@
 light_theme_colors = {
     "background": '#FFFFFF',
+    "button": "#ECEFF4",
     'dark1': '#2E3440',
     'dark2': '#3B4252',
     'dark3': '#434C5E',
@@ -24,6 +25,7 @@ dark_theme_colors = {
     "background_color": '#1e2030',
     "background_borders": '#222436',
     "font_color": '#ffffff',
+    "button": '#ECEFF4',
 
     'spikeHighlighting' : '#EBCB8B',
     'tracePlotting': '#08F7FE',

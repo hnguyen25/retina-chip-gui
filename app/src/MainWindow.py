@@ -21,7 +21,6 @@ class MainWindow(QtWidgets.QMainWindow):
     first_time_plotting = True  # toggles to false when all the charts are setup for the first time
     settings = {}  # session parameters created through user input from the startup pane
     loading_dict = {}  # contains details of the model run currently being analyzed
-    LoadedData = None  # contains all neural model loaded from specified model run
     profile_data = {
         'appendRawData': [], 'filterData': [], 'calculateArrayStats': [], 'arrayMap': [],
         'noiseHeatMap': [], 'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [],
@@ -357,7 +356,10 @@ class MainWindow(QtWidgets.QMainWindow):
         new_window.label = QLabel("Individual Channel Analysis")
         new_window.setSessionParent(self)
         new_window.show()
+
         self.external_windows.append(new_window)
+        self.update_theme(self.settings["current_theme"])
+
 
     def viewChannelListInformation(self):
         """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant model
@@ -367,7 +369,10 @@ class MainWindow(QtWidgets.QMainWindow):
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
         new_window.show()
+
         self.external_windows.append(new_window)
+        self.update_theme(self.settings["current_theme"])
+
 
     def viewGUIPreferences(self):
         from src.view.windows.window_sessionparameters import GUIPreferences
@@ -401,7 +406,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     chart.setBackground(background_color)
 
         for window in self.external_windows:
-            window.setBackground(background_color)
+            window.update_theme(self.settings["current_theme"], themes)
 
     def toggle_dark_mode(self):
         if self.settings["current_theme"] == "light":

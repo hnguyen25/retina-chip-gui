@@ -64,7 +64,6 @@ class DC1DataContainer:
         self.df = pd.DataFrame(initial_data, columns=df_columns)
 
         self.stats = {"largest_spike_cnt": 0}
-
         self.array_spike_times = {
             "spike_bins": [[] for i in range(self.ARRAY_NUM_ROWS * self.ARRAY_NUM_COLS)],
             "spike_bins_max_amps": [[] for i in range(self.ARRAY_NUM_ROWS * self.ARRAY_NUM_COLS)]
@@ -117,7 +116,6 @@ class DC1DataContainer:
                           "spikes_avg_amp", "spikes_cnt", "spikes_std", "spikes_cum_cnt",
                           "num_bins_per_buffer"]  # spikes
 
-
             self.df.at[this_channel_idx, "N"] += packet["stats_cnt"]
             self.df.at[this_channel_idx, "avg_unfiltered_amp"] = packet["stats_avg+unfiltered+amp"]
             self.df.at[this_channel_idx, "noise_mean"] = packet["stats_noise+mean"]
@@ -131,7 +129,6 @@ class DC1DataContainer:
             self.df.at[this_channel_idx, "spikes_avg_amp"] += packet["stats_spikes+avg+amp"]
             self.df.at[this_channel_idx, "spikes_std"] += packet["stats_spikes+std"]
 
-
             """
             self.array_indexed = {
                 "stats_num+spike+bins+in+buffer": np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),
@@ -144,7 +141,6 @@ class DC1DataContainer:
             #print('array spike times -> spike_bins_max_amp', packet["spike_bins_max_amps"])
             self.array_spike_times["spike_bins"][this_channel_idx] = packet["spike_bins"]
             self.array_spike_times["spike_bins_max_amps"][this_channel_idx] = packet["spike_bins_max_amps"]
-
 
             avg_packet_spike_count += packet["stats_spikes+cnt"]
         # buffer-level information
@@ -187,6 +183,49 @@ class DC1DataContainer:
 
         self.avg_spike_rate_x.append(x)
         self.avg_spike_rate_y.append(y)
+
+    def find_last_buffer_with_electrode_idx(self, electrode_idx):
+        # return buffer which contains an electrode idx
+        # start from the end
+        len_processed_buffer = len(self.buffer_indexed)
+        for i in reversed(range(len_processed_buffer)):
+            if electrode_idx in self.buffer_indexed[i]["channel_idxs"]:
+                return i
+        return -1
+
+    def find_all_buffers_with_electrode_idx(self, electrode_idx):
+        buffers = []
+        len_processed_buffer = len(self.buffer_indexed)
+        for i in range(len_processed_buffer):
+            if electrode_idx in self.buffer_indexed[i]["channel_idxs"]:
+                buffers.append(i)
+        return buffers
+
+    def get_last_trace_with_electrode_idx(self, electrode_idx):
+        buffer_idx = self.find_last_buffer_with_electrode_idx(electrode_idx)
+        if buffer_idx == -1:
+            return None, None
+        else:
+            params = {
+                "file_dir": self.buffer_indexed[buffer_idx]["file_dir"],
+                "filter_type": self.buffer_indexed[buffer_idx]["filter_type"],
+                "SPIKING_THRESHOLD": self.app.settings["spikeThreshold"],
+                "BIN_SIZE": self.app.settings["binSize"]
+            }
+
+            N, Y = None, None
+            packet = load_one_mat_file(params)
+            for channel_data in packet["packet_data"]:
+                if channel_data["channel_idx"] == electrode_idx:
+                    Y = channel_data["filtered_data"]
+                    N = channel_data["N"]
+
+            time_elapsed = self.buffer_indexed[buffer_idx]["time_elapsed"]
+            SAMPLING_PERIOD = 0.05  # check data_loading.py for more details
+            end_time = N * SAMPLING_PERIOD
+            X = np.linspace(time_elapsed, time_elapsed + end_time, N + 1)
+
+            return X, Y
 
 def map2idx(ch_row: int, ch_col: int):
     """ Given a channel's row and col, return channel's index

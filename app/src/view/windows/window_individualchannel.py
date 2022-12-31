@@ -39,9 +39,9 @@ class IndividualChannelInformation(QWidget):
         self.updateElectrodeNum.clicked.connect(self.setElecNum)
         self.updateRC.clicked.connect(self.setRC)
 
-        self.chan_charts = {'ChannelTracePlot': None,
-                            'AmplitudeHistPlot': None,
-                            'SpikeRatePlot': None}
+        self.chan_charts = {'ChannelTracePlot': self.ChannelTracePlot,
+                            'AmplitudeHistPlot': self.AmplitudeHistPlot,
+                            'SpikeRatePlot': self.SpikeRatePlot}
 
     def setSessionParent(self, session_parent):
         self.session_parent = session_parent
@@ -84,8 +84,12 @@ class IndividualChannelInformation(QWidget):
         self.electrode_times.clear()
 
         match = False
-        len_filtered_data = len(self.session_parent.LoadedData.filtered_data)
 
+        X, Y = self.session_parent.data.get_last_trace_with_electrode_idx(self.current_elec)
+
+        # TODO hook this data with rest of GUI
+
+        """
         # Create a list of dictionaries of model packets for the selected electrode
         for i in range(len_filtered_data):
             if self.session_parent.LoadedData.filtered_data[i]['channel_idx'] == self.current_elec:
@@ -109,6 +113,7 @@ class IndividualChannelInformation(QWidget):
             self.electrode_data.extend(self.electrode_packets[i]['model'])
 
         self.recordedTime = round((len(self.electrode_data)) * 0.05, 2)
+        """
 
     def updateAmplitudeHist(self):
         vals = self.electrode_data
@@ -276,3 +281,30 @@ class IndividualChannelInformation(QWidget):
             ch_row = int(ch_idx / 32)
             ch_col = int(ch_idx - ch_row * 32)
             return ch_row, ch_col
+
+    # see MainWindow.update_theme() for how this is called
+    def update_theme(self, current_theme, themes):
+        background_color = themes[current_theme]["background_color"]
+        background_border = themes[current_theme]["background_borders"]
+        button_color = themes[current_theme]["button"]
+        font_color = themes[current_theme]["font_color"]
+        self.setStyleSheet("background-color: " + background_border)
+
+        self.updateElectrodeNum.setStyleSheet("background-color: " + button_color)
+        self.updateRC.setStyleSheet("background-color: " + button_color)
+
+        self.label_elecnum.setStyleSheet("color: " + font_color)
+        self.label_2.setStyleSheet("color: " + font_color)
+        self.label_3.setStyleSheet("color: " + font_color)
+
+        self.numSpikes.setStyleSheet("color: " + font_color)
+        self.totalSamples.setStyleSheet("color: " + font_color)
+        self.timeRecorded.setStyleSheet("color: " + font_color)
+        self.InputElectrodeRow.setStyleSheet("background-color: " + button_color)
+        self.InputElectrodeCol.setStyleSheet("background-color: " + button_color)
+        self.InputElectrodeNumber.setStyleSheet("background-color: " + button_color)
+
+
+        for chart in self.chan_charts.keys():
+            self.chan_charts[chart].setBackground(background_color)
+

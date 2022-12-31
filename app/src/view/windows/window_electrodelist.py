@@ -112,4 +112,8 @@ class DataFrameModel(QtCore.QAbstractTableModel):
             DataFrameModel.ValueRole: b'value'
         }
         return roles
+    # see MainWindow.update_theme() for how this is called
+    def update_theme(self, current_theme, themes):
+
+        pass
 
