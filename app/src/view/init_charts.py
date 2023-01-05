@@ -65,6 +65,8 @@ def setup_layout(app, layout: str, CURRENT_THEME: str, themes: dict, NUM_CHANNEL
         app.actionIndividualChannelInfo.triggered.connect(app.viewNewIndividualChannelInformation)
         app.actionListElectrodesInfo.triggered.connect(app.viewChannelListInformation)
         app.actionAnalysisParameters.triggered.connect(app.viewGUIPreferences)
+        app.actionGUIProfiler.triggered.connect(app.viewGUIProfiler)
+
         # TODO what is this? app.actionGUIProfiler.triggered.connect(app.viewGUIProfiler)
         if app.settings["visStyle"] == "Spike Search":
             app.resetButton.clicked.connect(app.resetSpikeSearchPlotParams)
@@ -92,11 +94,22 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
         channel_traces = [pg.PlotWidget() for _ in range(NUM_CHANNELS_PER_BUFFER)]
         for i in range(NUM_CHANNELS_PER_BUFFER):
             app.channelTracesGrid.addWidget(channel_traces[i], i, 0)
+
     else:
         channel_traces = [pg.PlotWidget() for _ in range(8)]
         for i in range(4):
             app.channelTracesGrid.addWidget(channel_traces[i], i, 0)
             app.channelTracesGrid.addWidget(channel_traces[i+4], i, 1)
+
+    """
+    # add a signal function for mouse click
+    for i in range(NUM_CHANNELS_PER_BUFFER):
+        # https://stackoverflow.com/questions/58526980/how-to-connect-mouse-clicked-signal-to-pyqtgraph-plot-widget
+        from app.src.controller.input_mouse import pause_trace_updating
+        print('updating signal function', i)
+        # TODO Bug -> all the buttons when clicked only trigger the last trace plot
+        channel_traces[i].scene().sigMouseClicked.connect(lambda: pause_trace_updating(channel_traces[i], i))
+    """
 
     app.charts = {
         "arrayMap": app.arrayMap,

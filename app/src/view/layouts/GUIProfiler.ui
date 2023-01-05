@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>758</width>
-    <height>502</height>
+    <height>474</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,19 +22,19 @@
      <height>501</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="4,6">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,4">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="4,6">
       <item>
-       <widget class="QListWidget" name="listWidget_2"/>
+       <widget class="QListWidget" name="profiling_list"/>
       </item>
       <item>
-       <widget class="PlotWidget" name="widget" native="true"/>
+       <widget class="PlotWidget" name="profiling_plot" native="true"/>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QListWidget" name="listWidget"/>
+     <widget class="QTableView" name="profiling_table"/>
     </item>
    </layout>
   </widget>

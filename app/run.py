@@ -19,7 +19,7 @@ WINDOWED_APP_SIZE = [1000, 750]  # size of main application (W x H)
 DEBUG_SETTINGS = {
     'current_theme': 'dark',
     # different GUI modes
-    'is_mode_profiling': False,  # if on, measures how long different aspects of the GUI takes to compute
+    'is_mode_profiling': True,  # if on, measures how long different aspects of the GUI takes to compute
     'is_mode_multithreading': False,  # if on, enables multiprocessing capability. may be easier to debug if off
     # GUI play/pause
     'first_time_plotting': True,  # indicates if the first packet of model has not been processed yet,

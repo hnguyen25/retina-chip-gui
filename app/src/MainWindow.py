@@ -26,10 +26,14 @@ class MainWindow(QtWidgets.QMainWindow):
         'noiseHeatMap': [], 'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [],
         'miniMap': [], 'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
     }  # contains information about how long different view functions took to run
+
+    profiling_df = None
+
     charts = {}  # keys=name of every possible chart, value=reference to chart in GUI, None if not in it
     chart_update_function_mapping = {}  # keys=names of charts, value=related functions to update respective charts
     chart_update_extra_params = {}
     external_windows = []  # reference to windows that have been generated outside of this MainWindow
+
     basedir = None  # base directory of where the program is loaded up, acquired from run.py script
 
     # list of length DC1DataContainer.settings["simultaneousChannelsRecordedPerPacket"] with model and
@@ -55,7 +59,7 @@ class MainWindow(QtWidgets.QMainWindow):
     arrayMapHoverCoords = None
     array_map_channels_to_update = []
 
-    #### NEW STRUCTS
+    ### NEW STRUCTS
     subplot_elements = {}
     def update_subplot_element(self, chart, key, value):
         if key in self.subplot_elements:
@@ -89,25 +93,7 @@ class MainWindow(QtWidgets.QMainWindow):
         charts_list = self.chart_update_function_mapping.keys()
         self.gui_charts_time_counter = {chart: 100 for chart in charts_list}
 
-        profiling_columns = [
-            "buffer_idx",
-            "gui_refresh",
-            "parallelized_loop",
-            "serial_loop",
-            "array_map",
-            "minimap",
-            "spike_rate",
-            "noise",
-            "trace"
-        ]
-
-        initial_data = []
-        for i in range(300):
-            initial_data.append([
-                i, -1, -1, -1, -1, -1, -1, -1, -1
-            ])
-
-        self.profiling_df = pd.DataFrame(initial_data, columns=profiling_columns)
+        self.profiling_df = pd.DataFrame(columns=["name", "type", "time elapsed", "timestamp"])
         self.exec_multithreading()
 
     last_gui_refresh_time = time.time()
@@ -311,11 +297,34 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 if True:
                 #if chart == "channelTraces" or chart == "noiseHistogram" or chart == "arrayMap":
-                    a = time.time()
                     extra_params = self.chart_update_extra_params[chart]
+                    start_time = time.time()
                     self.chart_update_function_mapping[chart](self, next_packet, self.settings["current_theme"], themes, extra_params)
-                    #print('updating chart time', chart, time.time()-a)
-                self.gui_charts_time_counter[chart] = time.time()
+                    if self.settings["is_mode_profiling"]:
+                        new_data = {
+                             "name": chart,
+                             "type": "chart",
+                             "time elapsed": round(time.time() - start_time, 5),
+                             "timestamp": round(start_time, 5)
+                        }
+                        #print('adding profiling df...1', new_data)
+                        
+                        self.profiling_df = self.profiling_df.append(new_data, ignore_index=True)
+                        #print(self.profiling_df)
+
+        for window in self.external_windows:
+            start_time = time.time()
+            window.update()
+            if self.settings["is_mode_profiling"]:
+                new_data = {
+                    "name": chart,
+                    "type": "chart",
+                    "time elapsed": round(time.time() - start_time, 5),
+                    "timestamp": round(start_time, 5)
+                }
+                #print('adding profiling df...2', new_data)
+                self.profiling_df = self.profiling_df.append(new_data, ignore_index=True)
+            
         return True
 
     def showArrayLocOnStatusBar(self, x, y):
@@ -360,7 +369,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
         self.update_theme(self.settings["current_theme"])
 
-
     def viewChannelListInformation(self):
         """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant model
         for sorting all the electrodes on the array. """
@@ -373,22 +381,24 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
         self.update_theme(self.settings["current_theme"])
 
-
     def viewGUIPreferences(self):
         from src.view.windows.window_sessionparameters import GUIPreferences
         new_window = GUIPreferences()
         new_window.label = QLabel("GUI Preferences")
         new_window.show()
-        new_window.exec()
+
         self.external_windows.append(new_window)
 
     def viewGUIProfiler(self):
+        print("GUI profiler")
         from src.view.windows.window_profiler import GUIProfiler
         new_window = GUIProfiler()
         new_window.label = QLabel("GUI Profiler")
         new_window.show()
-        new_window.exec()
+        new_window.setSessionParent(self)
+
         self.external_windows.append(new_window)
+        self.update_theme(self.settings["current_theme"])
 
     def update_theme(self, new_theme):
         print('update_theme()')
@@ -470,15 +480,6 @@ class MainWindow(QtWidgets.QMainWindow):
             event.accept()
         else:
             event.ignore()
-    def printProfilingData(self):
-        if self.settings['is_mode_profiling']:
-            print("------------------------------")
-            print("Current profiling statistics:")
-            for key in self.profile_data.keys():
-                if self.profile_data[key] != []:
-                    avg_time = np.round(np.mean(self.profile_data[key]), 3)
-                    print(key, avg_time)
-            print("------------------------------\n")
 
     def OnRewind(self):
         print('<<')

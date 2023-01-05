@@ -29,8 +29,8 @@ class IndividualChannelInformation(QWidget):
     electrode_spikes = []
     electrode_spike_times = []
 
-    chan_charts = {} # dictionary for all different individual channel charts
-    chan_charts_update_mapping = {} # dictionary for mapping charts to their update functions
+    individualchannel_charts = {} # dictionary for all different individual channel charts
+    individualchannel_charts_update_mapping = {} # dictionary for mapping charts to their update functions
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -39,9 +39,16 @@ class IndividualChannelInformation(QWidget):
         self.updateElectrodeNum.clicked.connect(self.setElecNum)
         self.updateRC.clicked.connect(self.setRC)
 
-        self.chan_charts = {'ChannelTracePlot': self.ChannelTracePlot,
-                            'AmplitudeHistPlot': self.AmplitudeHistPlot,
-                            'SpikeRatePlot': self.SpikeRatePlot}
+        self.individualchannel_charts = {
+            'ChannelTracePlot': self.ChannelTracePlot,
+            'AmplitudeHistPlot': self.AmplitudeHistPlot,
+            'SpikeRatePlot': self.SpikeRatePlot
+        }
+        self.individualchannel_charts_update_mapping = {
+            'ChannelTracePlot': self.updateChannelTrace,
+            'AmplitudeHistPlot': self.updateAmplitudeHist,
+            'SpikeRatePlot': self.updateSpikeRate
+        }
 
     def setSessionParent(self, session_parent):
         self.session_parent = session_parent
@@ -52,11 +59,12 @@ class IndividualChannelInformation(QWidget):
         start = time.time()
         print("Update individual channels: " + str(self.current_elec))
         self.updateElectrodeData()
-        self.updateAmplitudeHist()
-        self.updateSpikeRate()
-        self.updateChannelTrace()
-        idx = map2idx(self.current_row, self.current_col)
 
+        # update the charts
+        for chart in self.individualchannel_charts_update_mapping.keys():
+            self.individualchannel_charts_update_mapping[chart]()
+
+        idx = map2idx(self.current_row, self.current_col)
         if debug:
             print('std from array stats: ' +
                   str(self.session_parent.LoadedData.df.at[idx, "noise_std"]))
@@ -304,7 +312,5 @@ class IndividualChannelInformation(QWidget):
         self.InputElectrodeCol.setStyleSheet("background-color: " + button_color)
         self.InputElectrodeNumber.setStyleSheet("background-color: " + button_color)
 
-
-        for chart in self.chan_charts.keys():
-            self.chan_charts[chart].setBackground(background_color)
-
+        for chart in self.individualchannel_charts.keys():
+            self.individualchannel_charts[chart].setBackground(background_color)

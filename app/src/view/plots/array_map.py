@@ -35,8 +35,9 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME, themes):
 
     # bound the LinearRegionItem to the plotted model
     app.charts["arrayMap"].addItem(image)
+    # TODO check if average spike amplitude makes sense w/ colors
     app.array_map_color_bar = app.charts["arrayMap"].addColorBar(image, colorMap=cm, label="Spike Amplitude",
-                                                                 values=(0, 30))  # values=(0, np.max(model)))
+                                                                 values=(-10, 20))  # values=(0, np.max(model)))
     app.array_map_color_bar.sigLevelsChanged.connect(lambda: on_color_bar_levels_changed(app))
     #app.charts["arrayMapHover"].region.setClipItem(image)
 
@@ -159,7 +160,7 @@ def recalculate_all_sizes(app):
             spike_amp = app.data.df.at[idx, "spikes_avg_amp"]
             # spike_cnt = app.model.array_indexed['stats_spikes+cnt'][y][x + 1]
             # spike_amp = app.model.array_indexed['stats_spikes+avg+amp'][y][x + 1]
-            from ..data.data_loading import map2idx
+            from app.src.model.data_loading import map2idx
             channel_idx = map2idx(y, x)
             tooltip_text = "<html>" + "Electrode Channel #" + str(channel_idx) + "<br>" + \
                            "Row " + str(y) + ", Column " + str(x) + "<br>" + \

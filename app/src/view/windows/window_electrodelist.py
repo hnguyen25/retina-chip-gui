@@ -17,6 +17,7 @@ class ElectrodeListInformation(QWidget):
     current_elec = 0
     current_row = 0
     current_col = 0
+    model = None
 
     sortOption = None
 
