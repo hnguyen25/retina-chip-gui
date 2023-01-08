@@ -8,7 +8,7 @@ import os, sys
 import multiprocessing as mp
 from PyQt5 import QtWidgets, QtCore
 
-from src.view.windows.window_sessionstartup import SessionStartupGUI
+from src.controller.windows.window_sessionstartup import SessionStartupGUI
 from src.MainWindow import MainWindow
 
 # =============================

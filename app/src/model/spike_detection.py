@@ -7,7 +7,6 @@ Huy Nguyen, John Bailey, Maddy Hays (2022)
 
 """
 
-from ..view.init_charts import *
 import numpy as np
 import math
 from sklearn.mixture import GaussianMixture

@@ -1,5 +1,6 @@
 import pyqtgraph as pg
 import numpy as np
+
 def setupNoiseHistogramPlot(plot_widget, CURRENT_THEME, themes):
     plot_widget.getAxis("left").setTextPen(themes[CURRENT_THEME]['font_color'])
     plot_widget.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['font_color'])

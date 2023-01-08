@@ -5,8 +5,6 @@ theme:
 nav:
   - Introduction: 'index.md'
   - Getting Started: 'getting-started.md'
-  - To Dos: 'todo.md'
-  - Change Log: 'changelog.md'
   - Source:
       - Run Script: 'run.md'
       - Main Window: 'main-window.md'

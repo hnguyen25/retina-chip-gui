@@ -2,16 +2,43 @@ import pyqtgraph as pg
 import numpy as np
 import math
 
-def clearSpikeSearchPlots(app):
+def clearTraceSearchPlots(app):
     for chart in app.charts:
         app.charts[chart].clear()
 
-def update_spike_search_plots(app, next_packet, CURRENT_THEME, themes, extra_params):
+def setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
+    # (1) load the Qt Designer template
+    uic.loadUi("./src/view/layouts/TraceSearch.ui", app)
+
+    # (2) set the functions to continually update charts in the GUI
+    for i in range(0, 6):
+        for j in range(0, 6):
+            chart_name = "r" + str(i) + "c" + str(j)
+            app.charts[chart_name] = eval("app." + chart_name)
+
+    app.chart_update_function_mapping = {
+        "traceSearch": update_trace_search_plots,
+        #"channelTraces": update_channel_trace_plot
+    }
+    app.chart_update_extra_params = {
+        "traceSearch": None
+    }
+
+    # (3) Set up additional functionality
+    # app.buttons["ResetButton"] = app.resetButton
+    # app.buttons["nextFigButton"] = app.nextFigButton
+    # app.buttons["yScaleButton"] = app.yScaleButton
+    # app.buttons["backButton"] = app.backButton
+    # app.buttons["nextButton"] = app.nextButton
+    # app.buttons["atTimeWindowButton"] = app.atTimeWindowButton
+    app.FigureLabel.setText("Figure: " + str(app.pageNum))
+
+def update_trace_search_plots(app, next_packet, CURRENT_THEME, themes, extra_params):
     """
     Returns:
     """
     # First, clear the plots
-    clearSpikeSearchPlots(app)
+    clearTraceSearchPlots(app)
 
     # Second, set up the plot figures for every electrode on the page
     # TODO make this code work

@@ -11,7 +11,6 @@ from src.model.spike_detection import *
 from src.model.DC1DataContainer import *
 
 class IndividualChannelInformation(QWidget):
-
     session_parent = None
     current_elec = 0
     current_row = 0

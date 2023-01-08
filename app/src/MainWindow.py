@@ -84,6 +84,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings["num_channels"] = load_first_buffer_info(self)
         self.data_loading_serialized_loop()
 
+        from src.view.modes.init_charts import setup_layout
         if not setup_layout(self, self.settings['visStyle'],
                             self.settings["current_theme"], themes,
                             self.settings["num_channels"]):
