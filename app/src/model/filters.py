@@ -22,7 +22,11 @@ Litke = filtfilt, [250,2000],order = 2 (~18 min)
 highpass = filtfilt, [250], order = 5 (~26 min)
 none = no filtering of model (~0 min)
 """
-
+def filter_preprocessed_data(packet, filter_type="Modified Hierlemann"):
+    for idx, channel_data in enumerate(packet["packet_data"]):
+        filtered_data = applyFilterToChannelData(channel_data['preprocessed_data'], filtType=filter_type)
+        packet["packet_data"][idx]["filtered_data"] = filtered_data
+    return packet
 
 def applyFilterToChannelData(channel_data, filtType='Hierlemann', debug = False):
     """

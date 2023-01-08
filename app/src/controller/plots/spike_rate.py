@@ -1,5 +1,4 @@
 import pyqtgraph as pg
-
 from src.model.DC1DataContainer import *
 from src.MainWindow import *
 

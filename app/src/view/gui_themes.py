@@ -52,3 +52,27 @@ themes = {
     'light': light_theme_colors,
     'dark': dark_theme_colors
 }
+
+def update_theme(app, new_theme):
+    print('update_theme()')
+    app.settings["current_theme"] = new_theme
+    background_color = themes[new_theme]["background_color"]
+    background_border = themes[new_theme]["background_borders"]
+    app.setStyleSheet("background-color: " + background_border)
+
+    for chart in app.charts.keys():
+        chart_type = type(app.charts[chart])
+        if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
+            app.charts[chart].setBackground(background_color)
+        elif chart_type is list:
+            for chart in app.charts[chart]:
+                chart.setBackground(background_color)
+
+    for window in app.external_windows:
+        window.update_theme(app.settings["current_theme"], themes)
+
+def toggle_dark_mode(app):
+    if app.settings["current_theme"] == "light":
+        app.update_theme("dark")
+    elif app.settings["current_theme"] == "dark":
+        app.update_theme("light")

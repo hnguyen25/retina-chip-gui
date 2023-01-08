@@ -26,7 +26,6 @@ def load_first_buffer_info(app):
 
     return NUM_CHANNELS_PER_BUFFER
 
-
 def load_one_mat_file(params):
     # this is designed to be multi-processed
     file_dir = params["file_dir"]
@@ -36,6 +35,8 @@ def load_one_mat_file(params):
 
     mat_contents = sio.loadmat(file_dir)
     dataRaw = mat_contents['gmem1'][0][:]
+
+    from src.model.raw_data_helpers import removeMultipleCounts
     data_real, cnt_real, N = removeMultipleCounts(dataRaw)
 
     # Note: this code does not timestamp model bc that cannot be parallelized properly
@@ -48,44 +49,12 @@ def load_one_mat_file(params):
         "filter_type": params["filter_type"]
     }
 
+    from src.model.filters import filter_preprocessed_data
     packet = filter_preprocessed_data(packet, filter_type=filter_type)
+
+    from src.model.statistics import calculate_channel_stats
     packet = calculate_channel_stats(packet, SPIKING_THRESHOLD, BIN_SIZE)
 
-    return packet
-
-def calculate_channel_stats(packet, SPIKING_THRESHOLD, BIN_SIZE):
-    for idx, channel_data in enumerate(packet["packet_data"]):
-        channel_data["stats_avg+unfiltered+amp"] = np.mean(channel_data["preprocessed_data"])
-        channel_data["stats_cnt"] = len(channel_data["filtered_data"])
-        channel_data["stats_noise+mean"] = np.mean(channel_data["filtered_data"])
-        channel_data["stats_noise+std"] = np.std(channel_data["filtered_data"])
-        channel_data["stats_buf+recording+len"] = channel_data["stats_cnt"] * 0.05 # assuming 20 khZ sampling rate
-
-        # TODO [later] add GMM spikes
-        SPIKE_DETECTION_METHOD = "threshold"
-        if SPIKE_DETECTION_METHOD == "threshold":
-            incom_spike_idx, incom_spike_amplitude = getAboveThresholdActivity(channel_data["filtered_data"],
-                                                                               channel_data["stats_noise+mean"],
-                                                                               channel_data["stats_noise+std"],
-                                                                               SPIKING_THRESHOLD)
-            spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER = binSpikeTimes(channel_data["stats_buf+recording+len"],
-                                                                           incom_spike_idx,
-                                                                           incom_spike_amplitude,
-                                                                           BIN_SIZE)
-
-            channel_data["stats_spikes+cnt"] = sum(spikeBins)
-            channel_data["stats_spikes+avg+amp"] = np.mean(spikeBinsMaxAmp)
-            channel_data["stats_spikes+std"] = np.std(spikeBinsMaxAmp)
-            channel_data["spike_bins"] = spikeBins
-            channel_data["spike_bins_max_amps"] = spikeBinsMaxAmp
-            channel_data["stats_num+spike+bins+in+buffer"] = NUM_BINS_IN_BUFFER
-
-    return packet
-
-def filter_preprocessed_data(packet, filter_type="Modified Hierlemann"):
-    for idx, channel_data in enumerate(packet["packet_data"]):
-        filtered_data = applyFilterToChannelData(channel_data['preprocessed_data'], filtType=filter_type)
-        packet["packet_data"][idx]["filtered_data"] = filtered_data
     return packet
 
 def preprocess_raw_data(data_real, cnt_real, N, SAMPLING_PERIOD=0.05):
@@ -98,6 +67,7 @@ def preprocess_raw_data(data_real, cnt_real, N, SAMPLING_PERIOD=0.05):
     times = np.linspace(0, end_time, N + 1)
 
     # identify relevant, nonzero channels, and then append only this model into recorded_data
+    from src.model.raw_data_helpers import identify_relevant_channels
     num_channels, channel_map, channel_id, start_idx, find_coords, recorded_channels = identify_relevant_channels(data_real)
 
     packet_data = []
@@ -161,80 +131,6 @@ def init_data_loading(path : str):
         "times": times
     }
     return loadingDict
-
-def removeMultipleCounts(dataRaw):
-    # Initialize Variables Needed for Each Buffer
-    chan_index_pre = 1025  # Check for chan changes, double cnt
-    cnt_pre = 0  # Check for cnt changes, double cnt
-    N = 0  # Sample times (DOES NOT ALLOW NON-COLLISION FREE SAMPLES)
-    data_real = np.zeros(
-        (32, 32, len(dataRaw) - 2))  # Initialize to max possible length. Note: Throw out first two values b/c garbo
-    cnt_real = np.zeros((32, 32, len(dataRaw) - 2))
-
-    # Convert model and remove double/triple counts
-    for i in range(2, len(dataRaw) - 1):
-        # Convert bit number into binary
-        word = (np.binary_repr(dataRaw[i], 32))
-
-        # Break that binary into it's respective pieces and convert to bit number
-        cnt = int(word[12:14], 2)
-        col = int(word[27:32], 2)
-        row = int(word[22:27], 2)
-        chan_index = row * 32 + col
-
-        # Only record the unique non-double count sample
-        if (i == 2 or (cnt_pre != cnt or chan_index != chan_index_pre)):
-
-            # Sample time only changes when cnt changes
-            if cnt != cnt_pre:
-                N += 1
-            # On the occurance the first cnt is not 0, make sure sample time is 0
-            if i == 2:
-                N = 0
-
-            # Update variables
-            cnt_pre = cnt
-            chan_index_pre = chan_index
-
-            # Record pertinent model
-            data_real[row][col][N] = int(word[14:22], 2)
-            cnt_real[row][col][N] = cnt
-
-    return data_real, cnt_real, N
-
-def identify_relevant_channels(raw_data: np.array):
-    """ Only n number of channels can be recorded at a given time due to bandwidth concerns--the rest are shut off.
-    For given model recorded at during a certain window, find which channels were recorded.
-
-    Args:
-        raw_data_all: unprocessed model in a given time window (num_channels_X x num_channels_Y x time_len)
-
-    Returns:
-        num_channels: number of channels that were found to have been recorded for given model
-        channel_map: list of channels that were recorded, i.e. nonzero (x/y_coords, num_channels)
-        channel_id: list of channels that were recorded, but identified by a single numerical ID
-        start_idx:
-
-    @param raw_data: all the raw model loaded thus far from files
-    """
-    # This bit takes the longest. ~ 30 sec for whole array 4 channel recording
-    num_samples = np.count_nonzero(raw_data, axis=2)
-    num_channels = np.count_nonzero(num_samples)
-
-    # Map and Identify recorded channels
-    find_coords = np.nonzero(num_samples)
-    channel_map = np.array(find_coords)
-    channel_id = np.zeros(num_channels)
-    start_idx = np.zeros(num_channels)
-
-    for k in range(0,num_channels):
-        channel_id[k] = map2idx(channel_map[0,k],channel_map[1,k])
-        start_idx[k] = (raw_data[channel_map[0, k], channel_map[1, k], :] != 0).argmax(axis=0)
-
-    recorded_channels = np.stack((channel_id, start_idx), axis=1).astype(int)
-
-    #return recorded_channels
-    return num_channels, channel_map, channel_id, start_idx, find_coords, recorded_channels
 
 def map2idx(ch_row: int, ch_col: int):
     """ Given a channel's row and col, return channel's index

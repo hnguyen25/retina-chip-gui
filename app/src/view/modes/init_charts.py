@@ -20,6 +20,7 @@ from src.controller.plots.spike_rate import *
 from src.controller.plots.mini_map import *
 from src.controller.plots.noise_histogram import *
 from src.controller.plots.channel_trace import *
+from src.view.gui_themes import *
 from PyQt5 import uic
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileDialog
@@ -63,7 +64,7 @@ def setup_layout(app, layout: str, CURRENT_THEME: str, themes: dict, NUM_CHANNEL
         setup_noise_plots(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER)
 
     else: return False
-    app.update_theme(CURRENT_THEME)
+    update_theme(app, CURRENT_THEME)
 
     # Because we needed to call app.setupInteractivity separately in
     # the case that Spike Search is called, we don't want to call it twice (causes a bug)

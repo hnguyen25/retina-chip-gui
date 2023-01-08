@@ -360,30 +360,29 @@ class MainWindow(QtWidgets.QMainWindow):
     def viewNewIndividualChannelInformation(self):
         """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
         for analyzing individual channels on DC1. """
-
-        from src.view.windows.window_individualchannel import IndividualChannelInformation
+        from src.controller.windows.window_individualchannel import IndividualChannelInformation
         new_window = IndividualChannelInformation()
         new_window.label = QLabel("Individual Channel Analysis")
         new_window.setSessionParent(self)
         new_window.show()
 
         self.external_windows.append(new_window)
-        self.update_theme(self.settings["current_theme"])
+        update_theme(self, self.settings["current_theme"])
 
     def viewChannelListInformation(self):
         """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant model
         for sorting all the electrodes on the array. """
-        from src.view.windows.window_electrodelist import ElectrodeListInformation
+        from src.controller.windows.window_electrodelist import ElectrodeListInformation
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
         new_window.setSessionParent(self)
         new_window.show()
 
         self.external_windows.append(new_window)
-        self.update_theme(self.settings["current_theme"])
+        update_theme(self, self.settings["current_theme"])
 
     def viewGUIPreferences(self):
-        from src.view.windows.window_sessionparameters import GUIPreferences
+        from src.controller.windows.window_sessionparameters import GUIPreferences
         new_window = GUIPreferences()
         new_window.label = QLabel("GUI Preferences")
         new_window.show()
@@ -392,38 +391,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def viewGUIProfiler(self):
         print("GUI profiler")
-        from src.view.windows.window_profiler import GUIProfiler
+        from src.controller.windows.window_profiler import GUIProfiler
         new_window = GUIProfiler()
         new_window.label = QLabel("GUI Profiler")
         new_window.show()
         new_window.setSessionParent(self)
 
         self.external_windows.append(new_window)
-        self.update_theme(self.settings["current_theme"])
-
-    def update_theme(self, new_theme):
-        print('update_theme()')
-        self.settings["current_theme"] = new_theme
-        background_color = themes[new_theme]["background_color"]
-        background_border = themes[new_theme]["background_borders"]
-        self.setStyleSheet("background-color: " + background_border)
-
-        for chart in self.charts.keys():
-            chart_type = type(self.charts[chart])
-            if str(chart_type) == "<class 'pyqtgraph.widgets.PlotWidget.PlotWidget'>":
-                self.charts[chart].setBackground(background_color)
-            elif chart_type is list:
-                for chart in self.charts[chart]:
-                    chart.setBackground(background_color)
-
-        for window in self.external_windows:
-            window.update_theme(self.settings["current_theme"], themes)
-
-    def toggle_dark_mode(self):
-        if self.settings["current_theme"] == "light":
-            self.update_theme("dark")
-        elif self.settings["current_theme"] == "dark":
-            self.update_theme("light")
+        update_theme(self, self.settings["current_theme"])
 
     def progress_fn(self, n): print("%d%% done" % n)
     def print_output(self, s): print(s)
@@ -463,6 +438,7 @@ class MainWindow(QtWidgets.QMainWindow):
     # callback from progress signal
     def updateStatusBar(self, message):
         self.statusBar().showMessage(message)
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Up:
             self.onArrayMapClick(self.settings['cursor_row'], self.settings['cursor_col']+1)
@@ -472,6 +448,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.onArrayMapClick(self.settings['cursor_row']+1, self.settings['cursor_col'])
         if event.key() == Qt.Key_Left:
             self.onArrayMapClick(self.settings['cursor_row']-1, self.settings['cursor_col'])
+
     def closeEvent(self, event):
         quit_msg = "Are you sure you want to exit the program?"
         reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
@@ -500,7 +477,6 @@ class MainWindow(QtWidgets.QMainWindow):
         pass
 
     def OnNewSession(self):
-
         # (1) open dialog box verifying start of new session
 
         """

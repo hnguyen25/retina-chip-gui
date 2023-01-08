@@ -114,4 +114,3 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
                     spike_indicator.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
                     spike_indicator.setParentItem(spike_indicator_base)
                     app.charts["miniMap"].addItem(spike_indicator)
-
