@@ -1,0 +1,1 @@
+::: src.controller.plots.array_map

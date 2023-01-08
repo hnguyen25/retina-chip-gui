@@ -2,6 +2,16 @@ import pyqtgraph as pg
 import numpy as np
 
 def setupNoiseHistogramPlot(plot_widget, CURRENT_THEME, themes):
+    """
+
+    Args:
+        plot_widget:
+        CURRENT_THEME:
+        themes:
+
+    Returns:
+
+    """
     plot_widget.getAxis("left").setTextPen(themes[CURRENT_THEME]['font_color'])
     plot_widget.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['font_color'])
     plot_widget.getAxis('top').setTextPen(themes[CURRENT_THEME]['font_color'])
@@ -18,10 +28,18 @@ def setupNoiseHistogramPlot(plot_widget, CURRENT_THEME, themes):
 
 def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=False, colored=True):
     """
-    @param debug: if true, prints helpful information
-    @param colored: if true, plots normal range of histogram and colors according to bin. false plots single
+
+    Args:
+        app:
+        next_packet:
+        CURRENT_THEME:
+        themes:
+        debug: if true, prints helpful information
+        colored: if true, plots normal range of histogram and colors according to bin. false plots single
     color with larger range, used primarily for debugging array_indexed
-    @return:
+
+    Returns:
+
     """
 
     app.charts["noiseHistogram"].clear()

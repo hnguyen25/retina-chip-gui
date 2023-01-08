@@ -7,7 +7,19 @@ from PyQt5.QtGui import QColor
 
 NUM_TOTAL_ROWS, NUM_TOTAL_COLS = 32, 32
 
-def setupArrayMap(app, plot_widget, CURRENT_THEME, themes):
+def setupArrayMap(app, plot_widget, CURRENT_THEME: str, themes: dict):
+    """
+
+    Args:
+        app: MainWindow
+        plot_widget: reference to pyqtgraph widget
+        CURRENT_THEME: current GUI theme
+        themes: dictionary of theme colors
+
+    Returns:
+        None
+
+    """
     plot_widget.showGrid(x=False, y=False, alpha=0)
     plot_widget.setAspectLocked()
 
@@ -56,7 +68,20 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME, themes):
     elecs_plot.addPoints(elecs_points)
     app.update_subplot_element("arrayMap", 'default_elecs_plot', elecs_plot)
 
-def update_array_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
+def update_array_map_plot(app, next_packet, CURRENT_THEME: str, themes: dict, extra_params):
+    """
+
+    Args:
+        app: MainWindow
+        next_packet: data from the chip on the next buffer to be displayed
+        CURRENT_THEME: current GUI theme
+        themes: dictionary of theme colors
+        extra_params:
+
+    Returns:
+        None
+
+    """
     # CURRENT ELECTRODE BOX INDICATOR
     curr_rec_elecs_box = []
     dot_scaling_changed = False
@@ -120,7 +145,17 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params)
     app.update_subplot_element("arrayMap", 'default_elecs_plot', elecs_plot)
 
 
-def calculate_one_elec_color_and_size(app, idx):
+def calculate_one_elec_color_and_size(app, idx: int):
+    """
+
+    Args:
+        app: MainWindow
+        idx: the index of the electrode (0-1023) to be calculated
+
+    Returns:
+        None
+
+    """
     # calculate the dot color from electrode's average spike amplitude
     spike_avg_amp = app.data.df.at[idx, "spikes_avg_amp"]
 
@@ -138,6 +173,15 @@ def calculate_one_elec_color_and_size(app, idx):
     return color, size
 
 def recalculate_all_colors(app):
+    """
+
+    Args:
+        app: MainWindow
+
+    Returns:
+        None
+
+    """
     spikes_avg_amp = np.array(app.data.df["spikes_avg_amp"])
     levels = app.array_map_color_bar.levels()
     spikes_avg_amp = np.clip(np.abs(spikes_avg_amp), levels[0], levels[1])
@@ -146,6 +190,15 @@ def recalculate_all_colors(app):
     app.data.df["array_dot_color"] = spikes_avg_amp
 
 def recalculate_all_sizes(app):
+    """
+
+    Args:
+        app: MainWindow
+
+    Returns:
+        None
+
+    """
     spikes_cnt = np.array(app.data.df["spikes_cnt"])
     sizes = (spikes_cnt / app.data.stats["largest_spike_cnt"]) * app.settings["max_dot_size"]
     sizes = np.clip(sizes, app.settings["min_dot_size"], app.settings["max_dot_size"])
@@ -170,6 +223,16 @@ def recalculate_all_sizes(app):
 
 
 def on_color_bar_levels_changed(app):
+    """ called when the color bar is interacted with by the user in the viewing mode, changes the
+    colors of the dots on the array map
+
+    Args:
+        app: MainWindow
+
+    Returns:
+        None
+
+    """
     recalculate_all_colors(app)
     elecs_points = []
     color_map = app.array_map_color_bar.colorMap()
@@ -230,6 +293,15 @@ class HoverRegion():
     #    self.region.setRegion(rgn)
 
     def mouseMoved(self, evt):
+        """Updated when the mouse is moved by the user
+
+        Args:
+            evt: event encoded by PyQt
+
+        Returns:
+            None
+
+        """
         pos = evt[0]  # using signal proxy turns original arguments into a tuple
         if self.window.sceneBoundingRect().contains(pos):
             mousePoint = self.vb.mapSceneToView(pos)
@@ -238,6 +310,14 @@ class HoverRegion():
             self.HoverFunc(mousePoint.x(), mousePoint.y())
 
     def mouseClicked(self, evt):
+        """Update when the mouse is clicked by the user
+
+        Args:
+            evt: event encoded by PyQt
+
+        Returns:
+
+        """
         pos = (self.last_mouse_x, self.last_mouse_y)
         #if self.window.sceneBoundingRect().contains(pos):
             # mousePoint = self.vb.mapSceneToView(pos)
@@ -245,8 +325,18 @@ class HoverRegion():
         self.ClickFunc(self.last_mouse_x, self.last_mouse_y)
 
 
-def update_minimap_indicator(app, CURRENT_THEME, themes): # this is called on cursor click + on setup
-    # add a square around electrodes displayed in the minimap
+def update_minimap_indicator(app, CURRENT_THEME: str, themes: dict): # this is called on cursor click + on setup
+    """add a square around electrodes displayed in the minimap
+
+    Args:
+        app: MainWindow
+        CURRENT_THEME: current GUI theme
+        themes: dictionary of theme colors
+
+    Returns:
+        None
+
+    """
 
     minimap_square_indicator = pg.QtGui.QGraphicsRectItem(app.settings['cursor_row'] - 4.5,
                                                           app.settings['cursor_col'] - 2.5, 8, 4)

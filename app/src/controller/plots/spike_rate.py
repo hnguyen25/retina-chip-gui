@@ -3,6 +3,16 @@ from src.model.DC1DataContainer import *
 from src.MainWindow import *
 
 def setupSpikeRatePlot(plot_widget, CURRENT_THEME, themes):
+    """
+
+    Args:
+        plot_widget:
+        CURRENT_THEME:
+        themes:
+
+    Returns:
+
+    """
     plot_widget.getAxis("left").setTextPen(themes[CURRENT_THEME]['font_color'])
     plot_widget.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['font_color'])
     plot_widget.getAxis('top').setTextPen(themes[CURRENT_THEME]['font_color'])
@@ -21,6 +31,19 @@ def setupSpikeRatePlot(plot_widget, CURRENT_THEME, themes):
     plot_widget.enableAutoRange(axis='x')
 
 def update_spike_rate_plot(app, next_packet, CURRENT_THEME, themes, extra_params, debug=False):
+    """
+
+    Args:
+        app:
+        next_packet:
+        CURRENT_THEME:
+        themes:
+        extra_params:
+        debug:
+
+    Returns:
+
+    """
     app.charts["spikeRatePlot"].clear()
 
     #print("avgspikerate x/y", app.model.avg_spike_rate_x, app.model.avg_spike_rate_y)

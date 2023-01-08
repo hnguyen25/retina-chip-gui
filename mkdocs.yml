@@ -13,7 +13,30 @@ nav:
         - raw data helpers: 'model/raw_data_helpers.md'
         - spike detection: 'model/spike_detection.md'
         - statistics: 'model/statistics.md'
-
+      - view (gui elements):
+        - themes: 'view/gui_themes.md'
+        - layouts: 'view/layouts.md'
+      - controller:
+          - modes:
+              - initialize charts: 'controller/modes/init_charts.md'
+              - compression: 'controller/modes/mode_compression.md'
+              - diagnostic: 'controller/modes/mode_diagnostic.md'
+              - noise: 'controller/modes/mode_noise.md'
+              - spike finding (main): 'controller/modes/mode_spikefinding.md'
+              - trace search: 'controller/modes/mode_tracesearch.md'
+          - plots:
+              - array map: 'controller/plots/array_map.md'
+              - channel trace: 'controller/plots/channel_trace.md'
+              - mini map: 'controller/plots/mini_map.md'
+              - noise heatmap: 'controller/plots/noise_heatmap.md'
+              - noise histogram: 'controller/plots/noise_histogram.md'
+              - spike rate: 'controller/plots/spike_rate.md'
+          - windows:
+              - electrode list: 'controller/windows/window_electrodelist.md'
+              - individual channel analysis: 'controller/windows/window_individualchannel.md'
+              - profiler: 'controller/windows/window_profiler.md'
+              - session parameters: 'controller/windows/window_sessionparameters.md'
+              - session startup: 'controller/windows/window_sessionstartup.md'
 plugins:
   - search
   - mkdocstrings:

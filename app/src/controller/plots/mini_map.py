@@ -6,6 +6,16 @@ from PyQt5.QtGui import QColor
 bar_color = QColor(100, 0, 0, 100)
 spike_color = QColor(0, 100, 0, 100)
 def minimap_gui_update_fn(x, y, data):
+    """
+
+    Args:
+        x:
+        y:
+        data:
+
+    Returns:
+
+    """
     spike_times, spike_amps, elec_idx = data["spike_times_normed"], data["spike_amps_normed"], data["idx"]
 
     # draw a horizontal bar at the bottom with the index of the electrode
@@ -36,6 +46,19 @@ def minimap_gui_update_fn(x, y, data):
     return shape_refs
 
 def setupMiniMapPlot(app, plot_widget, CURRENT_THEME, themes, center_row=16, center_col=16):
+    """
+
+    Args:
+        app:
+        plot_widget:
+        CURRENT_THEME:
+        themes:
+        center_row:
+        center_col:
+
+    Returns:
+
+    """
     plot_widget.showGrid(x=True, y=True, alpha=0)
     plot_widget.getPlotItem().hideAxis('bottom')
     plot_widget.getPlotItem().hideAxis('left')
@@ -44,6 +67,18 @@ def setupMiniMapPlot(app, plot_widget, CURRENT_THEME, themes, center_row=16, cen
     plot_widget.setAspectLocked()
 
 def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
+    """
+
+    Args:
+        app:
+        next_packet:
+        CURRENT_THEME:
+        themes:
+        extra_params:
+
+    Returns:
+
+    """
     app.charts["miniMap"].clear()
 
     BAR_LENGTH = 4

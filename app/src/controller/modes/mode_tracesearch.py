@@ -1,12 +1,36 @@
+"""
+This is the code to start the visualization of the trace search mode, which will be used
+to view large amounts of trace data to search for spikes in non-live data.
+"""
+
 import pyqtgraph as pg
 import numpy as np
 import math
 
 def clearTraceSearchPlots(app):
+    """
+
+    Args:
+        app: MainWindow
+
+    Returns:
+
+    """
     for chart in app.charts:
         app.charts[chart].clear()
 
 def setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
+    """
+
+    Args:
+        app: MainWindow
+        CURRENT_THEME:
+        themes:
+        NUM_CHANNELS_PER_BUFFER:
+
+    Returns:
+
+    """
     # (1) load the Qt Designer template
     uic.loadUi("./src/view/layouts/TraceSearch.ui", app)
 
@@ -34,6 +58,18 @@ def setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     app.FigureLabel.setText("Figure: " + str(app.pageNum))
 
 def update_trace_search_plots(app, next_packet, CURRENT_THEME, themes, extra_params):
+    """
+
+    Args:
+        app:
+        next_packet:
+        CURRENT_THEME:
+        themes:
+        extra_params:
+
+    Returns:
+
+    """
     """
     Returns:
     """
@@ -103,6 +139,16 @@ def update_trace_search_plots(app, next_packet, CURRENT_THEME, themes, extra_par
 # HELPER FUNCTIONS
 def electrodeToPlotGrid(app, electrodeNum):
     """
+
+    Args:
+        app: MainWindow
+        electrodeNum:
+
+    Returns:
+        None
+
+    """
+    """
     Args:
         electrodeNum: electrode number on RC array (0-1023)
 
@@ -116,6 +162,14 @@ def electrodeToPlotGrid(app, electrodeNum):
 
 def getTracesToPlot(app):
     """
+
+    Args:
+        app: MainWindow
+
+    Returns:
+        None
+    """
+    """
     Function to determine which electrodes to plot given what page of spike
     search GUI user is on
 
@@ -128,3 +182,94 @@ def getTracesToPlot(app):
         app.FigureLabel.setText("Figure " + str(app.pageNum)
                                  + ": Ch " + str(app.tracesToPlot[0]) + " to Ch " + str(app.tracesToPlot[-1]))
     return app.tracesToPlot
+
+import pyqtgraph as pg
+
+def resetSpikeSearchPlotParams(app):
+    """
+
+    Args:
+        app: MainWindow
+
+    Returns:
+        None
+    """
+    app.yMax.setValue(20)
+    app.yMin.setValue(30)
+    app.timeZoom = True
+    app.timeStep = 0
+    app.update_spike_search_plots()
+
+def switchTimeZoom(app):
+    """
+
+    Args:
+        app: MainWindow
+
+    Returns:
+        None
+
+    """
+    app.timeZoom = not app.timeZoom
+    app.timeStep = 0
+    app.update_spike_search_plots()
+
+def nextPage(app):
+    """
+
+    Args:
+        app: MainWindow
+
+    Returns:
+        None
+
+    """
+    if app.pageNum < 28:
+        app.pageNum += 1
+        app.FigureLabel.setText("Page: " + str(app.pageNum))
+        app.timeStep = 0
+        app.update_spike_search_plots()
+
+def backPage(app):
+    """
+
+    Args:
+        app: MainWindow
+
+    Returns:
+        None
+
+    """
+    if app.pageNum > 0:
+        app.pageNum -= 1
+        app.FigureLabel.setText("Page: " + str(app.pageNum))
+        app.timeStep = 0
+        app.update_spike_search_plots()
+
+def timeStepUp(app):
+    """
+
+    Args:
+        app: MainWindow
+
+    Returns:
+        None
+
+    """
+    if app.timeStep < app.numberOfTimeSteps - 1:
+        app.timeStep += 1
+        app.update_spike_search_plots()
+
+def timeStepDown(app):
+    """
+
+    Args:
+        app: MainWindow
+
+    Returns:
+        None
+
+    """
+    if app.timeStep > 0:
+        app.timeStep -= 1
+        app.update_spike_search_plots()

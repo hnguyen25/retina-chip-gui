@@ -1,0 +1,1 @@
+::: src.controller.plots.mini_map

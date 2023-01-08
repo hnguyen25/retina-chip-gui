@@ -1,7 +1,4 @@
 """
-init_charts
-Huy Nguyen (Nov 2022)
-----------------
 This is boilerplate code for the initial setup of the GUI plots, once a specific type of plot has been chosen.
 Note that chart-specific update logic within each type of plot is specified in its own corresponding file.
 
@@ -52,15 +49,15 @@ def setup_layout(app, layout: str, CURRENT_THEME: str, themes: dict, NUM_CHANNEL
 
     # Load layout based on QtDesigner .ui file
     if layout == "Spike Finding":
-        from src.view.modes.mode_spikefinding import setup_spike_finding
+        from src.controller.modes.mode_spikefinding import setup_spike_finding
         setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER)
 
     elif layout == "Trace Search":
-        from src.view.modes.mode_tracesearch import setup_trace_search
+        from src.controller.modes.mode_tracesearch import setup_trace_search
         setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER)
 
     elif layout == "Noise":
-        from src.view.modes.mode_noise import setup_noise_plots
+        from src.controller.modes.mode_noise import setup_noise_plots
         setup_noise_plots(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER)
 
     else: return False
@@ -77,6 +74,7 @@ def setup_layout(app, layout: str, CURRENT_THEME: str, themes: dict, NUM_CHANNEL
         app.actionGUIProfiler.triggered.connect(app.viewGUIProfiler)
 
         # TODO what is this? app.actionGUIProfiler.triggered.connect(app.viewGUIProfiler)
+        from src.controller.modes.mode_tracesearch import resetSpikeSearchPlotParams, nextPage, backPage, switchTimeZoom, timeStepUp, timeStepDown
         if app.settings["visStyle"] == "Spike Search":
             app.resetButton.clicked.connect(app.resetSpikeSearchPlotParams)
             app.nextButton.clicked.connect(app.nextPage)

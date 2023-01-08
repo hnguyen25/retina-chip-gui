@@ -1,3 +1,8 @@
+"""
+This is the code to start the visualization of the spike finding mode, which will be used
+experimentally to find existence of spikes in live data.
+"""
+
 from src.controller.plots.array_map import *
 from src.controller.plots.spike_rate import *
 from src.controller.plots.mini_map import *
@@ -18,6 +23,17 @@ import pyqtgraph as pg
 import os
 
 def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
+    """
+
+    Args:
+        app:
+        CURRENT_THEME:
+        themes:
+        NUM_CHANNELS_PER_BUFFER:
+
+    Returns:
+
+    """
     # (1) load the Qt Designer template
     uic.loadUi("./src/view/layouts/SpikeFinding.ui", app)
 
@@ -95,9 +111,50 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     app.statusBar().addPermanentWidget(app.TogglePlayButton)
     app.statusBar().addPermanentWidget(app.FastForwardButton)
 
-    from src.controller.modes.interact_spikefinding import OnRewind, OnPlay, OnFastForward
+    from src.controller.modes.mode_spikefinding import OnRewind, OnPlay, OnFastForward
     app.RewindButton.clicked.connect(OnRewind)
     app.TogglePlayButton.clicked.connect(OnPlay)
     app.FastForwardButton.clicked.connect(OnFastForward)
 
     app.actionUpdateSession.triggered.connect(app.OnNewSession)
+
+def OnRewind(app):
+    """
+
+    Args:
+        app:
+
+    Returns:
+
+    """
+    print('<<')
+    pass
+
+def OnPlay(app):
+    """
+
+    Args:
+        app:
+
+    Returns:
+
+    """
+    print('play')
+    app.is_paused = not app.is_paused
+    if app.is_paused is True:
+        app.statusBar().showMessage("Paused!")
+    else:
+        app.statusBar().showMessage("Un-paused!")
+    pass
+
+def OnFastForward(app):
+    """
+
+    Args:
+        app:
+
+    Returns:
+
+    """
+    print('>>')
+    pass

@@ -29,17 +29,35 @@ class ElectrodeListInformation(QWidget):
         self.chooseSortOption.activated.connect(self.setSortOption)
 
     def setSessionParent(self, session_parent):
+        """
+
+        Args:
+            session_parent:
+
+        Returns:
+
+        """
         self.app = session_parent
         self.model = DataFrameModel(self.app.data.df)
         self.electrodeTable.setModel(self.model)
         self.setTheme()
 
     def update(self):
+        """
+
+        Returns:
+
+        """
         self.model = DataFrameModel(self.app.data.df)
         self.model.sort(1)
         self.electrodeTable.setModel(self.model)
 
     def setSortOption(self):
+        """
+
+        Returns:
+
+        """
         self.sortOption = self.chooseSortOption.currentText()
         print("SORT OPTION: " + self.sortOption)
         self.update()

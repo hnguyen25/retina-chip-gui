@@ -4,6 +4,16 @@ import math
 from PyQt5.QtGui import QColor
 
 def setupSpikeTrace(list_of_plots, CURRENT_THEME, themes):
+    """
+
+    Args:
+        list_of_plots:
+        CURRENT_THEME:
+        themes:
+
+    Returns:
+
+    """
     for plot in list_of_plots:
         plot.getAxis("left").setTextPen(themes[CURRENT_THEME]['font_color'])
         plot.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['font_color'])

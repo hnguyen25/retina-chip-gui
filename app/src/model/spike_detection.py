@@ -85,7 +85,7 @@ def getAboveThresholdActivity(data,
 
 def binSpikeTimes(buf_recording_len, incom_spike_idx, incom_spike_amps, BIN_SIZE):
     """
-    
+
     Args:
         buf_recording_len:
         incom_spike_idx:
@@ -115,6 +115,3 @@ def binSpikeTimes(buf_recording_len, incom_spike_idx, incom_spike_amps, BIN_SIZE
             spikeBinsMaxAmp[bin_idx] = np.max(spiking_amps)
 
     return spikeBins, spikeBinsMaxAmp, NUM_BINS_IN_BUFFER
-
-
-

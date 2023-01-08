@@ -2,6 +2,19 @@ import pyqtgraph as pg
 import numpy as np
 
 def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params, debug=False):
+    """
+
+    Args:
+        app:
+        next_packet:
+        CURRENT_THEME:
+        themes:
+        extra_params:
+        debug:
+
+    Returns:
+
+    """
     plot = app.charts["noiseHeatMap"]
     plot.clear()
 
@@ -35,6 +48,19 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
 
 
 def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params, debug=False):
+    """
+
+    Args:
+        app:
+        next_packet:
+        CURRENT_THEME:
+        themes:
+        extra_params:
+        debug:
+
+    Returns:
+
+    """
     plot = app.charts["noiseHeatMap"]
     plot.clear()
 

@@ -1,3 +1,8 @@
+"""
+This is the code to start the visualization of the noise mode, which will be used
+to view noise statistics of the retina chip.
+"""
+
 from src.controller.plots.array_map import *
 from src.controller.plots.spike_rate import *
 from src.controller.plots.mini_map import *
@@ -17,6 +22,17 @@ import pandas as pd
 from natsort import natsorted, index_natsorted, order_by_index
 
 def setup_noise_plots(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
+    """
+
+    Args:
+        app:
+        CURRENT_THEME:
+        themes:
+        NUM_CHANNELS_PER_BUFFER:
+
+    Returns:
+
+    """
     # (1) load the Qt Designer template
     uic.loadUi("./src/view/layouts/NoiseWindow.ui", app)
 
