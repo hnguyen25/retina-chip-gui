@@ -13,7 +13,7 @@
     
     
       
-        <title>DC1 Data Container - DC1 Visualization</title>
+        <title>data structs - DC1 Visualization</title>
       
     
     
@@ -94,7 +94,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              DC1 Data Container
+              data structs
             
           </span>
         </div>
@@ -180,7 +180,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../index.md" class="md-nav__link">
+      <a href="../../general/" class="md-nav__link">
         Introduction
       </a>
     </li>
@@ -195,7 +195,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started.md" class="md-nav__link">
+      <a href="../../general/getting-started/" class="md-nav__link">
         Getting Started
       </a>
     </li>
@@ -208,12 +208,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
       
       
       
@@ -234,51 +236,25 @@
               
   
   
-  
-    <li class="md-nav__item">
-      <a href="../../data_loading.md" class="md-nav__link">
-        Run Script
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../main-window.md" class="md-nav__link">
-        Main Window
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
+    
   
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_3_3">
+        <label class="md-nav__link" for="__nav_3_1">
           model (data)
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="model (data)" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_3">
+        <label class="md-nav__title" for="__nav_3_1">
           <span class="md-nav__icon md-icon"></span>
           model (data)
         </label>
@@ -290,8 +266,188 @@
   
   
     <li class="md-nav__item">
-      <a href="../../data_loading.md" class="md-nav__link">
+      <a href="../data_loading/" class="md-nav__link">
         data loading
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          data structs
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        data structs
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer" class="md-nav__link">
+    src.model.DC1DataContainer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer" class="md-nav__link">
+    DC1DataContainer
+  </a>
+  
+    <nav class="md-nav" aria-label="DC1DataContainer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer--to-dos" class="md-nav__link">
+    To-Dos:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.append_buf" class="md-nav__link">
+    append_buf()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.calculate_moving_spike_rate_avg" class="md-nav__link">
+    calculate_moving_spike_rate_avg()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.find_all_buffers_with_electrode_idx" class="md-nav__link">
+    find_all_buffers_with_electrode_idx()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.find_last_buffer_with_electrode_idx" class="md-nav__link">
+    find_last_buffer_with_electrode_idx()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.get_last_trace_with_electrode_idx" class="md-nav__link">
+    get_last_trace_with_electrode_idx()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.map2idx" class="md-nav__link">
+    map2idx()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../filters/" class="md-nav__link">
+        filters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../raw_data_helpers/" class="md-nav__link">
+        raw data helpers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spike_detection/" class="md-nav__link">
+        spike detection
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../statistics/" class="md-nav__link">
+        statistics
       </a>
     </li>
   
@@ -355,6 +511,48 @@
           <li class="md-nav__item">
   <a href="#src.model.DC1DataContainer.DC1DataContainer--to-dos" class="md-nav__link">
     To-Dos:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.__init__" class="md-nav__link">
+    __init__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.append_buf" class="md-nav__link">
+    append_buf()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.calculate_moving_spike_rate_avg" class="md-nav__link">
+    calculate_moving_spike_rate_avg()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.find_all_buffers_with_electrode_idx" class="md-nav__link">
+    find_all_buffers_with_electrode_idx()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.find_last_buffer_with_electrode_idx" class="md-nav__link">
+    find_last_buffer_with_electrode_idx()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.model.DC1DataContainer.DC1DataContainer.get_last_trace_with_electrode_idx" class="md-nav__link">
+    get_last_trace_with_electrode_idx()
   </a>
   
 </li>
@@ -456,6 +654,13 @@ TODO figure out time budget for model processing + filtering</p>
     <span class="n">avg_spike_rate_y</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">recording_info</span><span class="o">=</span><span class="p">{},</span> <span class="n">data_processing_settings</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            app:</span>
+<span class="sd">            recording_info:</span>
+<span class="sd">            data_processing_settings:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>  <span class="c1"># reference to MainWindow</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_track</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_track</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_track_processed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_track_processed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
@@ -497,6 +702,14 @@ TODO figure out time budget for model processing + filtering</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">to_show</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">append_buf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            buf:</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">packet_idx</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="s1">&#39;packet_idx&#39;</span><span class="p">]</span>
         <span class="n">channel_idxs</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># for buffer_indexed model struct</span>
 
@@ -581,6 +794,11 @@ TODO figure out time budget for model processing + filtering</p>
         <span class="k">return</span> <span class="n">buffer_indexed_dict</span><span class="p">[</span><span class="s2">&quot;channel_idxs&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">calculate_moving_spike_rate_avg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">avg_spike_rate</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">time_elapsed</span> <span class="o">=</span> <span class="mi">0</span>
 
@@ -604,6 +822,14 @@ TODO figure out time budget for model processing + filtering</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">avg_spike_rate_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">find_last_buffer_with_electrode_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">electrode_idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            electrode_idx:</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># return buffer which contains an electrode idx</span>
         <span class="c1"># start from the end</span>
         <span class="n">len_processed_buffer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">)</span>
@@ -613,6 +839,14 @@ TODO figure out time budget for model processing + filtering</p>
         <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
 
     <span class="k">def</span> <span class="nf">find_all_buffers_with_electrode_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">electrode_idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            electrode_idx:</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">buffers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">len_processed_buffer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">len_processed_buffer</span><span class="p">):</span>
@@ -621,6 +855,14 @@ TODO figure out time budget for model processing + filtering</p>
         <span class="k">return</span> <span class="n">buffers</span>
 
     <span class="k">def</span> <span class="nf">get_last_trace_with_electrode_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">electrode_idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            electrode_idx:</span>
+
+<span class="sd">        Returns:</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">buffer_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_last_buffer_with_electrode_idx</span><span class="p">(</span><span class="n">electrode_idx</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">buffer_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
@@ -669,9 +911,480 @@ TODO figure out time budget for model processing + filtering</p>
 
 
 
+  <div class="doc doc-object doc-method">
 
 
 
+<h3 class="doc doc-heading" id="src.model.DC1DataContainer.DC1DataContainer.__init__">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">recording_info</span><span class="o">=</span><span class="p">{},</span> <span class="n">data_processing_settings</span><span class="o">=</span><span class="p">{})</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>app</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>recording_info</code></td>
+        <td></td>
+        <td></td>
+        <td><code>{}</code></td>
+      </tr>
+      <tr>
+        <td><code>data_processing_settings</code></td>
+        <td></td>
+        <td></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>src/model/DC1DataContainer.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">,</span> <span class="n">recording_info</span><span class="o">=</span><span class="p">{},</span> <span class="n">data_processing_settings</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        app:</span>
+<span class="sd">        recording_info:</span>
+<span class="sd">        data_processing_settings:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">app</span>  <span class="c1"># reference to MainWindow</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">time_track</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_track</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">time_track_processed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_track_processed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+    <span class="c1"># channel-level information</span>
+    <span class="c1"># indexed via row, col of array</span>
+    <span class="c1"># value: a dict containing all info for a certain electrode</span>
+    <span class="c1"># self.array_indexed_df = pd.Dataframe() # TODO make array-indexed pandas df to replace below</span>
+
+    <span class="n">df_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;row&quot;</span><span class="p">,</span> <span class="s2">&quot;col&quot;</span><span class="p">,</span> <span class="c1"># indexing</span>
+                  <span class="s2">&quot;avg_filtered_amp&quot;</span><span class="p">,</span> <span class="s2">&quot;avg_unfiltered_amp&quot;</span><span class="p">,</span> <span class="s2">&quot;channel_noise_mean&quot;</span><span class="p">,</span> <span class="s2">&quot;channel_noise_std&quot;</span><span class="p">,</span> <span class="c1"># noise</span>
+                  <span class="s2">&quot;start_time&quot;</span><span class="p">,</span> <span class="s2">&quot;start_count&quot;</span><span class="p">,</span> <span class="s2">&quot;buf_recording_len&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;packet_idx&quot;</span><span class="p">,</span> <span class="c1"># timing</span>
+                  <span class="s2">&quot;spikes_avg_amp&quot;</span><span class="p">,</span> <span class="s2">&quot;spikes_cnt&quot;</span><span class="p">,</span> <span class="s2">&quot;spikes_std&quot;</span><span class="p">,</span> <span class="s2">&quot;spikes_cum_cnt&quot;</span><span class="p">,</span> <span class="s2">&quot;num_bins_per_buffer&quot;</span><span class="p">,</span> <span class="c1">#spikes</span>
+                  <span class="s2">&quot;array_dot_color&quot;</span><span class="p">,</span> <span class="s2">&quot;array_dot_size&quot;</span>  <span class="c1"># specific plot info</span>
+                  <span class="p">]</span>
+
+    <span class="n">initial_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">32</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">32</span><span class="p">):</span>
+            <span class="n">initial_data</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span>
+                                 <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span>
+                                 <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span>
+                                 <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span>
+                                 <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">initial_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">df_columns</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;largest_spike_cnt&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">array_spike_times</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;spike_bins&quot;</span><span class="p">:</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ARRAY_NUM_ROWS</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ARRAY_NUM_COLS</span><span class="p">)],</span>
+        <span class="s2">&quot;spike_bins_max_amps&quot;</span><span class="p">:</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ARRAY_NUM_ROWS</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ARRAY_NUM_COLS</span><span class="p">)]</span>
+    <span class="p">}</span>
+
+    <span class="c1"># =====================</span>
+    <span class="c1"># buffer-level information</span>
+    <span class="c1"># indexed via key: buffer number (0 - MAX_NUMBER_OF_BUFFERS)</span>
+    <span class="c1"># value:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">to_serialize</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">to_show</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.model.DC1DataContainer.DC1DataContainer.append_buf">
+<code class="highlight language-python"><span class="n">append_buf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>buf</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>src/model/DC1DataContainer.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">append_buf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        buf:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">packet_idx</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="s1">&#39;packet_idx&#39;</span><span class="p">]</span>
+    <span class="n">channel_idxs</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># for buffer_indexed model struct</span>
+
+    <span class="c1"># calculate times</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="s2">&quot;packet_data&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;N&quot;</span><span class="p">]</span>
+    <span class="n">len_packet_time</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="mf">0.05</span>  <span class="c1"># 20kHz sampling rate, means time_recording (ms) = num_sam*0.05ms</span>
+    <span class="n">next_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time_track</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_track</span> <span class="o">+</span> <span class="n">len_packet_time</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">time_track</span> <span class="o">+=</span> <span class="n">len_packet_time</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">count_track</span> <span class="o">+=</span> <span class="n">N</span>
+
+    <span class="n">avg_packet_spike_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">packet_data</span> <span class="o">=</span> <span class="n">buf</span><span class="p">[</span><span class="s1">&#39;packet_data&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">packet</span> <span class="ow">in</span> <span class="n">packet_data</span><span class="p">:</span>
+
+        <span class="c1"># load model</span>
+        <span class="c1"># packet keys: &#39;data_real&#39;, &#39;cnt_real&#39;, &#39;N&#39;,</span>
+        <span class="c1">#   &#39;channel_idx&#39;, &#39;preprocessed_data&#39;, &#39;filtered_data&#39;,</span>
+        <span class="c1">#   &#39;stats_cnt&#39;, &#39;stats_noise+mean&#39;, &#39;stats_noise+std&#39;</span>
+        <span class="n">this_channel_idx</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s1">&#39;channel_idx&#39;</span><span class="p">]</span>
+
+        <span class="c1"># for buffer_indexed model struct</span>
+        <span class="n">channel_idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_channel_idx</span><span class="p">)</span>
+
+        <span class="c1"># reformatting packet for to_show model struct</span>
+        <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">next_times</span>
+
+        <span class="c1"># for array_indexed model struct</span>
+        <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">idx2map</span><span class="p">(</span><span class="n">this_channel_idx</span><span class="p">)</span>
+
+        <span class="c1"># TODO make this adapt for when multiple packets record from the same channel</span>
+        <span class="c1"># use formula Maddy gave</span>
+
+        <span class="n">df_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;row&quot;</span><span class="p">,</span> <span class="s2">&quot;col&quot;</span><span class="p">,</span>  <span class="c1"># indexing</span>
+                      <span class="s2">&quot;avg_filtered_amp&quot;</span><span class="p">,</span> <span class="s2">&quot;avg_unfiltered_amp&quot;</span><span class="p">,</span> <span class="s2">&quot;noise_mean&quot;</span><span class="p">,</span> <span class="s2">&quot;noise_std&quot;</span><span class="p">,</span>  <span class="c1"># noise</span>
+                      <span class="s2">&quot;start_time&quot;</span><span class="p">,</span> <span class="s2">&quot;start_count&quot;</span><span class="p">,</span> <span class="s2">&quot;buf_recording_len&quot;</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="s2">&quot;packet_idx&quot;</span><span class="p">,</span>  <span class="c1"># timing</span>
+                      <span class="s2">&quot;spikes_avg_amp&quot;</span><span class="p">,</span> <span class="s2">&quot;spikes_cnt&quot;</span><span class="p">,</span> <span class="s2">&quot;spikes_std&quot;</span><span class="p">,</span> <span class="s2">&quot;spikes_cum_cnt&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;num_bins_per_buffer&quot;</span><span class="p">]</span>  <span class="c1"># spikes</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">this_channel_idx</span><span class="p">,</span> <span class="s2">&quot;N&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_cnt&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">this_channel_idx</span><span class="p">,</span> <span class="s2">&quot;avg_unfiltered_amp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_avg+unfiltered+amp&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">this_channel_idx</span><span class="p">,</span> <span class="s2">&quot;noise_mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_noise+mean&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">this_channel_idx</span><span class="p">,</span> <span class="s2">&quot;noise_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_noise+std&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">this_channel_idx</span><span class="p">,</span> <span class="s2">&quot;buf_recording_len&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_buf+recording+len&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">this_channel_idx</span><span class="p">,</span> <span class="s2">&quot;avg_unfiltered_amp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_avg+unfiltered+amp&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">this_channel_idx</span><span class="p">,</span> <span class="s2">&quot;spikes_cnt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_spikes+cnt&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">this_channel_idx</span><span class="p">,</span> <span class="s2">&quot;spikes_cum_cnt&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_spikes+cnt&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">this_channel_idx</span><span class="p">,</span> <span class="s2">&quot;spikes_avg_amp&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_spikes+avg+amp&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">this_channel_idx</span><span class="p">,</span> <span class="s2">&quot;spikes_std&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_spikes+std&quot;</span><span class="p">]</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        self.array_indexed = {</span>
+<span class="sd">            &quot;stats_num+spike+bins+in+buffer&quot;: np.zeros((self.ARRAY_NUM_ROWS, self.ARRAY_NUM_COLS)),</span>
+<span class="sd">            &quot;spike_bins&quot;: [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)],</span>
+<span class="sd">            &quot;spike_bins_max_amps&quot;: [([] for i in range(self.ARRAY_NUM_ROWS)) for j in range(self.ARRAY_NUM_COLS)]</span>
+<span class="sd">        }   </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO put spike bins here</span>
+        <span class="c1">#print(&#39;array spike times -&gt; spike_bins&#39;, packet[&quot;spike_bins&quot;])</span>
+        <span class="c1">#print(&#39;array spike times -&gt; spike_bins_max_amp&#39;, packet[&quot;spike_bins_max_amps&quot;])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">array_spike_times</span><span class="p">[</span><span class="s2">&quot;spike_bins&quot;</span><span class="p">][</span><span class="n">this_channel_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;spike_bins&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">array_spike_times</span><span class="p">[</span><span class="s2">&quot;spike_bins_max_amps&quot;</span><span class="p">][</span><span class="n">this_channel_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;spike_bins_max_amps&quot;</span><span class="p">]</span>
+
+        <span class="n">avg_packet_spike_count</span> <span class="o">+=</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;stats_spikes+cnt&quot;</span><span class="p">]</span>
+    <span class="c1"># buffer-level information</span>
+    <span class="n">buffer_indexed_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;file_dir&quot;</span><span class="p">:</span> <span class="n">buf</span><span class="p">[</span><span class="s2">&quot;file_dir&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;filter_type&quot;</span><span class="p">:</span> <span class="n">buf</span><span class="p">[</span><span class="s2">&quot;filter_type&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="n">N</span><span class="p">,</span>
+        <span class="s2">&quot;time_elapsed&quot;</span><span class="p">:</span> <span class="n">len_packet_time</span><span class="p">,</span> <span class="c1"># TODO check if this is accurate for all recording types</span>
+        <span class="s2">&quot;channel_idxs&quot;</span><span class="p">:</span> <span class="n">channel_idxs</span><span class="p">,</span>
+        <span class="s2">&quot;num_detected_spikes&quot;</span><span class="p">:</span> <span class="n">avg_packet_spike_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">packet_data</span><span class="p">)</span> <span class="c1"># for spike rate plot</span>
+    <span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">buffer_indexed_dict</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">calculate_moving_spike_rate_avg</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">to_show</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+
+    <span class="c1"># return the channels in the buffer</span>
+    <span class="k">return</span> <span class="n">buffer_indexed_dict</span><span class="p">[</span><span class="s2">&quot;channel_idxs&quot;</span><span class="p">]</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.model.DC1DataContainer.DC1DataContainer.calculate_moving_spike_rate_avg">
+<code class="highlight language-python"><span class="n">calculate_moving_spike_rate_avg</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+
+        <details class="quote">
+          <summary>Source code in <code>src/model/DC1DataContainer.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">calculate_moving_spike_rate_avg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">avg_spike_rate</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">time_elapsed</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">SPIKE_RATE_WINDOW_SIZE</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">SPIKE_RATE_WINDOW_SIZE</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">buffer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">:</span>
+            <span class="n">avg_spike_rate</span> <span class="o">+=</span> <span class="n">buffer</span><span class="p">[</span><span class="s2">&quot;num_detected_spikes&quot;</span><span class="p">]</span>
+            <span class="n">time_elapsed</span> <span class="o">+=</span> <span class="n">buffer</span><span class="p">[</span><span class="s2">&quot;time_elapsed&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">buffer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">SPIKE_RATE_WINDOW_SIZE</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">avg_spike_rate</span> <span class="o">+=</span> <span class="n">buffer</span><span class="p">[</span><span class="s2">&quot;num_detected_spikes&quot;</span><span class="p">]</span>
+            <span class="n">time_elapsed</span> <span class="o">+=</span> <span class="n">buffer</span><span class="p">[</span><span class="s2">&quot;time_elapsed&quot;</span><span class="p">]</span>
+
+    <span class="c1">#print(&#39;avg spike rate before division&#39;, avg_spike_rate)</span>
+    <span class="n">avg_spike_rate</span> <span class="o">/=</span> <span class="n">time_elapsed</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_track</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">avg_spike_rate</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">avg_spike_rate_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">avg_spike_rate_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.model.DC1DataContainer.DC1DataContainer.find_all_buffers_with_electrode_idx">
+<code class="highlight language-python"><span class="n">find_all_buffers_with_electrode_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">electrode_idx</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>electrode_idx</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>src/model/DC1DataContainer.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">find_all_buffers_with_electrode_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">electrode_idx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        electrode_idx:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">buffers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">len_processed_buffer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">len_processed_buffer</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">electrode_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;channel_idxs&quot;</span><span class="p">]:</span>
+            <span class="n">buffers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">buffers</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.model.DC1DataContainer.DC1DataContainer.find_last_buffer_with_electrode_idx">
+<code class="highlight language-python"><span class="n">find_last_buffer_with_electrode_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">electrode_idx</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>electrode_idx</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>src/model/DC1DataContainer.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">find_last_buffer_with_electrode_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">electrode_idx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        electrode_idx:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># return buffer which contains an electrode idx</span>
+    <span class="c1"># start from the end</span>
+    <span class="n">len_processed_buffer</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">len_processed_buffer</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">electrode_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;channel_idxs&quot;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">i</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.model.DC1DataContainer.DC1DataContainer.get_last_trace_with_electrode_idx">
+<code class="highlight language-python"><span class="n">get_last_trace_with_electrode_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">electrode_idx</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>electrode_idx</code></td>
+        <td></td>
+        <td></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>src/model/DC1DataContainer.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_last_trace_with_electrode_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">electrode_idx</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        electrode_idx:</span>
+
+<span class="sd">    Returns:</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">buffer_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_last_buffer_with_electrode_idx</span><span class="p">(</span><span class="n">electrode_idx</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">buffer_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;file_dir&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">[</span><span class="n">buffer_idx</span><span class="p">][</span><span class="s2">&quot;file_dir&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;filter_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">[</span><span class="n">buffer_idx</span><span class="p">][</span><span class="s2">&quot;filter_type&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;SPIKING_THRESHOLD&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;spikeThreshold&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;BIN_SIZE&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s2">&quot;binSize&quot;</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="n">N</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">packet</span> <span class="o">=</span> <span class="n">load_one_mat_file</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">channel_data</span> <span class="ow">in</span> <span class="n">packet</span><span class="p">[</span><span class="s2">&quot;packet_data&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">channel_data</span><span class="p">[</span><span class="s2">&quot;channel_idx&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">electrode_idx</span><span class="p">:</span>
+                <span class="n">Y</span> <span class="o">=</span> <span class="n">channel_data</span><span class="p">[</span><span class="s2">&quot;filtered_data&quot;</span><span class="p">]</span>
+                <span class="n">N</span> <span class="o">=</span> <span class="n">channel_data</span><span class="p">[</span><span class="s2">&quot;N&quot;</span><span class="p">]</span>
+
+        <span class="n">time_elapsed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer_indexed</span><span class="p">[</span><span class="n">buffer_idx</span><span class="p">][</span><span class="s2">&quot;time_elapsed&quot;</span><span class="p">]</span>
+        <span class="n">SAMPLING_PERIOD</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c1"># check data_loading.py for more details</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">SAMPLING_PERIOD</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">time_elapsed</span><span class="p">,</span> <span class="n">time_elapsed</span> <span class="o">+</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
 
 
 
@@ -769,6 +1482,41 @@ TODO figure out time budget for model processing + filtering</p>
       </main>
       
         <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../data_loading/" class="md-footer__link md-footer__link--prev" aria-label="Previous: data loading" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              data loading
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../filters/" class="md-footer__link md-footer__link--next" aria-label="Next: filters" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              filters
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

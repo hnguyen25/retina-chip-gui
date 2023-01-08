@@ -13,7 +13,7 @@
     
     
       
-        <title>Development Getting Started Guide - DC1 Visualization</title>
+        <title>Getting Started - DC1 Visualization</title>
       
     
     
@@ -94,7 +94,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Development Getting Started Guide
+              Getting Started
             
           </span>
         </div>
@@ -180,7 +180,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../index.md" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         Introduction
       </a>
     </li>
@@ -193,11 +193,154 @@
 
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../getting-started.md" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Getting Started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Getting Started
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-setting-up-the-development-environment" class="md-nav__link">
+    1. Setting up the development environment
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Setting up the development environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-conda-environment" class="md-nav__link">
+    a. Conda environment
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-github-repository" class="md-nav__link">
+    b. Github Repository
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-information-pyqt-and-pyqtgraph" class="md-nav__link">
+    Additional Information: PyQt and PyQtGraph
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-running-developer-build-for-the-first-time" class="md-nav__link">
+    2. Running developer build for the first time
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Running developer build for the first time">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-to-run-in-terminal" class="md-nav__link">
+    a. To run in terminal
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-to-run-in-pycharm" class="md-nav__link">
+    b. To run in PyCharm
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-notes-on-important-files-and-where-files-are-located-last-updated-nov-2022" class="md-nav__link">
+    3. Notes on important files and where files are located (last updated Nov 2022)
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Notes on important files and where files are located (last updated Nov 2022)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#srcmainwindowpy" class="md-nav__link">
+    src/MainWindow.py
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#srcdata-folder" class="md-nav__link">
+    src/data folder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#srcgui-folder" class="md-nav__link">
+    src/gui folder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#srclayouts-folder" class="md-nav__link">
+    src/layouts folder
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#srcdebug-folder" class="md-nav__link">
+    src/debug folder
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -235,50 +378,22 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../data_loading.md" class="md-nav__link">
-        Run Script
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../main-window.md" class="md-nav__link">
-        Main Window
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
     
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
       
       
       
       
-        <label class="md-nav__link" for="__nav_3_3">
+        <label class="md-nav__link" for="__nav_3_1">
           model (data)
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="model (data)" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_3">
+        <label class="md-nav__title" for="__nav_3_1">
           <span class="md-nav__icon md-icon"></span>
           model (data)
         </label>
@@ -290,8 +405,78 @@
   
   
     <li class="md-nav__item">
-      <a href="../../data_loading.md" class="md-nav__link">
+      <a href="../../model/data_loading/" class="md-nav__link">
         data loading
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model/DC1DataContainer/" class="md-nav__link">
+        data structs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model/filters/" class="md-nav__link">
+        filters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model/raw_data_helpers/" class="md-nav__link">
+        raw data helpers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model/spike_detection/" class="md-nav__link">
+        spike detection
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model/statistics/" class="md-nav__link">
+        statistics
       </a>
     </li>
   
@@ -533,6 +718,41 @@ from these .ui files and are convenient to know how to reference different pyqtg
       </main>
       
         <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Introduction" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Introduction
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../model/data_loading/" class="md-footer__link md-footer__link--next" aria-label="Next: data loading" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              data loading
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

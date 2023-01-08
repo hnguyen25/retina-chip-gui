@@ -13,7 +13,7 @@
     
     
       
-        <title>Filters - DC1 Visualization</title>
+        <title>filters - DC1 Visualization</title>
       
     
     
@@ -94,7 +94,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Filters
+              filters
             
           </span>
         </div>
@@ -180,7 +180,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../index.md" class="md-nav__link">
+      <a href="../../general/" class="md-nav__link">
         Introduction
       </a>
     </li>
@@ -195,7 +195,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../getting-started.md" class="md-nav__link">
+      <a href="../../general/getting-started/" class="md-nav__link">
         Getting Started
       </a>
     </li>
@@ -208,12 +208,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
       
       
       
@@ -234,51 +236,25 @@
               
   
   
-  
-    <li class="md-nav__item">
-      <a href="../../data_loading.md" class="md-nav__link">
-        Run Script
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../main-window.md" class="md-nav__link">
-        Main Window
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
+    
   
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_3_3">
+        <label class="md-nav__link" for="__nav_3_1">
           model (data)
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="model (data)" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_3">
+        <label class="md-nav__title" for="__nav_3_1">
           <span class="md-nav__icon md-icon"></span>
           model (data)
         </label>
@@ -290,8 +266,245 @@
   
   
     <li class="md-nav__item">
-      <a href="../../data_loading.md" class="md-nav__link">
+      <a href="../data_loading/" class="md-nav__link">
         data loading
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../DC1DataContainer/" class="md-nav__link">
+        data structs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          filters
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        filters
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters" class="md-nav__link">
+    src.model.filters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterAuto" class="md-nav__link">
+    applyFilterAuto()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterAutoTimed" class="md-nav__link">
+    applyFilterAutoTimed()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterFastBandpass" class="md-nav__link">
+    applyFilterFastBandpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterFastBandpassTimed" class="md-nav__link">
+    applyFilterFastBandpassTimed()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterFasterBandpass" class="md-nav__link">
+    applyFilterFasterBandpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterFasterBandpassTimed" class="md-nav__link">
+    applyFilterFasterBandpassTimed()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterH0bandpass" class="md-nav__link">
+    applyFilterH0bandpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterH0bandpassTimed" class="md-nav__link">
+    applyFilterH0bandpassTimed()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterHierlemann" class="md-nav__link">
+    applyFilterHierlemann()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterHierlemannTimed" class="md-nav__link">
+    applyFilterHierlemannTimed()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterHighpass" class="md-nav__link">
+    applyFilterHighpass()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterHighpassTimed" class="md-nav__link">
+    applyFilterHighpassTimed()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterLitke" class="md-nav__link">
+    applyFilterLitke()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterLitkeTimed" class="md-nav__link">
+    applyFilterLitkeTimed()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterModHierlemann" class="md-nav__link">
+    applyFilterModHierlemann()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterModHierlemannTimed" class="md-nav__link">
+    applyFilterModHierlemannTimed()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterToAllData" class="md-nav__link">
+    applyFilterToAllData()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.filters.applyFilterToChannelData" class="md-nav__link">
+    applyFilterToChannelData()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../raw_data_helpers/" class="md-nav__link">
+        raw data helpers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spike_detection/" class="md-nav__link">
+        spike detection
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../statistics/" class="md-nav__link">
+        statistics
       </a>
     </li>
   
@@ -1806,6 +2019,41 @@
       </main>
       
         <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../DC1DataContainer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: data structs" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              data structs
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../raw_data_helpers/" class="md-footer__link md-footer__link--next" aria-label="Next: raw data helpers" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              raw data helpers
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
