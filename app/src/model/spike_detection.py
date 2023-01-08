@@ -64,6 +64,17 @@ def findSpikesGMM(electrode_data, channel_idx, debug = False):
 def getAboveThresholdActivity(data,
                               channel_noise_mean, channel_noise_std,
                               spiking_threshold):
+    """
+
+    Args:
+        data:
+        channel_noise_mean:
+        channel_noise_std:
+        spiking_threshold:
+
+    Returns:
+
+    """
 
     below_threshold = channel_noise_mean - (spiking_threshold * channel_noise_std)
     above_threshold_activity = (data <= below_threshold)
@@ -73,6 +84,17 @@ def getAboveThresholdActivity(data,
     return incom_spike_idx, incom_spike_amplitude
 
 def binSpikeTimes(buf_recording_len, incom_spike_idx, incom_spike_amps, BIN_SIZE):
+    """
+    
+    Args:
+        buf_recording_len:
+        incom_spike_idx:
+        incom_spike_amps:
+        BIN_SIZE:
+
+    Returns:
+
+    """
 
     NUM_BINS_IN_BUFFER = math.floor(buf_recording_len / BIN_SIZE)
 

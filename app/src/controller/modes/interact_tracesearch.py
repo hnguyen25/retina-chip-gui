@@ -19,7 +19,6 @@ def nextPage(app):
         app.timeStep = 0
         app.update_spike_search_plots()
 
-
 def backPage(app):
     if app.pageNum > 0:
         app.pageNum -= 1

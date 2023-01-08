@@ -3,34 +3,22 @@ theme:
   name: material
 
 nav:
-  - Introduction: 'index.md'
-  - Getting Started: 'getting-started.md'
+  - Introduction: 'general/index.md'
+  - Getting Started: 'general/getting-started.md'
   - Source:
-      - Run Script: 'run.md'
-      - Main Window: 'main-window.md'
-      - Data:
-        - Data Container: 'DC1DataContainer.md'
-        - Data Loading: 'model-loading.md'
-        - Filters: 'filters.md'
-        - Preprocessing: 'preprocessing.md'
-        - Multithreading: 'python-thread-worker.md'
-      - GUI:
-          - External Windows:
-            - Session Startup: 'session-parameters.md'
-            - Electrode info table: 'electrode-info.md'
-            - Individual channel: 'individual-channel.md'
-            - Profiler: 'profiler.md'
-          - Full Bandwidth Plots:
-              - Array Map: 'array-map.md'
-              - Litke Minimap: 'Litke-minimap.md'
-              - Noise: 'noise.md'
-              - Spike Rate: 'spike-rate.md'
-              - Traces: 'traces.md'
-              - Per Electrode Rendering: 'per-electrode-rendering.md'
-              - Chart Setup: 'setup-charts.md'
-              - Themes: 'themes.md'
-          - Compression Plots (Coming soon!): 'compression-plots.md'
+      - model (data):
+        - data loading: 'model/data_loading.md'
+        - data structs: 'model/DC1DataContainer.md'
+        - filters: 'model/filters.md'
+        - raw data helpers: 'model/raw_data_helpers.md'
+        - spike detection: 'model/spike_detection.md'
+        - statistics: 'model/statistics.md'
 
 plugins:
   - search
-  - mkdocstrings
+  - mkdocstrings:
+      handlers:
+             python:
+                setup_commands:
+                  - import sys
+                  - sys.path.append("app")

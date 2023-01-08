@@ -1,11 +1,10 @@
 import numpy as np
 import time
-
 from src.model.data_loading import *
 from ..model.filters import *
 import warnings
 import queue
-import pandas as pd  # TODO make a pandas dataframe for array info
+import pandas as pd
 
 class DC1DataContainer:
     """
@@ -37,6 +36,13 @@ class DC1DataContainer:
     avg_spike_rate_y = []
 
     def __init__(self, app, recording_info={}, data_processing_settings={}):
+        """
+
+        Args:
+            app:
+            recording_info:
+            data_processing_settings:
+        """
         self.app = app  # reference to MainWindow
         self.time_track, self.count_track = 0, 0
         self.time_track_processed, self.count_track_processed = 0, 0
@@ -78,6 +84,14 @@ class DC1DataContainer:
         self.to_show = queue.Queue()
 
     def append_buf(self, buf):
+        """
+
+        Args:
+            buf:
+
+        Returns:
+
+        """
         packet_idx = buf['packet_idx']
         channel_idxs = []  # for buffer_indexed model struct
 
@@ -162,6 +176,11 @@ class DC1DataContainer:
         return buffer_indexed_dict["channel_idxs"]
 
     def calculate_moving_spike_rate_avg(self):
+        """
+
+        Returns:
+
+        """
         avg_spike_rate = 0
         time_elapsed = 0
 
@@ -185,6 +204,14 @@ class DC1DataContainer:
         self.avg_spike_rate_y.append(y)
 
     def find_last_buffer_with_electrode_idx(self, electrode_idx):
+        """
+
+        Args:
+            electrode_idx:
+
+        Returns:
+
+        """
         # return buffer which contains an electrode idx
         # start from the end
         len_processed_buffer = len(self.buffer_indexed)
@@ -194,6 +221,14 @@ class DC1DataContainer:
         return -1
 
     def find_all_buffers_with_electrode_idx(self, electrode_idx):
+        """
+
+        Args:
+            electrode_idx:
+
+        Returns:
+
+        """
         buffers = []
         len_processed_buffer = len(self.buffer_indexed)
         for i in range(len_processed_buffer):
@@ -202,6 +237,14 @@ class DC1DataContainer:
         return buffers
 
     def get_last_trace_with_electrode_idx(self, electrode_idx):
+        """
+
+        Args:
+            electrode_idx:
+
+        Returns:
+
+        """
         buffer_idx = self.find_last_buffer_with_electrode_idx(electrode_idx)
         if buffer_idx == -1:
             return None, None

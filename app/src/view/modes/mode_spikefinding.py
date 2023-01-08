@@ -3,18 +3,19 @@ from src.controller.plots.spike_rate import *
 from src.controller.plots.mini_map import *
 from src.controller.plots.noise_histogram import *
 from src.controller.plots.channel_trace import *
-from PyQt5 import uic
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+
+from PyQt5 import uic, QtWidgets
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
 from PyQt5.QtWidgets import *
-import os
-import numpy as np
-import pyqtgraph as pg
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
-import pandas as pd
+
 from natsort import natsorted, index_natsorted, order_by_index
+import pandas as pd
+import numpy as np
+import pyqtgraph as pg
+import os
 
 def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     # (1) load the Qt Designer template
@@ -94,8 +95,9 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     app.statusBar().addPermanentWidget(app.TogglePlayButton)
     app.statusBar().addPermanentWidget(app.FastForwardButton)
 
-    app.RewindButton.clicked.connect(app.OnRewind)
-    app.TogglePlayButton.clicked.connect(app.OnPlay)
-    app.FastForwardButton.clicked.connect(app.OnFastForward)
+    from src.controller.modes.interact_spikefinding import OnRewind, OnPlay, OnFastForward
+    app.RewindButton.clicked.connect(OnRewind)
+    app.TogglePlayButton.clicked.connect(OnPlay)
+    app.FastForwardButton.clicked.connect(OnFastForward)
 
     app.actionUpdateSession.triggered.connect(app.OnNewSession)

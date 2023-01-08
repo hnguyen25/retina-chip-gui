@@ -1,6 +1,14 @@
 import numpy as np
 
 def removeMultipleCounts(dataRaw):
+    """
+
+    Args:
+        dataRaw:
+
+    Returns:
+
+    """
     # Initialize Variables Needed for Each Buffer
     chan_index_pre = 1025  # Check for chan changes, double cnt
     cnt_pre = 0  # Check for cnt changes, double cnt

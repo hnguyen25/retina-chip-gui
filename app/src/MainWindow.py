@@ -353,6 +353,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings['cursor_row'] = np.clip(int(x), 4, 28)
         self.settings['cursor_col'] = np.clip(int(y), 2, 30)
 
+        from src.controller.plots.array_map import update_minimap_indicator
         update_minimap_indicator(self, self.settings["current_theme"], themes)
         # TODO update minimap plot with new model
         #self.update_mini_map_plot()
@@ -458,23 +459,6 @@ class MainWindow(QtWidgets.QMainWindow):
             event.accept()
         else:
             event.ignore()
-
-    def OnRewind(self):
-        print('<<')
-        pass
-
-    def OnPlay(self):
-        print('play')
-        self.is_paused = not self.is_paused
-        if self.is_paused is True:
-            self.statusBar().showMessage("Paused!")
-        else:
-            self.statusBar().showMessage("Un-paused!")
-        pass
-
-    def OnFastForward(self):
-        print('>>')
-        pass
 
     def OnNewSession(self):
         # (1) open dialog box verifying start of new session

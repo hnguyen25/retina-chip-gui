@@ -1,5 +1,15 @@
 import numpy as np
 def calculate_channel_stats(packet, SPIKING_THRESHOLD, BIN_SIZE):
+    """
+
+    Args:
+        packet:
+        SPIKING_THRESHOLD:
+        BIN_SIZE:
+
+    Returns:
+
+    """
     for idx, channel_data in enumerate(packet["packet_data"]):
         channel_data["stats_avg+unfiltered+amp"] = np.mean(channel_data["preprocessed_data"])
         channel_data["stats_cnt"] = len(channel_data["filtered_data"])

@@ -1,7 +1,7 @@
 """
-@authors Maddy Hays, Huy Nguyen, John Bailey (2022)
 Functions for loading model files into form that can be read by GUI
 """''
+
 import os
 import scipy.io as sio
 
@@ -9,6 +9,14 @@ from .spike_detection import *
 from ..model.filters import *
 
 def load_first_buffer_info(app):
+    """
+
+    Args:
+        app:
+
+    Returns:
+
+    """
     data_run = os.path.basename(app.settings["path"])
     file_dir = app.settings["path"] +  "/" + data_run + "_" + str(0) + ".mat"
     first_file_params = {
@@ -27,6 +35,14 @@ def load_first_buffer_info(app):
     return NUM_CHANNELS_PER_BUFFER
 
 def load_one_mat_file(params):
+    """
+
+    Args:
+        params:
+
+    Returns:
+
+    """
     # this is designed to be multi-processed
     file_dir = params["file_dir"]
     filter_type = params["filter_type"]
@@ -58,6 +74,17 @@ def load_one_mat_file(params):
     return packet
 
 def preprocess_raw_data(data_real, cnt_real, N, SAMPLING_PERIOD=0.05):
+    """
+
+    Args:
+        data_real:
+        cnt_real:
+        N:
+        SAMPLING_PERIOD:
+
+    Returns:
+
+    """
     # Determine time estimate and sample counts for the total combined buffers
     # (note this does not take into account communication delays - hence an estimate)
     end_time = N * SAMPLING_PERIOD  # 20kHz sampling rate, means time_recording (ms) = num_sam * 0.05ms
@@ -107,6 +134,14 @@ loadingDict = initDataLoading('/Volumes/Lab/Users/mads/dc1DataVis/debugData', '2
 dataAll, cntAll, times = processData(loadingDict, dataIdentifierString='gmem1', buffer_num=0)
 """
 def init_data_loading(path : str):
+    """
+
+    Args:
+        path:
+
+    Returns:
+
+    """
     bufDir = os.listdir(path)
     num_of_buf = len(bufDir)
     bramdepth = 65536
