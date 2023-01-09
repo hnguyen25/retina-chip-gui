@@ -6,13 +6,10 @@ sys.path.append("app")
 
 import multiprocessing as mp
 from PyQt5 import QtWidgets, QtCore
-
 from src.controller.windows.window_sessionstartup import SessionStartupGUI
 from src.MainWindow import MainWindow
 
-# =============================
-# EDITABLE PARAMETERS
-# =============================
+
 APP_TITLE = 'Stanford Artificial Retina Project | Retina Chip v1.0 Experimental Visualization'
 WINDOWED_APP_SIZE = [1000, 750]  # size of main application (W x H)
 DEBUG_SETTINGS = {
@@ -44,9 +41,6 @@ DEBUG_STARTUP = {
     'default_dataset_path': 'debugData/2022-02-18-0/data001'
 }
 
-# =============================
-# MAIN BODY
-# =============================
 if __name__ == "__main__":
     base_dir = os.path.dirname(__file__)
     os.chdir(base_dir)
@@ -67,7 +61,7 @@ if __name__ == "__main__":
     app.setStyleSheet("QStatusBar{padding-left:8px;color:white;font-weight:bold;font-family:'Arial'}")
 
     continue_running = True
-    while (continue_running):
+    while continue_running:
         continue_running = False
 
         session_startup = SessionStartupGUI(base_dir, DEBUG_STARTUP)  # load initial startup window where user can specify session
@@ -88,5 +82,3 @@ if __name__ == "__main__":
 
     print('Application completed. Killing process...')
     app.quit()
-    #sys.exit()
-

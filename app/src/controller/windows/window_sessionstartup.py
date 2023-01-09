@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtCore
 import PyQt5.uic as uic
 import os
+from PyQt5.QtWidgets import QFileDialog
 
 class SessionStartupGUI(QtWidgets.QDialog):
     settings = {}
@@ -18,7 +19,7 @@ class SessionStartupGUI(QtWidgets.QDialog):
         self.chooseVisStyle.activated.connect(self.setVisStyle)
         self.settings["visStyle"] = self.chooseVisStyle.currentText()
 
-        self.chooseFilePath.clicked.connect(self.getFolderDir)
+        self.chooseFilePath.clicked.connect(self.getDirectoryPath)
 
         # os.chdir(basedir)
         self.settings["path"] = os.path.join(os.getcwd(), self.DEFAULT_DATASET_PATH)
@@ -32,19 +33,41 @@ class SessionStartupGUI(QtWidgets.QDialog):
         self.chooseSpikeDetectionMethod.activated.connect(self.setSpikeDetectionMethod)
         self.settings["spikeDetectionMethod"] = self.chooseSpikeDetectionMethod.currentText()
 
+        self.LabelFilePath.setWordWrap(True)
+
         self.chooseSpikeThreshold.sliderMoved.connect(self.setSpikeThreshold)
         self.chooseSpikeThreshold.setRange(float(self.THRESHOLD_MIN) * 100, float(self.THRESHOLD_MAX) * 100)
         self.chooseSpikeThreshold.setValue(self.THRESHOLD_DEFAULT * 100)
         self.LabelSpikeThreshold.setText(str(self.THRESHOLD_DEFAULT))
         self.settings["spikeThreshold"] = float(self.THRESHOLD_DEFAULT)
 
-    def getFolderDir(self):
-        path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
-        self.LabelFilePath.setText(os.path.basename(path))
-        self.settings["path"] = path
+    def getDirectoryPath(self):
+        path = ""
+        if self.settings["realTime"] == "Yes, load first .mat chunk" or \
+           self.settings["realTime"] == "Yes, load latest .mat chunk":
+            path = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder')
+
+        if self.settings["realTime"] == "No, load preprocessed .npz file":
+            path, _ = QFileDialog.getOpenFileName(self, 'Open file',
+                                                           '~', 'NPZ files (*.npz)')
+
+        if path is not "":
+            self.LabelFilePath.setText("Selected Path: " + os.path.basename(path))
+            self.settings["path"] = path
 
     def setVisStyle(self): self.settings["visStyle"] = self.chooseVisStyle.currentText()
-    def setRealTime(self): self.settings["realTime"] = self.chooseRealTime.currentText()
+    def setRealTime(self):
+        self.settings["realTime"] = self.chooseRealTime.currentText()
+        if self.settings["realTime"] == "Yes, load first .mat chunk" or \
+           self.settings["realTime"] == "Yes, load latest .mat chunk":
+            self.chooseFilePath.setText("Select .mat folder directory...")
+        if self.settings["realTime"] == "No, load preprocessed .npz file":
+            self.chooseFilePath.setText("Select .npz file...")
+
+        # clear existing directory selection
+        self.settings["path"] = ""
+        self.LabelFilePath.setText("")
+
     def setFilter(self): self.settings["filter"] = self.chooseFilter.currentText()
     def setSpikeDetectionMethod(self):
         self.settings["spikeDetectionMethod"] = self.chooseSpikeDetectionMethod.currentText()
