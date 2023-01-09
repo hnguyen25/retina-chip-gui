@@ -41,8 +41,6 @@ class MainWindow(QtWidgets.QMainWindow):
     noise_heat_map_color_bar = None
     arrayMapHoverCoords = None
 
-
-
     def __init__(self, *args, **kwargs):
 
         super(MainWindow, self).__init__()
@@ -57,21 +55,31 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # load first buffer so that layout can load properly from start
         self.data = DC1DataContainer(self)
-        self.settings["num_channels"] = load_first_buffer_info(self)
-        self.data_loading_serialized_loop()
 
-        from src.controller.modes.init_charts import setup_layout
-        if not setup_layout(self, self.settings['visStyle'],
-                            self.settings["current_theme"], themes,
-                            self.settings["num_channels"]):
-            print("This layout has not been developed yet! Exiting application...")
-            sys.exit()
+        if self.settings["realTime"] == "Yes, load first .mat chunk" or \
+           self.settings["realTime"] == "Yes, load latest .mat chunk":
+            self.settings["num_channels"] = load_first_buffer_info(self)
 
-        charts_list = self.chart_update_function_mapping.keys()
-        self.gui_charts_time_counter = {chart: 100 for chart in charts_list}
+            self.data_loading_serialized_loop()
+            from src.controller.modes.init_charts import setup_layout
+            if not setup_layout(self, self.settings['visStyle'],
+                                self.settings["current_theme"], themes,
+                                self.settings["num_channels"]):
+                print("This layout has not been developed yet! Exiting application...")
+                sys.exit()
 
-        self.profiling_df = pd.DataFrame(columns=["name", "type", "time elapsed", "timestamp"])
-        self.exec_multithreading()
+            charts_list = self.chart_update_function_mapping.keys()
+            self.gui_charts_time_counter = {chart: 100 for chart in charts_list}
+
+            self.profiling_df = pd.DataFrame(columns=["name", "type", "time elapsed", "timestamp"])
+            self.exec_multithreading()
+
+        if self.settings["realTime"] == "No, load preprocessed .npz file":
+            # this is non real-time
+            load_npz_file(self)
+
+            # TODO load gui for npz files
+
 
     last_gui_refresh_time = time.time()
     array_data, latest_buffers, buffer_metadata = None, None, None
@@ -138,7 +146,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.settings['debug_threads']: print("START: parallel thread")
         pool = multiprocessing.Pool(processes=NUM_SIMULTANEOUS_PROCESSES)
 
-        # TODO check what type of data is being processed .npz files vs .mat folder dir etc
 
 
         while self.running is True:
@@ -227,8 +234,6 @@ class MainWindow(QtWidgets.QMainWindow):
               + " loaded into memory,  " + str(self.NUM_GUI_QUEUE) + " waiting to be displayed). " +  \
              "From model directory " + datarun + "."
         self.statusBar().showMessage(msg)
-        #self.statusBar().showMessage('||TOT' + str(self.NUM_TOTAL) + '|| UNPROC' + str(self.NUM_UNPROCESSED) + ' >> PROC' +
-        #      str(self.NUM_PROCESSED) + ' >> GUIQ' + str(self.NUM_GUI_QUEUE) + ' >> DISP' + str(self.NUM_DISPLAYED))
 
     curr_buf_idx = 0
     def file_loading_parallelized_loop(self, pool, NUM_SIMULTANEOUS_PROCESSES):
@@ -319,10 +324,8 @@ class MainWindow(QtWidgets.QMainWindow):
                              "time elapsed": round(time.time() - start_time, 5),
                              "timestamp": round(start_time, 5)
                         }
-                        #print('adding profiling df...1', new_data)
                         
                         self.profiling_df = self.profiling_df.append(new_data, ignore_index=True)
-                        #print(self.profiling_df)
 
         for window in self.external_windows:
             start_time = time.time()
@@ -334,7 +337,6 @@ class MainWindow(QtWidgets.QMainWindow):
                     "time elapsed": round(time.time() - start_time, 5),
                     "timestamp": round(start_time, 5)
                 }
-                #print('adding profiling df...2', new_data)
                 self.profiling_df = self.profiling_df.append(new_data, ignore_index=True)
             
         return True
@@ -481,7 +483,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         """
-        
+
         Args:
             event:
 

@@ -51,7 +51,7 @@ class SessionStartupGUI(QtWidgets.QDialog):
             path, _ = QFileDialog.getOpenFileName(self, 'Open file',
                                                            '~', 'NPZ files (*.npz)')
 
-        if path is not "":
+        if path != "":
             self.LabelFilePath.setText("Selected Path: " + os.path.basename(path))
             self.settings["path"] = path
 

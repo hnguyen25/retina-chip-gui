@@ -31,7 +31,6 @@ def load_first_buffer_info(app):
     app.curr_buf_idx = 1
 
     NUM_CHANNELS_PER_BUFFER = len(packet["packet_data"])
-
     return NUM_CHANNELS_PER_BUFFER
 
 def load_one_mat_file(params):
