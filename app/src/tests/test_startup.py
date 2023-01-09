@@ -4,6 +4,12 @@ from app.run import *
 from PyQt5.QtTest import QTest
 from PyQt5.Qt import Qt
 
+# test testing capability
+def test_func_case_1():
+    assert True
+def test_func_case_2():
+    assert 1 == 1
+    
 def start_app_for_testing():
     base_dir = os.path.dirname(__file__)
     os.chdir(base_dir)
