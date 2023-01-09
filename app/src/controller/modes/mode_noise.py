@@ -3,11 +3,10 @@ This is the code to start the visualization of the noise mode, which will be use
 to view noise statistics of the retina chip.
 """
 
-from src.controller.plots.array_map import *
-from src.controller.plots.spike_rate import *
-from src.controller.plots.mini_map import *
+
 from src.controller.plots.noise_histogram import *
 from src.controller.plots.channel_trace import *
+from src.controller.plots.noise_heatmap import *
 from PyQt5 import uic
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileDialog
@@ -38,24 +37,27 @@ def setup_noise_plots(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
 
     # (2) set the functions to continually update charts in the GUI
     app.charts = {
-
+        "channelTracesVerticalLayout": app.channelTraceLayout,
+        "channelTraces": [app.channelTrace1, app.channelTrace2, app.channelTrace3, app.channelTrace4],
+        "noiseHistogram": app.noiseHistogramPlot,
+        "noiseHeatMap": app.noiseHeatMap
     }
     app.chart_update_function_mapping = {
         "channelTraces": update_channel_trace_plot,
-        "arrayMap": update_array_map_plot,
+        "noiseHistogram": update_noise_histogram_plot,
         "noiseHeatMap": update_noise_heat_map
     }
     app.chart_update_extra_params = {
-        "channelTraces": None,
-        "arrayMap": None,
+        "channelTraces": app.charts["channelTraces"],
+        "noiseHistogram": None,
         "noiseHeatMap": None
     }
 
-    app.charts["noiseHeatMap"] = app.noiseHeatMap
-    app.charts["noiseHistogram"] = app.noiseHistogramPlot
-
-    app.charts["channelTraceVerticalLayout"] = app.channelTraceLayout
-    app.charts["channelTraces"] = [app.channelTrace1, app.channelTrace2, app.channelTrace3, app.channelTrace4]
+    app.CHART_MIN_TIME_TO_REFRESH = {
+        "channelTraces": 1,
+        "noiseHistogram": 2,
+        "noiseHeatMap": 4
+    }
 
     app.charts["noiseHeatMap"].setTitle("Noise Heat Map", size="12pt")
 

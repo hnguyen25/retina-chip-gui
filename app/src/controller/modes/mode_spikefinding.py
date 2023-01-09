@@ -62,6 +62,7 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
         channel_traces[i].scene().sigMouseClicked.connect(lambda: pause_trace_updating(channel_traces[i], i))
     """
 
+
     app.charts = {
         "arrayMap": app.arrayMap,
         "miniMap": app.miniMap,
@@ -85,6 +86,17 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
         "arrayMap": None,
         "noiseHeatMap": None,
     }
+
+    app.CHART_MIN_TIME_TO_REFRESH = {
+        "miniMap": 2,
+        "spikeRatePlot": 0.5,
+        "noiseHistogram": 2,
+        "channelTraces": 1,
+        "arrayMap": 4,  # 4
+        "noiseHeatMap": 0.5,
+        "spikeSearch": 0.5
+    }
+
 
     setupArrayMap(app, app.charts["arrayMap"], CURRENT_THEME, themes)
     setupMiniMapPlot(app, app.charts["miniMap"], CURRENT_THEME, themes)

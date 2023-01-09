@@ -25,7 +25,7 @@ dark_theme_colors = {
     "background_color": '#1e2030',
     "background_borders": '#222436',
     "font_color": '#ffffff',
-    "button": '#ECEFF4',
+    "button": '#4C566A',
 
     'spikeHighlighting' : '#EBCB8B',
     'tracePlotting': '#08F7FE',

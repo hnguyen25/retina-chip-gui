@@ -276,16 +276,6 @@ class MainWindow(QtWidgets.QMainWindow):
         channel_idxs = self.data.append_buf(next_packet)
         return True
 
-    CHART_MIN_TIME_TO_REFRESH = {
-        "miniMap": 2,
-        "spikeRatePlot": 0.5,
-        "noiseHistogram": 2,
-        "channelTraces": 1,
-        "arrayMap": 4, #4
-        "noiseHeatMap": 0.5,
-        "spikeSearch": 0.5
-    }
-
     def gui_refresh_loop(self):
         if self.is_paused: return
         next_packet = self.data.to_show.get()

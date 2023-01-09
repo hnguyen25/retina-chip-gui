@@ -12,7 +12,7 @@ def load_first_buffer_info(app):
     """
 
     Args:
-        app:
+        app: MainWindow
 
     Returns:
 

@@ -63,28 +63,4 @@ def setup_layout(app, layout: str, CURRENT_THEME: str, themes: dict, NUM_CHANNEL
     else: return False
     update_theme(app, CURRENT_THEME)
 
-    # Because we needed to call app.setupInteractivity separately in
-    # the case that Spike Search is called, we don't want to call it twice (causes a bug)
-    if app.settings["visStyle"] != "Spike Search":
-        """ Connects all the different buttons with their respective actions. Also set up multithreading."""
-
-        app.actionIndividualChannelInfo.triggered.connect(app.viewNewIndividualChannelInformation)
-        app.actionListElectrodesInfo.triggered.connect(app.viewChannelListInformation)
-        app.actionAnalysisParameters.triggered.connect(app.viewGUIPreferences)
-        app.actionGUIProfiler.triggered.connect(app.viewGUIProfiler)
-
-        # TODO what is this? app.actionGUIProfiler.triggered.connect(app.viewGUIProfiler)
-        from src.controller.modes.mode_tracesearch import resetSpikeSearchPlotParams, nextPage, backPage, switchTimeZoom, timeStepUp, timeStepDown
-        if app.settings["visStyle"] == "Spike Search":
-            app.resetButton.clicked.connect(app.resetSpikeSearchPlotParams)
-            app.nextButton.clicked.connect(app.nextPage)
-            app.backButton.clicked.connect(app.backPage)
-            app.timeZoomToggle.clicked.connect(app.switchTimeZoom)
-            app.nextTimeStep.clicked.connect(app.timeStepUp)
-            app.lastTimeStep.clicked.connect(app.timeStepDown)
-            app.yMin.valueChanged.connect(app.update_spike_search_plots)
-            app.yMax.valueChanged.connect(app.update_spike_search_plots)
-            app.yMax.setValue(20)
-            app.yMin.setValue(30)  # note: pyqt spin boxes don't support negative values (for some reason)
-            # so yMin is the distance below the mean we display
     return True

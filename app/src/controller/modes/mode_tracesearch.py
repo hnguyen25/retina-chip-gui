@@ -3,21 +3,19 @@ This is the code to start the visualization of the trace search mode, which will
 to view large amounts of trace data to search for spikes in non-live data.
 """
 
-import pyqtgraph as pg
-import numpy as np
 import math
+from PyQt5 import uic, QtWidgets
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
+from PyQt5.QtWidgets import *
 
-def clearTraceSearchPlots(app):
-    """
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt
 
-    Args:
-        app: MainWindow
-
-    Returns:
-
-    """
-    for chart in app.charts:
-        app.charts[chart].clear()
+from natsort import natsorted, index_natsorted, order_by_index
+import pandas as pd
+import numpy as np
+import pyqtgraph as pg
+import os
 
 def setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     """
@@ -48,6 +46,10 @@ def setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
         "traceSearch": None
     }
 
+    app.CHART_MIN_TIME_TO_REFRESH = {
+        "traceSearch": 2
+    }
+
     # (3) Set up additional functionality
     # app.buttons["ResetButton"] = app.resetButton
     # app.buttons["nextFigButton"] = app.nextFigButton
@@ -56,40 +58,102 @@ def setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     # app.buttons["nextButton"] = app.nextButton
     # app.buttons["atTimeWindowButton"] = app.atTimeWindowButton
     app.FigureLabel.setText("Figure: " + str(app.pageNum))
+    app.actionIndividualChannelInfo.triggered.connect(app.viewNewIndividualChannelInformation)
+    app.actionListElectrodesInfo.triggered.connect(app.viewChannelListInformation)
+    app.actionAnalysisParameters.triggered.connect(app.viewGUIPreferences)
+    app.actionGUIProfiler.triggered.connect(app.viewGUIProfiler)
 
-def update_trace_search_plots(app, next_packet, CURRENT_THEME, themes, extra_params):
+    from src.controller.modes.mode_tracesearch import resetSpikeSearchPlotParams, nextPage, backPage, switchTimeZoom, \
+        timeStepUp, timeStepDown
+
+    """todo reconnect these
+    app.resetButton.clicked.connect(app.resetSpikeSearchPlotParams)
+    app.nextButton.clicked.connect(app.nextPage)
+    app.backButton.clicked.connect(app.backPage)
+    app.timeZoomToggle.clicked.connect(app.switchTimeZoom)
+    app.nextTimeStep.clicked.connect(app.timeStepUp)
+    app.lastTimeStep.clicked.connect(app.timeStepDown)
+    app.yMin.valueChanged.connect(app.update_spike_search_plots)
+    app.yMax.valueChanged.connect(app.update_spike_search_plots)
+    app.yMax.setValue(20)
+    app.yMin.setValue(30)  # note: pyqt spin boxes don't support negative values (for some reason)
+    # so yMin is the distance below the mean we display
+    """
+
+    font_color = themes[CURRENT_THEME]["font_color"]
+    button_color = themes[CURRENT_THEME]["button"]
+    button_style = "color:" + font_color + ";" + \
+                   "background-color:" + button_color + ";"
+    app.resetButton.setStyleSheet(button_style)
+    app.nextButton.setStyleSheet(button_style)
+    app.backButton.setStyleSheet(button_style)
+    app.timeZoomToggle.setStyleSheet(button_style)
+    app.nextTimeStep.setStyleSheet(button_style)
+    app.lastTimeStep.setStyleSheet(button_style)
+
+def clearTraceSearchPlots(app):
     """
 
     Args:
-        app:
-        next_packet:
-        CURRENT_THEME:
-        themes:
+        app: MainWindow
+
+    Returns:
+
+    """
+    for chart in app.charts:
+        app.charts[chart].clear()
+
+def setupOneSpikeTrace(plot_widget, label: int, CURRENT_THEME: str, themes: dict):
+    """function to set up trace plots in the spike search gui
+
+    Args:
+        plot_widget: reference to pyqtgraph widget
+        label:
+        CURRENT_THEME: current GUI theme
+        themes: dictionary of theme colors
+
+    Returns:
+
+    """
+    color = themes[CURRENT_THEME]["font_color"]
+    if label > 1023: label = "####"
+
+    plot_widget.setTitle('Ch #  ' + str(label),
+                         color = color,
+                         size = '10pt')
+
+    plot_widget.setLabel('bottom', 'time')
+
+def update_trace_search_plots(app, next_packet, CURRENT_THEME: str, themes: dict, extra_params):
+    """
+
+    Args:
+        app: MainWindow
+        next_packet: data contained in next buffer
+        CURRENT_THEME: current GUI theme
+        themes: dictionary of theme colors
         extra_params:
 
     Returns:
 
-    """
-    """
-    Returns:
     """
     # First, clear the plots
     clearTraceSearchPlots(app)
 
     # Second, set up the plot figures for every electrode on the page
     # TODO make this code work
-    #for elec in getTracesToPlot(app):
-    #    row, col = electrodeToPlotGrid(app, elec)
-    #    setupOneSpikeTrace(app.charts["r" + str(row) + "c" + str(col)], elec, CURRENT_THEME)
-
-    from src.view.windows.window_individualchannel import IndividualChannelInformation
-    individualChannel = IndividualChannelInformation()
-    individualChannel.setSessionParent(app)
+    for elec in getTracesToPlot(app):
+        row, col = electrodeToPlotGrid(app, elec)
+        setupOneSpikeTrace(app.charts["r" + str(row) + "c" + str(col)], elec, CURRENT_THEME, themes)
 
     pen = pg.mkPen(color=themes[CURRENT_THEME]['tracePlotting'])
 
+    from src.controller.windows.window_individualchannel import IndividualChannelInformation
+    individualChannel = IndividualChannelInformation()
+    individualChannel.setSessionParent(app)
+
     # Third, fill in plots with what model you have
-    for elec in app.getTracesToPlot():
+    for elec in getTracesToPlot(app):
         individualChannel.current_elec = elec
         individualChannel.updateElectrodeData()
 
@@ -114,7 +178,7 @@ def update_trace_search_plots(app, next_packet, CURRENT_THEME, themes, extra_par
             row, col = app.electrodeToPlotGrid(elec)
             gridToPlot = "r" + str(row) + "c" + str(col)
             app.charts[gridToPlot].plot(individualChannel.electrode_times,
-                                         individualChannel.electrode_data, pen=pen)
+                                        individualChannel.electrode_data, pen=pen)
             app.charts[gridToPlot].setYRange(lowerYBound, upperYBound, padding=0)
             app.charts[gridToPlot].setXRange(xRange[0], xRange[1], padding=0)
 
@@ -137,6 +201,8 @@ def update_trace_search_plots(app, next_packet, CURRENT_THEME, themes, extra_par
 
 # ================
 # HELPER FUNCTIONS
+# ================
+
 def electrodeToPlotGrid(app, electrodeNum):
     """
 
