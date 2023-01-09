@@ -1,10 +1,9 @@
 """
-run.py
-Huy Nguyen (2022)
-----
 script to run entire application
 """
 import os, sys
+sys.path.append("app")
+
 import multiprocessing as mp
 from PyQt5 import QtWidgets, QtCore
 
@@ -51,6 +50,7 @@ DEBUG_STARTUP = {
 if __name__ == "__main__":
     base_dir = os.path.dirname(__file__)
     os.chdir(base_dir)
+
     print("Application starting from base directory", base_dir)
 
     if DEBUG_SETTINGS['is_mode_multithreading']: mp.set_start_method('spawn')

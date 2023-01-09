@@ -6,7 +6,6 @@ from PyQt5.Qt import Qt
 
 class TestModeMiscWindows(unittest.TestCase):
 
-
     """ examples
     def test_upper(self):
         self.assertEqual('foo'.upper(), 'FOO')
