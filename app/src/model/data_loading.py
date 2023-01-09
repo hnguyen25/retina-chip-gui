@@ -176,12 +176,9 @@ def map2idx(ch_row: int, ch_col: int):
 
     Returns: numerical index of array
     """
-    if ch_row > 31 or ch_row <0:
-        print('Row out of range')
-    elif ch_col >31 or ch_col<0:
-        print('Col out of range')
-    else:
-        ch_idx = int(ch_row*32 + ch_col)
+    if ch_row > 31 or ch_row < 0: print('Row out of range')
+    elif ch_col > 31 or ch_col < 0: print('Col out of range')
+    else: ch_idx = int(ch_row * 32 + ch_col)
     return ch_idx
 
 def idx2map(ch_idx: int):

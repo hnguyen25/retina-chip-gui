@@ -17,34 +17,17 @@ class MainWindow(QtWidgets.QMainWindow):
     running = True
     is_paused = False
     new_session = False
-
     first_time_plotting = True  # toggles to false when all the charts are setup for the first time
+
     settings = {}  # session parameters created through user input from the startup pane
     loading_dict = {}  # contains details of the model run currently being analyzed
-    profile_data = {
-        'appendRawData': [], 'filterData': [], 'calculateArrayStats': [], 'arrayMap': [],
-        'noiseHeatMap': [], 'channelTrace': [], 'noiseHistogram': [], 'spikeRatePlot': [],
-        'miniMap': [], 'channelTrace1': [], 'channelTrace2': [], 'channelTrace3': [], 'channelTrace4': []
-    }  # contains information about how long different view functions took to run
-
     profiling_df = None
 
     charts = {}  # keys=name of every possible chart, value=reference to chart in GUI, None if not in it
     chart_update_function_mapping = {}  # keys=names of charts, value=related functions to update respective charts
     chart_update_extra_params = {}
     external_windows = []  # reference to windows that have been generated outside of this MainWindow
-
-    basedir = None  # base directory of where the program is loaded up, acquired from run.py script
-
-    # list of length DC1DataContainer.settings["simultaneousChannelsRecordedPerPacket"] with model and
-    # information to plot every channel in the latest model packet processed
-    # list contains a dictionary for every channel, with keys
-    # 'x': all times in packet
-    # 'y': all electrode amp values in packets, correlated with x
-    # 'curr_x': times in current window shown directly in GUI
-    # 'curr_y': respective amplitude values of curr_x
-    # 'chan_idx': the channel idx being plotted
-    trace_channels_info = []
+    subplot_elements = {}
 
     ### MISCELLANEOUS ###
     pageNum = 0  # used for knowing which traces to display in spike search modes. Zero-indexed
@@ -57,15 +40,8 @@ class MainWindow(QtWidgets.QMainWindow):
     array_map_color_bar = None  # reference to the color bar embedded with the array map chart
     noise_heat_map_color_bar = None
     arrayMapHoverCoords = None
-    array_map_channels_to_update = []
 
-    ### NEW STRUCTS
-    subplot_elements = {}
-    def update_subplot_element(self, chart, key, value):
-        if key in self.subplot_elements:
-            self.charts[chart].removeItem(self.subplot_elements[key])
-        self.charts[chart].addItem(value)
-        self.subplot_elements[key] = value
+
 
     def __init__(self, *args, **kwargs):
 
@@ -104,6 +80,11 @@ class MainWindow(QtWidgets.QMainWindow):
     NUM_TOTAL = 0  # should be = NUM_UNPROCESSED + NUM_PROCESSED + NUM_GUI_QUEUE + NUM_DISPLAYED
     threadpool = None
     def exec_multithreading(self):
+        """
+
+        Returns:
+
+        """
         print('setup multithreading')
 
         self.running = True
@@ -144,8 +125,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # this is one separate thread running a multiprocessing
     def data_loading_parallelized_thread(self, progress_callback, gui_callback,  NUM_SIMULTANEOUS_PROCESSES=6):
+        """
+
+        Args:
+            progress_callback:
+            gui_callback:
+            NUM_SIMULTANEOUS_PROCESSES:
+
+        Returns:
+
+        """
         if self.settings['debug_threads']: print("START: parallel thread")
         pool = multiprocessing.Pool(processes=NUM_SIMULTANEOUS_PROCESSES)
+
+        # TODO check what type of data is being processed .npz files vs .mat folder dir etc
+
 
         while self.running is True:
             if self.settings['debug_threads']: print('Thread-Parallel >> Time elapsed', round(time.time() - self.last_gui_refresh_time, 2))
@@ -166,6 +160,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 time.sleep(5)
 
     def data_loading_serialized_thread(self, progress_callback, gui_callback):
+        """
+
+        Args:
+            progress_callback:
+            gui_callback:
+
+        Returns:
+
+        """
         if self.settings['debug_threads']: print("START: serial thread")
         while self.running is True:
             buf_dir = os.listdir(self.settings["path"])
@@ -196,7 +199,11 @@ class MainWindow(QtWidgets.QMainWindow):
     MIN_GUI_REFRESH_INTERVAL = 2
     # this loop is run by a QTimer in MainWindow.exec_multithread
     def gui_refresh_thread(self):
+        """
 
+        Returns:
+
+        """
         buf_dir = os.listdir(self.settings["path"])
         self.NUM_TOTAL = len(buf_dir)
         self.NUM_UNPROCESSED = self.NUM_TOTAL - self.NUM_PROCESSED - self.NUM_GUI_QUEUE - self.NUM_DISPLAYED
@@ -225,6 +232,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
     curr_buf_idx = 0
     def file_loading_parallelized_loop(self, pool, NUM_SIMULTANEOUS_PROCESSES):
+        """
+
+        Args:
+            pool:
+            NUM_SIMULTANEOUS_PROCESSES:
+
+        Returns:
+
+        """
         if self.is_paused: return
         # decide how many packets to multiprocess this time
         if self.NUM_UNPROCESSED >= NUM_SIMULTANEOUS_PROCESSES:
@@ -277,6 +293,11 @@ class MainWindow(QtWidgets.QMainWindow):
         return True
 
     def gui_refresh_loop(self):
+        """
+
+        Returns:
+
+        """
         if self.is_paused: return
         next_packet = self.data.to_show.get()
 
@@ -318,6 +339,22 @@ class MainWindow(QtWidgets.QMainWindow):
             
         return True
 
+    def update_subplot_element(self, chart, key, value):
+        """
+
+        Args:
+            chart:
+            key:
+            value:
+
+        Returns:
+
+        """
+        if key in self.subplot_elements:
+            self.charts[chart].removeItem(self.subplot_elements[key])
+        self.charts[chart].addItem(value)
+        self.subplot_elements[key] = value
+
     def showArrayLocOnStatusBar(self, x, y):
         """ Given x, y mouse location on a chart -> display on the status bar on the bottom of the GUI
 
@@ -331,7 +368,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.arrayMapHoverCoords = (int_x, int_y)
 
     def onArrayMapClick(self, x, y):
-
         """ Given an x, y coord as clicked on from the array map,
         reset the center of the electrode minimap to that location.
 
@@ -349,8 +385,12 @@ class MainWindow(QtWidgets.QMainWindow):
         #self.update_mini_map_plot()
 
     def viewNewIndividualChannelInformation(self):
-        """ Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
-        for analyzing individual channels on DC1. """
+        """Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
+        for analyzing individual channels on DC1.
+
+        Returns:
+            None
+        """
         from src.controller.windows.window_individualchannel import IndividualChannelInformation
         new_window = IndividualChannelInformation()
         new_window.label = QLabel("Individual Channel Analysis")
@@ -361,8 +401,13 @@ class MainWindow(QtWidgets.QMainWindow):
         update_theme(self, self.settings["current_theme"])
 
     def viewChannelListInformation(self):
-        """ Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant model
-        for sorting all the electrodes on the array. """
+        """Connected to [View > List of electrodes info...]. Opens up a new window containing useful quant model
+        for sorting all the electrodes on the array.
+
+        Returns:
+            None
+
+        """
         from src.controller.windows.window_electrodelist import ElectrodeListInformation
         new_window = ElectrodeListInformation()
         new_window.label = QLabel("Electrode List Analysis")
@@ -373,6 +418,11 @@ class MainWindow(QtWidgets.QMainWindow):
         update_theme(self, self.settings["current_theme"])
 
     def viewGUIPreferences(self):
+        """
+
+        Returns:
+            None
+        """
         from src.controller.windows.window_sessionparameters import GUIPreferences
         new_window = GUIPreferences()
         new_window.label = QLabel("GUI Preferences")
@@ -381,7 +431,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.external_windows.append(new_window)
 
     def viewGUIProfiler(self):
-        print("GUI profiler")
+        """
+
+        Returns:
+            None
+        """
         from src.controller.windows.window_profiler import GUIProfiler
         new_window = GUIProfiler()
         new_window.label = QLabel("GUI Profiler")
@@ -395,42 +449,27 @@ class MainWindow(QtWidgets.QMainWindow):
     def print_output(self, s): print(s)
     def thread_complete(self): print("THREAD COMPLETE!")
 
-    """
-    =======================
-    MENU BAR // FILE...
-    =======================
-    """
-    def getDataPath(self, file_type : str):
-        options = QFileDialog.Options()
-        if file_type is None:
-            file_path, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()",
-                                                      "", "All Files (*)", options=options)
-        else:
-            file_path, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()",
-                                                      "", file_type, options=options)
-        if file_path: print(file_path)
-        return file_path
-    # (1) Yes, load first .mat chunk & (2) Yes, load latest .mat chunk
-    def onLoadRealtimeStream(self, load_from_beginning = True):
-        self.loading_dict = init_data_loading(self.settings["path"])
-
-        # TODO parallelize loading already saved .mat files
-        load_realtime_worker = Worker(self.realtimeLoading, self.settings["path"], self.loading_dict, load_from_beginning)
-        load_realtime_worker.signals.progress.connect(self.updateStatusBar)
-        load_realtime_worker.signals.gui_callback.connect(self.gui_refresh_loop)
-        self.threadpool.start(load_realtime_worker)
-    # TODO (3) No, load raw .mat file
-    # parallelize this faster
-
-    # TODO (4) No, load pre-processed .npz file
-
-    # TODO (5) No, load filtered .npz file
-
     # callback from progress signal
-    def updateStatusBar(self, message):
+    def updateStatusBar(self, message: str):
+        """
+
+        Args:
+            message:
+
+        Returns:
+            None
+        """
         self.statusBar().showMessage(message)
 
     def keyPressEvent(self, event):
+        """
+
+        Args:
+            event:
+
+        Returns:
+
+        """
         if event.key() == Qt.Key_Up:
             self.onArrayMapClick(self.settings['cursor_row'], self.settings['cursor_col']+1)
         if event.key() == Qt.Key_Down:
@@ -441,6 +480,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.onArrayMapClick(self.settings['cursor_row']-1, self.settings['cursor_col'])
 
     def closeEvent(self, event):
+        """
+        
+        Args:
+            event:
+
+        Returns:
+
+        """
         quit_msg = "Are you sure you want to exit the program?"
         reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
                                                QtWidgets.QMessageBox.Cancel | QtWidgets.QMessageBox.Ok)
