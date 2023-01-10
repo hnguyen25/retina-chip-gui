@@ -22,8 +22,7 @@ If certain packages don't install properly, this is probably because there are p
 specific packages for them. Just `conda install <insert-package-name>` the packages that do not install properly.
 
 ### b. Github Repository
-Clone code from the [Github Repository](https://github.com/hnguyen25/artifical-retina-pipeline-guis). If you do not have
-access, contact nguyen5h@stanford.edu.
+Clone code from the [Github Repository](https://github.com/hnguyen25/artifical-retina-pipeline-guis).
 
 ### Additional Information: PyQt and PyQtGraph
 Use PyQt5 (the latest version) and PyQtGraph (specifically the v0.12 builds).
@@ -44,7 +43,7 @@ This GUI can be run either within the terminal or inside a Python IDE such as Py
 ### a. To run in terminal
 1. On new terminal session, `conda activate <name-of-env>` to load relevant Python libraries
 2. Navigate to the location of `run.py` within the cloned repository
-3. Execute command `python3 run.py`
+3. Execute command `python run.py`
 
 ### b. To run in PyCharm
 1. The top-right bar should contain drop down menu to choose run configuration. Click on `Edit configurations...`
@@ -53,35 +52,31 @@ This GUI can be run either within the terminal or inside a Python IDE such as Py
 4. Setup Python interpreter to be the Conda environment which you setup in part 1
 5. The GUI should load when you press the play button now
 
-## 3. Notes on important files and where files are located (last updated Nov 2022)
+## 3. Notes on important files and where files are located (last updated Jan 2023)
 
-Executing `dc1DataVis/app/run.py` will startup the application. The beginning of the file contains editable parameters
+Executing `/app/run.py` will startup the application. The beginning of the file contains editable parameters
 that will be passed through to the application (`MainWindow.py`) for the session, which can be modified by the developer.
 It will also be possible to toggle these parameters within the GUI in the future.
 
-Other than `run.py`, the entire codebase for the GUI is located within the folder `dc1DataVis/app/src`.
+Other than `run.py`, the entire codebase for the GUI is located within the folder `dc1DataVis/app/src`. Every file
+within the `src` folder should have a corresponding documentation page within this wiki.
 
 ### `src/MainWindow.py`
-The main application for the entire GUI! Every other script links to this file! If unsure what a file does, check where it
-is loaded in relation to this file. Check this link for additional documentation: TODO
+The main application for the entire GUI! Every other script links to this file or run.py. If unsure what a file does,
+check where it is loaded in relation to this file.
 
-### `src/data` folder
-This file contains functions for loading, manipulating, filtering, and analyzing data collected from the retina chip.
-It also contains `DC1DataContainer.py`, which is the main class which holds all of the data visualized by the GUI
-during runtime. Within this data class, there are two types of data: data that is indexed by the electrode (i.e. noise,
-time updated, spike rate, etc.) and data that is indexed by the sequential order which data packets are received from
-the retina chip through the FPGA.
+The rest of the application logic is split in a standard MVC (model-view-control) pattern, as distinguished by folders
+with the respective role.
 
-### `src/gui` folder
-The folder contains all the code to plot the different types of visualizations (noise, trace, etc.)
+#### `src/Model`
+Files associated with loading, processing, and retrieving data for visualization.1
 
-### `src/layouts` folder
-This folder contains all files with endings *.ui. These are layout files which is
-interpreted by PyQt5 in order to generate the different GUIs. All of these files can
-be viewed and edited by Qt Designer. Associated .py files with the same filename generate
-from these .ui files and are convenient to know how to reference different pyqtgraph elements.
+#### `src/View`
+Files associated with the layout of the GUI elements themselves (designed in QtDesigner), and associated color themes
 
-**Official Documentation for Qt Designer**: https://doc.qt.io/qt-6/qtdesigner-manual.html
+#### `src/Controller`
+Any logic to show or manipulate GUI windows, whether through user input and automatically through the course of the
+program.
 
-### `src/debug` folder
-Nothing important in this folder (yet!). Will be used to contain unit testing scripts!
+### `src/Testing`
+This contains all the test cases for unit testing the GUI.
