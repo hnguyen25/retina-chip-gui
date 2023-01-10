@@ -5,8 +5,8 @@ from PyQt5.QtTest import QTest
 from PyQt5.Qt import Qt
 
 import logging
-self._logger = logging.getLogger(__name__)
-self._logger.debug("testing 1 2 3!")
+logger = logging.getLogger(__name__)
+logger.debug("testing 1 2 3!")
 
 # test testing capability
 def test_func_case_1():
