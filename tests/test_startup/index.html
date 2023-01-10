@@ -180,7 +180,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../general/" class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         Introduction
       </a>
     </li>
@@ -829,13 +829,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#src.tests.test_startup.TestData" class="md-nav__link">
-    TestData
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -865,70 +858,6 @@
 
 
 
-
-
-
-  <div class="doc doc-object doc-class">
-
-
-
-<h2 class="doc doc-heading" id="src.tests.test_startup.TestData">
-        <code>
-TestData            (<span title="unittest.case.TestCase">TestCase</span>)
-        </code>
-
-
-
-</h2>
-
-    <div class="doc doc-contents ">
-
-      <p>examples
-def test_upper(self):
-    self.assertEqual('foo'.upper(), 'FOO')</p>
-<p>def test_isupper(self):
-    self.assertTrue('FOO'.isupper())
-    self.assertFalse('Foo'.isupper())</p>
-<p>def test_split(self):
-    s = 'hello world'
-    self.assertEqual(s.split(), ['hello', 'world'])
-    # check that s.split fails when the separator is not a string
-    with self.assertRaises(TypeError):
-        s.split(2)</p>
-
-        <details class="quote">
-          <summary>Source code in <code>src/tests/test_startup.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TestData</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
-
-    <span class="c1"># TODO test that data has 1024 rows</span>
-
-    <span class="c1"># TODO test that each data column is in the right type</span>
-
-    <span class="c1"># TODO sanity check that each data column is within a reasonable range</span>
-
-    <span class="sd">&quot;&quot;&quot; examples</span>
-<span class="sd">    def test_upper(self):</span>
-<span class="sd">        self.assertEqual(&#39;foo&#39;.upper(), &#39;FOO&#39;)</span>
-
-<span class="sd">    def test_isupper(self):</span>
-<span class="sd">        self.assertTrue(&#39;FOO&#39;.isupper())</span>
-<span class="sd">        self.assertFalse(&#39;Foo&#39;.isupper())</span>
-
-<span class="sd">    def test_split(self):</span>
-<span class="sd">        s = &#39;hello world&#39;</span>
-<span class="sd">        self.assertEqual(s.split(), [&#39;hello&#39;, &#39;world&#39;])</span>
-<span class="sd">        # check that s.split fails when the separator is not a string</span>
-<span class="sd">        with self.assertRaises(TypeError):</span>
-<span class="sd">            s.split(2)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span>
-</code></pre></div>
-        </details>
-
-
-    </div>
-
-  </div>
 
 
 
