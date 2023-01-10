@@ -10,7 +10,6 @@ def test_func_case_1():
 def test_func_case_2():
     assert 1 == 1
 
-
 def start_app_for_testing():
     base_dir = os.path.dirname(__file__)
     os.chdir(base_dir)

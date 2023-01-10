@@ -89,7 +89,7 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME: str, themes: dict, ex
     for i in range(len(next_packet['packet_data'])):
         # get packet info
         chan_idx = next_packet['packet_data'][i]['channel_idx']
-        from src.model.data_loading import idx2map
+        from src.model.data_loading_mat import idx2map
         row, col = idx2map(chan_idx)
 
         # add squares around electrodes currently being recorded from + visualized in spike trace
@@ -127,7 +127,7 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME: str, themes: dict, ex
     color_map = app.array_map_color_bar.colorMap()
     for row in range(NUM_TOTAL_ROWS):
         for col in range(NUM_TOTAL_COLS):
-            from src.model.data_loading import map2idx
+            from src.model.data_loading_mat import map2idx
             idx = map2idx(row, col)
 
             array_dot_color_idx = app.data.df.at[idx, "array_dot_color"]
@@ -213,7 +213,7 @@ def recalculate_all_sizes(app):
             spike_amp = app.data.df.at[idx, "spikes_avg_amp"]
             # spike_cnt = app.model.array_indexed['stats_spikes+cnt'][y][x + 1]
             # spike_amp = app.model.array_indexed['stats_spikes+avg+amp'][y][x + 1]
-            from app.src.model.data_loading import map2idx
+            from src.model.data_loading_mat import map2idx
             channel_idx = map2idx(y, x)
             tooltip_text = "<html>" + "Electrode Channel #" + str(channel_idx) + "<br>" + \
                            "Row " + str(y) + ", Column " + str(x) + "<br>" + \
@@ -238,7 +238,7 @@ def on_color_bar_levels_changed(app):
     color_map = app.array_map_color_bar.colorMap()
     for row in range(NUM_TOTAL_ROWS):
         for col in range(NUM_TOTAL_COLS):
-            from src.model.data_loading import map2idx
+            from src.model.data_loading_mat import map2idx
             idx = map2idx(row, col)
             color = color_map.map(app.data.df.at[idx, "array_dot_color"])
 

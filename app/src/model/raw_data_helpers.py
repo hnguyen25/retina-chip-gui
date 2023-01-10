@@ -73,7 +73,7 @@ def identify_relevant_channels(raw_data: np.array):
     channel_id = np.zeros(num_channels)
     start_idx = np.zeros(num_channels)
 
-    from src.model.data_loading import map2idx
+    from src.model.data_loading_mat import map2idx
     for k in range(0,num_channels):
         channel_id[k] = map2idx(channel_map[0,k],channel_map[1,k])
         start_idx[k] = (raw_data[channel_map[0, k], channel_map[1, k], :] != 0).argmax(axis=0)

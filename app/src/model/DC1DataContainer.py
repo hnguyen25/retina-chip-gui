@@ -1,6 +1,6 @@
 import numpy as np
 import time
-from src.model.data_loading import *
+from src.model.data_loading_mat import *
 from ..model.filters import *
 import warnings
 import queue
@@ -264,7 +264,7 @@ class DC1DataContainer:
                     N = channel_data["N"]
 
             time_elapsed = self.buffer_indexed[buffer_idx]["time_elapsed"]
-            SAMPLING_PERIOD = 0.05  # check data_loading.py for more details
+            SAMPLING_PERIOD = 0.05  # check data_loading_mat.py for more details
             end_time = N * SAMPLING_PERIOD
             X = np.linspace(time_elapsed, time_elapsed + end_time, N + 1)
 

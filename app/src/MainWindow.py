@@ -79,6 +79,17 @@ class MainWindow(QtWidgets.QMainWindow):
             load_npz_file(self)
 
             # TODO load gui for npz files
+            """
+            if not setup_layout(self, self.settings['visStyle'],
+                            self.settings["current_theme"], themes,
+                            self.settings["num_channels"]):
+            print("This layout has not been developed yet! Exiting application...")
+            sys.exit()
+            charts_list = self.chart_update_function_mapping.keys()
+            self.gui_charts_time_counter = {chart: 100 for chart in charts_list}
+
+            self.profiling_df = pd.DataFrame(columns=["name", "type", "time elapsed", "timestamp"])
+            """
 
 
     last_gui_refresh_time = time.time()
@@ -145,8 +156,6 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         if self.settings['debug_threads']: print("START: parallel thread")
         pool = multiprocessing.Pool(processes=NUM_SIMULTANEOUS_PROCESSES)
-
-
 
         while self.running is True:
             if self.settings['debug_threads']: print('Thread-Parallel >> Time elapsed', round(time.time() - self.last_gui_refresh_time, 2))
