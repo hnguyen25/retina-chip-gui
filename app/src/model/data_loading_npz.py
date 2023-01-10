@@ -1,3 +1,5 @@
+import numpy as np
+
 def load_npz_file(app):
     print('npz! ------')
     data = np.load(app.settings["path"])
