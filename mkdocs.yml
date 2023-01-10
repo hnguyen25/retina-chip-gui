@@ -3,7 +3,7 @@ theme:
   name: material
 
 nav:
-  - Introduction: 'general/index.md'
+  - Introduction: 'index.md'
   - Getting Started: 'general/getting-started.md'
   - Source:
       - model (data):
