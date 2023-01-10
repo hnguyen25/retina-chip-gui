@@ -1,0 +1,1850 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.9">
+    
+    
+      
+        <title>individual channel analysis - DC1 Visualization</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.120efc48.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.9647289d.min.css">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#src.controller.windows.window_individualchannel" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="DC1 Visualization" class="md-header__button md-logo" aria-label="DC1 Visualization" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DC1 Visualization
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              individual channel analysis
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="DC1 Visualization" class="md-nav__button md-logo" aria-label="DC1 Visualization" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    DC1 Visualization
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../general/" class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../general/getting-started/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Source
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Source" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Source
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_1">
+          model (data)
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="model (data)" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          model (data)
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../model/data_loading_mat/" class="md-nav__link">
+        data loading (.mat files)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../model/data_loading_npz/" class="md-nav__link">
+        data loading (.npz files)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../model/DC1DataContainer/" class="md-nav__link">
+        data structs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../model/filters/" class="md-nav__link">
+        filters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../model/raw_data_helpers/" class="md-nav__link">
+        raw data helpers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../model/spike_detection/" class="md-nav__link">
+        spike detection
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../model/statistics/" class="md-nav__link">
+        statistics
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_2">
+          view (gui elements)
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="view (gui elements)" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          view (gui elements)
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../view/gui_themes/" class="md-nav__link">
+        themes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../view/layouts/" class="md-nav__link">
+        layouts
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_3">
+          controller
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="controller" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_3">
+          <span class="md-nav__icon md-icon"></span>
+          controller
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3_1" type="checkbox" id="__nav_3_3_1" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_3_1">
+          modes
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="modes" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          modes
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modes/init_charts/" class="md-nav__link">
+        initialize charts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modes/mode_compression/" class="md-nav__link">
+        compression
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modes/mode_diagnostic/" class="md-nav__link">
+        diagnostic
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modes/mode_noise/" class="md-nav__link">
+        noise
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modes/mode_spikefinding/" class="md-nav__link">
+        spike finding (main)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modes/mode_tracesearch/" class="md-nav__link">
+        trace search
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3_2" type="checkbox" id="__nav_3_3_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_3_2">
+          plots
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="plots" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          plots
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plots/array_map/" class="md-nav__link">
+        array map
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plots/channel_trace/" class="md-nav__link">
+        channel trace
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plots/mini_map/" class="md-nav__link">
+        mini map
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plots/noise_heatmap/" class="md-nav__link">
+        noise heatmap
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plots/noise_histogram.md" class="md-nav__link">
+        noise histogram
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plots/spike_rate/" class="md-nav__link">
+        spike rate
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3_3" type="checkbox" id="__nav_3_3_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_3_3">
+          windows
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="windows" data-md-level="3">
+        <label class="md-nav__title" for="__nav_3_3_3">
+          <span class="md-nav__icon md-icon"></span>
+          windows
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../window_electrodelist/" class="md-nav__link">
+        electrode list
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          individual channel analysis
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        individual channel analysis
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel" class="md-nav__link">
+    src.controller.windows.window_individualchannel
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation" class="md-nav__link">
+    IndividualChannelInformation
+  </a>
+  
+    <nav class="md-nav" aria-label="IndividualChannelInformation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.idx2map" class="md-nav__link">
+    idx2map()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.map2idx" class="md-nav__link">
+    map2idx()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.setElecNum" class="md-nav__link">
+    setElecNum()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.setRC" class="md-nav__link">
+    setRC()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.update" class="md-nav__link">
+    update()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.updateSpikeRate" class="md-nav__link">
+    updateSpikeRate()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../window_profiler/" class="md-nav__link">
+        profiler
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../window_sessionparameters/" class="md-nav__link">
+        session parameters
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../window_sessionstartup/" class="md-nav__link">
+        session startup
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel" class="md-nav__link">
+    src.controller.windows.window_individualchannel
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation" class="md-nav__link">
+    IndividualChannelInformation
+  </a>
+  
+    <nav class="md-nav" aria-label="IndividualChannelInformation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.idx2map" class="md-nav__link">
+    idx2map()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.map2idx" class="md-nav__link">
+    map2idx()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.setElecNum" class="md-nav__link">
+    setElecNum()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.setRC" class="md-nav__link">
+    setRC()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.update" class="md-nav__link">
+    update()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#src.controller.windows.window_individualchannel.IndividualChannelInformation.updateSpikeRate" class="md-nav__link">
+    updateSpikeRate()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+
+  <h1>individual channel analysis</h1>
+
+<div class="doc doc-object doc-module">
+
+<a id="src.controller.windows.window_individualchannel"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 class="doc doc-heading" id="src.controller.windows.window_individualchannel.IndividualChannelInformation">
+        <code>
+IndividualChannelInformation            (<span title="PyQt5.QtWidgets.QWidget">QWidget</span>)
+        </code>
+
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+
+        <details class="quote">
+          <summary>Source code in <code>src/controller/windows/window_individualchannel.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">IndividualChannelInformation</span><span class="p">(</span><span class="n">QWidget</span><span class="p">):</span>
+    <span class="n">session_parent</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">current_elec</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">current_row</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">current_col</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">recordedTime</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">has_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># List of dictionaries containing model packets with electrode info (model, times, spikes, etc).</span>
+    <span class="c1"># Each packet is for the same electrode, but may have model from different times within recording session</span>
+    <span class="n">electrode_packets</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Lists containing values stored in the associated key in electrode_packets dictionaries</span>
+    <span class="n">electrode_times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">electrode_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">electrode_spikes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">electrode_spike_times</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">individualchannel_charts</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># dictionary for all different individual channel charts</span>
+    <span class="n">individualchannel_charts_update_mapping</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># dictionary for mapping charts to their update functions</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">uic</span><span class="o">.</span><span class="n">loadUi</span><span class="p">(</span><span class="s2">&quot;./src/view/layouts/IndividualChannelWindow.ui&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateElectrodeNum</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setElecNum</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateRC</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setRC</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">individualchannel_charts</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ChannelTracePlot&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ChannelTracePlot</span><span class="p">,</span>
+            <span class="s1">&#39;AmplitudeHistPlot&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">AmplitudeHistPlot</span><span class="p">,</span>
+            <span class="s1">&#39;SpikeRatePlot&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">SpikeRatePlot</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">individualchannel_charts_update_mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;ChannelTracePlot&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateChannelTrace</span><span class="p">,</span>
+            <span class="s1">&#39;AmplitudeHistPlot&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateAmplitudeHist</span><span class="p">,</span>
+            <span class="s1">&#39;SpikeRatePlot&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">updateSpikeRate</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">setSessionParent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_parent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span> <span class="o">=</span> <span class="n">session_parent</span>
+        <span class="c1"># self.setupCharts() TODO figure why this was here</span>
+
+    <span class="c1"># Note: do NOT change name from &quot;update&quot;</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Update individual channels: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateElectrodeData</span><span class="p">()</span>
+
+        <span class="c1"># update the charts</span>
+        <span class="k">for</span> <span class="n">chart</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">individualchannel_charts_update_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">individualchannel_charts_update_mapping</span><span class="p">[</span><span class="n">chart</span><span class="p">]()</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">map2idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;std from array stats: &#39;</span> <span class="o">+</span>
+                  <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">LoadedData</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s2">&quot;noise_std&quot;</span><span class="p">]))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;noise mean from array stats: &quot;</span> <span class="o">+</span>
+                  <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">LoadedData</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s2">&quot;noise_mean&quot;</span><span class="p">]))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;std from direct calculation: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_packets</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;model&quot;</span><span class="p">])))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">totalSamples</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Total number of samples: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_data</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeRecorded</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Total time recording electrode: &quot;</span>
+                                  <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recordedTime</span><span class="p">)</span>
+                                  <span class="o">+</span> <span class="s2">&quot;ms&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numSpikes</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Number of spikes: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;number of spikes from array stats: &#39;</span> <span class="o">+</span>
+                  <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">LoadedData</span><span class="o">.</span><span class="n">array_indexed</span><span class="p">[</span><span class="s1">&#39;spike_cnt&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">]))</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">gui_state</span><span class="p">[</span><span class="s1">&#39;is_mode_profiling&#39;</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Individual Channel update time: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">updateElectrodeData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">electrode_packets</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">electrode_spike_times</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">electrode_data</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="n">match</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_last_trace_with_electrode_idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">)</span>
+
+        <span class="c1"># TODO hook this data with rest of GUI</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # Create a list of dictionaries of model packets for the selected electrode</span>
+<span class="sd">        for i in range(len_filtered_data):</span>
+<span class="sd">            if self.session_parent.LoadedData.filtered_data[i][&#39;channel_idx&#39;] == self.current_elec:</span>
+<span class="sd">                self.electrode_packets.append(self.session_parent.LoadedData.filtered_data[i])</span>
+<span class="sd">                match = True</span>
+<span class="sd">        if debug:</span>
+<span class="sd">            if not match:</span>
+<span class="sd">                print(&quot;No model from this electrode yet&quot;)</span>
+
+<span class="sd">        filtered = True</span>
+<span class="sd">        if self.session_parent.settings[&quot;filter&quot;] == &quot;None&quot;:</span>
+<span class="sd">            filtered = False</span>
+
+<span class="sd">        # Get lists of times and model from each packet for the selected electrode</span>
+<span class="sd">        for i in range(len(self.electrode_packets)):</span>
+<span class="sd">            self.session_parent.LoadedData.\</span>
+<span class="sd">                calculate_realtime_spike_info_for_channel_in_buffer(self.electrode_packets[i], filtered)</span>
+<span class="sd">            self.electrode_spikes.extend(self.electrode_packets[i][&quot;spikeBins&quot;])</span>
+<span class="sd">            self.electrode_spike_times.extend(self.electrode_packets[i][&quot;incom_spike_times&quot;])</span>
+<span class="sd">            self.electrode_times.extend(self.electrode_packets[i][&#39;times&#39;])</span>
+<span class="sd">            self.electrode_data.extend(self.electrode_packets[i][&#39;model&#39;])</span>
+
+<span class="sd">        self.recordedTime = round((len(self.electrode_data)) * 0.05, 2)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">updateAmplitudeHist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">electrode_data</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">vals</span><span class="o">/</span><span class="n">std</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AmplitudeHistPlot</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
+        <span class="n">curve</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">PlotCurveItem</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">stepMode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fillLevel</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">brush</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">80</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AmplitudeHistPlot</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">curve</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">updateSpikeRate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">movingAverage</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">windowSize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">numberOfUpdates</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        movingAverage: If false, divide up the range into numberOfUpdates bins and average to find spike rate</span>
+
+<span class="sd">        windowSize: Size of moving average window in milliseconds</span>
+
+<span class="sd">        numberOfUpdates: How many times you want to update the spike rate if not doing moving average.</span>
+<span class="sd">        Function divides the range of model into numberOfUpdates bins to time average spikes.</span>
+
+<span class="sd">        debug: Print helpful model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SpikeRatePlot</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;self.electrode_times: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;self.electrode_spikes: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Length of electrode times: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">)))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Length of electrode spikes list: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="p">)))</span>
+        <span class="n">spikeList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikeList</span><span class="p">),</span> <span class="n">numberOfUpdates</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">spike_rate</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Only run if electrode has been recorded</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recordedTime</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Perform moving average on spike list</span>
+            <span class="k">if</span> <span class="n">movingAverage</span><span class="p">:</span>
+                <span class="n">moving_averages</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikeList</span><span class="p">)</span> <span class="o">-</span> <span class="n">windowSize</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">window_average</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">spikeList</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">windowSize</span><span class="p">])</span> <span class="o">/</span> <span class="n">windowSize</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="n">moving_averages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1000</span><span class="o">*</span><span class="n">window_average</span><span class="p">)</span> <span class="c1"># multiply by 1000 to go to spikes/sec</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="nb">len</span><span class="p">(</span><span class="n">spikeList</span><span class="p">)</span><span class="o">-</span><span class="n">windowSize</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">spike_rate</span> <span class="o">=</span> <span class="n">moving_averages</span>
+
+            <span class="c1"># Window modes</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">num_spikes</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numberOfUpdates</span><span class="p">):</span>
+                    <span class="n">window</span> <span class="o">=</span> <span class="n">spikeList</span><span class="p">[</span><span class="n">indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">indexes</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span>
+                    <span class="n">num_spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                    <span class="n">spike_rate</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1000</span><span class="o">*</span><span class="n">num_spike</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recordedTime</span><span class="o">/</span><span class="n">numberOfUpdates</span><span class="p">)</span> <span class="k">for</span> <span class="n">num_spike</span> <span class="ow">in</span> <span class="n">num_spikes</span><span class="p">]</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">numberOfUpdates</span><span class="p">)</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spike_rate</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numberOfUpdates</span><span class="p">)]</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numberOfUpdates</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">SpikeRatePlot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">spike_rate</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="n">pg</span><span class="o">.</span><span class="n">mkPen</span><span class="p">(</span><span class="n">themes</span><span class="p">[</span><span class="n">CURRENT_THEME</span><span class="p">][</span><span class="s1">&#39;blue1&#39;</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">map2idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;length of recording: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; model points&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;electrode times: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;spikes: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="p">))</span>
+            <span class="c1">#print(&quot;double binned spikes: &quot; + str(num_spikes))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;number of spike bins: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="p">)))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;incoming spike times: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spike_times</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;noise mean: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">LoadedData</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s1">&#39;noise_mean&#39;</span><span class="p">]))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;noise std: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">LoadedData</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s1">&#39;noise_std&#39;</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="nf">updateChannelTrace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ChannelTracePlot</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ChannelTracePlot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">electrode_data</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ChannelTracePlot</span><span class="o">.</span><span class="n">enableAutoRange</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ChannelTracePlot</span><span class="o">.</span><span class="n">setAutoVisible</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ChannelTracePlot</span><span class="o">.</span><span class="n">setLabel</span><span class="p">(</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">setRC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the row and column entries and text boxes given an electrode number.</span>
+
+<span class="sd">        Connected to &quot;Update Row and Column&quot; button</span>
+
+<span class="sd">         &quot;&quot;&quot;</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeNumber</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">():</span>
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1024</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx2map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeRow</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeCol</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeNumber</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeNumber</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">setElecNum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Given a row and column value, set the electrode number textbox and display plots</span>
+
+<span class="sd">        Connected to the</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeRow</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeCol</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeRow</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeCol</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">()</span> <span class="ow">and</span> <span class="n">col</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">():</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="n">col</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">row</span> <span class="o">&lt;</span> <span class="mi">32</span> <span class="ow">and</span> <span class="n">row</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span> <span class="o">=</span> <span class="n">row</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeRow</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">col</span> <span class="o">&lt;</span> <span class="mi">32</span> <span class="ow">and</span> <span class="n">col</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span> <span class="o">=</span> <span class="n">col</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">pass</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeCol</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">map2idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeNumber</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">map2idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ch_col</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Given a channel&#39;s row and col, return channel&#39;s index</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ch_row: row index of channel in array (up to 32)</span>
+<span class="sd">            ch_col: column index of channel in array (up to 32)</span>
+
+<span class="sd">        Returns: numerical index of array</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ch_row</span> <span class="o">&gt;</span> <span class="mi">31</span> <span class="ow">or</span> <span class="n">ch_row</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Row out of range&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ch_col</span> <span class="o">&gt;</span> <span class="mi">31</span> <span class="ow">or</span> <span class="n">ch_col</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Col out of range&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ch_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ch_row</span> <span class="o">*</span> <span class="mi">32</span> <span class="o">+</span> <span class="n">ch_col</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ch_idx</span>
+
+    <span class="k">def</span> <span class="nf">idx2map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Given a channel index, return the channel&#39;s row and col</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ch_idx: single numerical index for array (up to 1024)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            channel row and channel index</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ch_idx</span> <span class="o">&gt;</span> <span class="mi">1023</span> <span class="ow">or</span> <span class="n">ch_idx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Chan num out of range&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ch_row</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ch_idx</span> <span class="o">/</span> <span class="mi">32</span><span class="p">)</span>
+            <span class="n">ch_col</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ch_idx</span> <span class="o">-</span> <span class="n">ch_row</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ch_row</span><span class="p">,</span> <span class="n">ch_col</span>
+
+    <span class="c1"># see MainWindow.update_theme() for how this is called</span>
+    <span class="k">def</span> <span class="nf">update_theme</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_theme</span><span class="p">,</span> <span class="n">themes</span><span class="p">):</span>
+        <span class="n">background_color</span> <span class="o">=</span> <span class="n">themes</span><span class="p">[</span><span class="n">current_theme</span><span class="p">][</span><span class="s2">&quot;background_color&quot;</span><span class="p">]</span>
+        <span class="n">background_border</span> <span class="o">=</span> <span class="n">themes</span><span class="p">[</span><span class="n">current_theme</span><span class="p">][</span><span class="s2">&quot;background_borders&quot;</span><span class="p">]</span>
+        <span class="n">button_color</span> <span class="o">=</span> <span class="n">themes</span><span class="p">[</span><span class="n">current_theme</span><span class="p">][</span><span class="s2">&quot;button&quot;</span><span class="p">]</span>
+        <span class="n">font_color</span> <span class="o">=</span> <span class="n">themes</span><span class="p">[</span><span class="n">current_theme</span><span class="p">][</span><span class="s2">&quot;font_color&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;background-color: &quot;</span> <span class="o">+</span> <span class="n">background_border</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateElectrodeNum</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;background-color: &quot;</span> <span class="o">+</span> <span class="n">button_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updateRC</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;background-color: &quot;</span> <span class="o">+</span> <span class="n">button_color</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_elecnum</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;color: &quot;</span> <span class="o">+</span> <span class="n">font_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_2</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;color: &quot;</span> <span class="o">+</span> <span class="n">font_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_3</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;color: &quot;</span> <span class="o">+</span> <span class="n">font_color</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">numSpikes</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;color: &quot;</span> <span class="o">+</span> <span class="n">font_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">totalSamples</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;color: &quot;</span> <span class="o">+</span> <span class="n">font_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeRecorded</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;color: &quot;</span> <span class="o">+</span> <span class="n">font_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeRow</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;background-color: &quot;</span> <span class="o">+</span> <span class="n">button_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeCol</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;background-color: &quot;</span> <span class="o">+</span> <span class="n">button_color</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeNumber</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;background-color: &quot;</span> <span class="o">+</span> <span class="n">button_color</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">chart</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">individualchannel_charts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">individualchannel_charts</span><span class="p">[</span><span class="n">chart</span><span class="p">]</span><span class="o">.</span><span class="n">setBackground</span><span class="p">(</span><span class="n">background_color</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.controller.windows.window_individualchannel.IndividualChannelInformation.idx2map">
+<code class="highlight language-python"><span class="n">idx2map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_idx</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Given a channel index, return the channel's row and col</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ch_idx</code></td>
+        <td><code>int</code></td>
+        <td><p>single numerical index for array (up to 1024)</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td></td>
+      <td><p>channel row and channel index</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>src/controller/windows/window_individualchannel.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">idx2map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Given a channel index, return the channel&#39;s row and col</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ch_idx: single numerical index for array (up to 1024)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        channel row and channel index</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ch_idx</span> <span class="o">&gt;</span> <span class="mi">1023</span> <span class="ow">or</span> <span class="n">ch_idx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Chan num out of range&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ch_row</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ch_idx</span> <span class="o">/</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="n">ch_col</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ch_idx</span> <span class="o">-</span> <span class="n">ch_row</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ch_row</span><span class="p">,</span> <span class="n">ch_col</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.controller.windows.window_individualchannel.IndividualChannelInformation.map2idx">
+<code class="highlight language-python"><span class="n">map2idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_row</span><span class="p">,</span> <span class="n">ch_col</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Given a channel's row and col, return channel's index</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ch_row</code></td>
+        <td><code>int</code></td>
+        <td><p>row index of channel in array (up to 32)</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>ch_col</code></td>
+        <td><code>int</code></td>
+        <td><p>column index of channel in array (up to 32)</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>      <p>Returns: numerical index of array</p>
+
+        <details class="quote">
+          <summary>Source code in <code>src/controller/windows/window_individualchannel.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">map2idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch_row</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ch_col</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Given a channel&#39;s row and col, return channel&#39;s index</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ch_row: row index of channel in array (up to 32)</span>
+<span class="sd">        ch_col: column index of channel in array (up to 32)</span>
+
+<span class="sd">    Returns: numerical index of array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ch_row</span> <span class="o">&gt;</span> <span class="mi">31</span> <span class="ow">or</span> <span class="n">ch_row</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Row out of range&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">ch_col</span> <span class="o">&gt;</span> <span class="mi">31</span> <span class="ow">or</span> <span class="n">ch_col</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Col out of range&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ch_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ch_row</span> <span class="o">*</span> <span class="mi">32</span> <span class="o">+</span> <span class="n">ch_col</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ch_idx</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.controller.windows.window_individualchannel.IndividualChannelInformation.setElecNum">
+<code class="highlight language-python"><span class="n">setElecNum</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Given a row and column value, set the electrode number textbox and display plots</p>
+<p>Connected to the</p>
+
+        <details class="quote">
+          <summary>Source code in <code>src/controller/windows/window_individualchannel.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">setElecNum</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Given a row and column value, set the electrode number textbox and display plots</span>
+
+<span class="sd">    Connected to the</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeRow</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeCol</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeRow</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">col</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeCol</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">()</span> <span class="ow">and</span> <span class="n">col</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">():</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">row</span> <span class="o">&lt;</span> <span class="mi">32</span> <span class="ow">and</span> <span class="n">row</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span> <span class="o">=</span> <span class="n">row</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeRow</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">col</span> <span class="o">&lt;</span> <span class="mi">32</span> <span class="ow">and</span> <span class="n">col</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span> <span class="o">=</span> <span class="n">col</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeCol</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">map2idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeNumber</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">))</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.controller.windows.window_individualchannel.IndividualChannelInformation.setRC">
+<code class="highlight language-python"><span class="n">setRC</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Set the row and column entries and text boxes given an electrode number.</p>
+<p>Connected to "Update Row and Column" button</p>
+
+        <details class="quote">
+          <summary>Source code in <code>src/controller/windows/window_individualchannel.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">setRC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Set the row and column entries and text boxes given an electrode number.</span>
+
+<span class="sd">    Connected to &quot;Update Row and Column&quot; button</span>
+
+<span class="sd">     &quot;&quot;&quot;</span>
+    <span class="nb">input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeNumber</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">():</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1024</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx2map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeRow</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeCol</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeNumber</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">InputElectrodeNumber</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">))</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.controller.windows.window_individualchannel.IndividualChannelInformation.update">
+<code class="highlight language-python"><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>update(self)
+update(self, QRect)
+update(self, QRegion)
+update(self, int, int, int, int)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>src/controller/windows/window_individualchannel.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Update individual channels: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_elec</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">updateElectrodeData</span><span class="p">()</span>
+
+    <span class="c1"># update the charts</span>
+    <span class="k">for</span> <span class="n">chart</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">individualchannel_charts_update_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">individualchannel_charts_update_mapping</span><span class="p">[</span><span class="n">chart</span><span class="p">]()</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">map2idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;std from array stats: &#39;</span> <span class="o">+</span>
+              <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">LoadedData</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s2">&quot;noise_std&quot;</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;noise mean from array stats: &quot;</span> <span class="o">+</span>
+              <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">LoadedData</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s2">&quot;noise_mean&quot;</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;std from direct calculation: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_packets</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;model&quot;</span><span class="p">])))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">totalSamples</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Total number of samples: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_data</span><span class="p">)))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">timeRecorded</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Total time recording electrode: &quot;</span>
+                              <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recordedTime</span><span class="p">)</span>
+                              <span class="o">+</span> <span class="s2">&quot;ms&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">numSpikes</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Number of spikes: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;number of spikes from array stats: &#39;</span> <span class="o">+</span>
+              <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">LoadedData</span><span class="o">.</span><span class="n">array_indexed</span><span class="p">[</span><span class="s1">&#39;spike_cnt&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">]))</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">gui_state</span><span class="p">[</span><span class="s1">&#39;is_mode_profiling&#39;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Individual Channel update time: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 class="doc doc-heading" id="src.controller.windows.window_individualchannel.IndividualChannelInformation.updateSpikeRate">
+<code class="highlight language-python"><span class="n">updateSpikeRate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">movingAverage</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">windowSize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">numberOfUpdates</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+
+</h3>
+
+    <div class="doc doc-contents ">
+
+      <p>movingAverage: If false, divide up the range into numberOfUpdates bins and average to find spike rate</p>
+<p>windowSize: Size of moving average window in milliseconds</p>
+<p>numberOfUpdates: How many times you want to update the spike rate if not doing moving average.
+Function divides the range of model into numberOfUpdates bins to time average spikes.</p>
+<p>debug: Print helpful model.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>src/controller/windows/window_individualchannel.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">updateSpikeRate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">movingAverage</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">windowSize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">numberOfUpdates</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    movingAverage: If false, divide up the range into numberOfUpdates bins and average to find spike rate</span>
+
+<span class="sd">    windowSize: Size of moving average window in milliseconds</span>
+
+<span class="sd">    numberOfUpdates: How many times you want to update the spike rate if not doing moving average.</span>
+<span class="sd">    Function divides the range of model into numberOfUpdates bins to time average spikes.</span>
+
+<span class="sd">    debug: Print helpful model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">SpikeRatePlot</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;self.electrode_times: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;self.electrode_spikes: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Length of electrode times: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">)))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Length of electrode spikes list: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="p">)))</span>
+    <span class="n">spikeList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span>
+    <span class="n">indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikeList</span><span class="p">),</span> <span class="n">numberOfUpdates</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">indexes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indexes</span><span class="p">]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">spike_rate</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Only run if electrode has been recorded</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recordedTime</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Perform moving average on spike list</span>
+        <span class="k">if</span> <span class="n">movingAverage</span><span class="p">:</span>
+            <span class="n">moving_averages</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikeList</span><span class="p">)</span> <span class="o">-</span> <span class="n">windowSize</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">window_average</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">spikeList</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">windowSize</span><span class="p">])</span> <span class="o">/</span> <span class="n">windowSize</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">moving_averages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1000</span><span class="o">*</span><span class="n">window_average</span><span class="p">)</span> <span class="c1"># multiply by 1000 to go to spikes/sec</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="nb">len</span><span class="p">(</span><span class="n">spikeList</span><span class="p">)</span><span class="o">-</span><span class="n">windowSize</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">spike_rate</span> <span class="o">=</span> <span class="n">moving_averages</span>
+
+        <span class="c1"># Window modes</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">num_spikes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numberOfUpdates</span><span class="p">):</span>
+                <span class="n">window</span> <span class="o">=</span> <span class="n">spikeList</span><span class="p">[</span><span class="n">indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">indexes</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]]</span>
+                <span class="n">num_spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="n">spike_rate</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1000</span><span class="o">*</span><span class="n">num_spike</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recordedTime</span><span class="o">/</span><span class="n">numberOfUpdates</span><span class="p">)</span> <span class="k">for</span> <span class="n">num_spike</span> <span class="ow">in</span> <span class="n">num_spikes</span><span class="p">]</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">numberOfUpdates</span><span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">spike_rate</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numberOfUpdates</span><span class="p">)]</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numberOfUpdates</span><span class="p">)]</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">SpikeRatePlot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">spike_rate</span><span class="p">,</span> <span class="n">pen</span><span class="o">=</span><span class="n">pg</span><span class="o">.</span><span class="n">mkPen</span><span class="p">(</span><span class="n">themes</span><span class="p">[</span><span class="n">CURRENT_THEME</span><span class="p">][</span><span class="s1">&#39;blue1&#39;</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">map2idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_row</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_col</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;length of recording: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; model points&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;electrode times: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;spikes: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="p">))</span>
+        <span class="c1">#print(&quot;double binned spikes: &quot; + str(num_spikes))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;number of spike bins: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spikes</span><span class="p">)))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;incoming spike times: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electrode_spike_times</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;noise mean: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">LoadedData</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s1">&#39;noise_mean&#39;</span><span class="p">]))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;noise std: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_parent</span><span class="o">.</span><span class="n">LoadedData</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s1">&#39;noise_std&#39;</span><span class="p">]))</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../window_electrodelist/" class="md-footer__link md-footer__link--prev" aria-label="Previous: electrode list" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              electrode list
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../window_profiler/" class="md-footer__link md-footer__link--next" aria-label="Next: profiler" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              profiler
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.6e54b5cd.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -13,7 +13,7 @@
     
     
       
-        <title>Introduction to Retina Chip GUI - DC1 Visualization</title>
+        <title>Test startup - DC1 Visualization</title>
       
     
     
@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#introduction-to-retina-chip-gui" class="md-skip">
+        <a href="#src.tests.test_startup" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +94,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction to Retina Chip GUI
+              Test startup
             
           </span>
         </div>
@@ -180,7 +180,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../general/" class="md-nav__link">
         Introduction
       </a>
     </li>
@@ -195,7 +195,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/" class="md-nav__link">
+      <a href="../../general/getting-started/" class="md-nav__link">
         Getting Started
       </a>
     </li>
@@ -815,8 +815,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -825,84 +823,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-downloading-application" class="md-nav__link">
-    1. Downloading application
+  <a href="#src.tests.test_startup" class="md-nav__link">
+    src.tests.test_startup
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-acceptable-data-formats" class="md-nav__link">
-    2. Acceptable Data Formats
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-opening-the-application" class="md-nav__link">
-    3. Opening the application
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-choose-session-parameters" class="md-nav__link">
-    4. Choose session parameters
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-types-of-visualizations" class="md-nav__link">
-    5. Types of Visualizations
-  </a>
-  
-    <nav class="md-nav" aria-label="5. Types of Visualizations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#a-spike-finding-plots" class="md-nav__link">
-    a. Spike Finding Plots
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#b-noise-plots" class="md-nav__link">
-    b. Noise Plots
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#c-spike-search-plots" class="md-nav__link">
-    c. Spike Search Plots
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#d-diagnostic-plot" class="md-nav__link">
-    d. Diagnostic Plot
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-additional-tools" class="md-nav__link">
-    6. Additional Tools
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-debugging-and-profiling-the-gui" class="md-nav__link">
-    7. Debugging and Profiling the GUI
+  <a href="#src.tests.test_startup.TestData" class="md-nav__link">
+    TestData
   </a>
   
 </li>
@@ -921,19 +850,101 @@
                 
 
 
-<h1 id="introduction-to-retina-chip-gui">Introduction to Retina Chip GUI</h1>
-<h2 id="1-downloading-application">1. Downloading application</h2>
-<p>The latest version of the rc-gui is available here:</p>
-<h2 id="2-acceptable-data-formats">2. Acceptable Data Formats</h2>
-<h2 id="3-opening-the-application">3. Opening the application</h2>
-<h2 id="4-choose-session-parameters">4. Choose session parameters</h2>
-<h2 id="5-types-of-visualizations">5. Types of Visualizations</h2>
-<h3 id="a-spike-finding-plots">a. Spike Finding Plots</h3>
-<h3 id="b-noise-plots">b. Noise Plots</h3>
-<h3 id="c-spike-search-plots">c. Spike Search Plots</h3>
-<h3 id="d-diagnostic-plot">d. Diagnostic Plot</h3>
-<h2 id="6-additional-tools">6. Additional Tools</h2>
-<h2 id="7-debugging-and-profiling-the-gui">7. Debugging and Profiling the GUI</h2>
+  <h1>Test startup</h1>
+
+<div class="doc doc-object doc-module">
+
+<a id="src.tests.test_startup"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 class="doc doc-heading" id="src.tests.test_startup.TestData">
+        <code>
+TestData            (<span title="unittest.case.TestCase">TestCase</span>)
+        </code>
+
+
+
+</h2>
+
+    <div class="doc doc-contents ">
+
+      <p>examples
+def test_upper(self):
+    self.assertEqual('foo'.upper(), 'FOO')</p>
+<p>def test_isupper(self):
+    self.assertTrue('FOO'.isupper())
+    self.assertFalse('Foo'.isupper())</p>
+<p>def test_split(self):
+    s = 'hello world'
+    self.assertEqual(s.split(), ['hello', 'world'])
+    # check that s.split fails when the separator is not a string
+    with self.assertRaises(TypeError):
+        s.split(2)</p>
+
+        <details class="quote">
+          <summary>Source code in <code>src/tests/test_startup.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">TestData</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+    <span class="c1"># TODO test that data has 1024 rows</span>
+
+    <span class="c1"># TODO test that each data column is in the right type</span>
+
+    <span class="c1"># TODO sanity check that each data column is within a reasonable range</span>
+
+    <span class="sd">&quot;&quot;&quot; examples</span>
+<span class="sd">    def test_upper(self):</span>
+<span class="sd">        self.assertEqual(&#39;foo&#39;.upper(), &#39;FOO&#39;)</span>
+
+<span class="sd">    def test_isupper(self):</span>
+<span class="sd">        self.assertTrue(&#39;FOO&#39;.isupper())</span>
+<span class="sd">        self.assertFalse(&#39;Foo&#39;.isupper())</span>
+
+<span class="sd">    def test_split(self):</span>
+<span class="sd">        s = &#39;hello world&#39;</span>
+<span class="sd">        self.assertEqual(s.split(), [&#39;hello&#39;, &#39;world&#39;])</span>
+<span class="sd">        # check that s.split fails when the separator is not a string</span>
+<span class="sd">        with self.assertRaises(TypeError):</span>
+<span class="sd">            s.split(2)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</code></pre></div>
+        </details>
+
+
+    </div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
 
               
             </article>

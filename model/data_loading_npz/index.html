@@ -13,7 +13,7 @@
     
     
       
-        <title>Introduction to Retina Chip GUI - DC1 Visualization</title>
+        <title>data loading (.npz files) - DC1 Visualization</title>
       
     
     
@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#introduction-to-retina-chip-gui" class="md-skip">
+        <a href="#data-loading-npz" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +94,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Introduction to Retina Chip GUI
+              data loading (.npz files)
             
           </span>
         </div>
@@ -180,7 +180,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../general/" class="md-nav__link">
         Introduction
       </a>
     </li>
@@ -195,7 +195,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../getting-started/" class="md-nav__link">
+      <a href="../../general/getting-started/" class="md-nav__link">
         Getting Started
       </a>
     </li>
@@ -208,12 +208,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
       
       
       
@@ -234,12 +236,14 @@
               
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" checked>
       
       
       
@@ -262,7 +266,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../model/data_loading_mat/" class="md-nav__link">
+      <a href="../data_loading_mat/" class="md-nav__link">
         data loading (.mat files)
       </a>
     </li>
@@ -274,11 +278,52 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../model/data_loading_npz/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          data loading (.npz files)
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         data loading (.npz files)
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#src.model.data_loading_npz" class="md-nav__link">
+    src.model.data_loading_npz
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -290,7 +335,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../model/DC1DataContainer/" class="md-nav__link">
+      <a href="../DC1DataContainer/" class="md-nav__link">
         data structs
       </a>
     </li>
@@ -304,7 +349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../model/filters/" class="md-nav__link">
+      <a href="../filters/" class="md-nav__link">
         filters
       </a>
     </li>
@@ -318,7 +363,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../model/raw_data_helpers/" class="md-nav__link">
+      <a href="../raw_data_helpers/" class="md-nav__link">
         raw data helpers
       </a>
     </li>
@@ -332,7 +377,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../model/spike_detection/" class="md-nav__link">
+      <a href="../spike_detection/" class="md-nav__link">
         spike detection
       </a>
     </li>
@@ -346,7 +391,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../model/statistics/" class="md-nav__link">
+      <a href="../statistics/" class="md-nav__link">
         statistics
       </a>
     </li>
@@ -825,84 +870,8 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-downloading-application" class="md-nav__link">
-    1. Downloading application
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-acceptable-data-formats" class="md-nav__link">
-    2. Acceptable Data Formats
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-opening-the-application" class="md-nav__link">
-    3. Opening the application
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-choose-session-parameters" class="md-nav__link">
-    4. Choose session parameters
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-types-of-visualizations" class="md-nav__link">
-    5. Types of Visualizations
-  </a>
-  
-    <nav class="md-nav" aria-label="5. Types of Visualizations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#a-spike-finding-plots" class="md-nav__link">
-    a. Spike Finding Plots
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#b-noise-plots" class="md-nav__link">
-    b. Noise Plots
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#c-spike-search-plots" class="md-nav__link">
-    c. Spike Search Plots
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#d-diagnostic-plot" class="md-nav__link">
-    d. Diagnostic Plot
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-additional-tools" class="md-nav__link">
-    6. Additional Tools
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-debugging-and-profiling-the-gui" class="md-nav__link">
-    7. Debugging and Profiling the GUI
+  <a href="#src.model.data_loading_npz" class="md-nav__link">
+    src.model.data_loading_npz
   </a>
   
 </li>
@@ -921,19 +890,35 @@
                 
 
 
-<h1 id="introduction-to-retina-chip-gui">Introduction to Retina Chip GUI</h1>
-<h2 id="1-downloading-application">1. Downloading application</h2>
-<p>The latest version of the rc-gui is available here:</p>
-<h2 id="2-acceptable-data-formats">2. Acceptable Data Formats</h2>
-<h2 id="3-opening-the-application">3. Opening the application</h2>
-<h2 id="4-choose-session-parameters">4. Choose session parameters</h2>
-<h2 id="5-types-of-visualizations">5. Types of Visualizations</h2>
-<h3 id="a-spike-finding-plots">a. Spike Finding Plots</h3>
-<h3 id="b-noise-plots">b. Noise Plots</h3>
-<h3 id="c-spike-search-plots">c. Spike Search Plots</h3>
-<h3 id="d-diagnostic-plot">d. Diagnostic Plot</h3>
-<h2 id="6-additional-tools">6. Additional Tools</h2>
-<h2 id="7-debugging-and-profiling-the-gui">7. Debugging and Profiling the GUI</h2>
+<h1 id="data-loading-npz">Data Loading (.NPZ)</h1>
+
+
+  <div class="doc doc-object doc-module">
+
+<a id="src.model.data_loading_npz"></a>
+    <div class="doc doc-contents first">
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
 
               
             </article>
@@ -943,6 +928,41 @@
       </main>
       
         <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../data_loading_mat/" class="md-footer__link md-footer__link--prev" aria-label="Previous: data loading (.mat files)" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              data loading (.mat files)
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../DC1DataContainer/" class="md-footer__link md-footer__link--next" aria-label="Next: data structs" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              data structs
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
