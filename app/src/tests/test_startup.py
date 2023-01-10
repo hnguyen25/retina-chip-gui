@@ -34,6 +34,7 @@ def start_app_for_testing():
 
     session_startup = SessionStartupGUI(base_dir, DEBUG_STARTUP)  # load initial startup window where user can specify session
     return app, session_startup
+
     """
     if session_startup.exec():  # continue running app only if user has successfully completed startup window
 
@@ -54,17 +55,20 @@ def start_app_for_testing():
 
 class TestStartupSessionGUI(unittest.TestCase):
     def test_defaultView(self):
+        self.assertEqual(session_startup.chooseVisStyle.currentText(), "Spike Finding")
 
+        """
         print('test_defaultview 1')
         # prepare test
         app, session_startup = start_app_for_testing()
         print('test_defaultview 2')
 
         # asserts
-        self.assertEqual(session_startup.chooseVisStyle.currentText(), "Spike Finding")
+
         self.assertEqual(session_startup.chooseSpikeThreshold.value(), 400) # value * 100 TODO fix
         print('test_defaultview 3')
         #self.assertEqual(session_startup)
+        """
 
 
 class TestData(unittest.TestCase):

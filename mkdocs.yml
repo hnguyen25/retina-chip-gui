@@ -7,7 +7,8 @@ nav:
   - Getting Started: 'general/getting-started.md'
   - Source:
       - model (data):
-        - data loading: 'model/data_loading.md'
+        - data loading (.mat files): 'model/data_loading_mat.md'
+        - data loading (.npz files): 'model/data_loading_npz.md'
         - data structs: 'model/DC1DataContainer.md'
         - filters: 'model/filters.md'
         - raw data helpers: 'model/raw_data_helpers.md'
