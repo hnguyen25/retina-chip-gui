@@ -3,9 +3,8 @@ This is the code to start the visualization of the noise mode, which will be use
 to view noise statistics of the retina chip.
 """
 
-
 from src.controller.plots.noise_histogram import *
-from src.controller.plots.channel_trace import *
+from src.controller.plots.realtime_channel_trace import *
 from src.controller.plots.noise_heatmap import *
 from PyQt5 import uic
 from PyQt5 import QtWidgets

@@ -7,7 +7,7 @@ from src.controller.plots.array_map import *
 from src.controller.plots.spike_rate import *
 from src.controller.plots.mini_map import *
 from src.controller.plots.noise_histogram import *
-from src.controller.plots.channel_trace import *
+from src.controller.plots.realtime_channel_trace import *
 
 from PyQt5 import uic, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog

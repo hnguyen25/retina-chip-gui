@@ -2,7 +2,6 @@
 Huy Nguyen, John Bailey (2022)
 Contains the base app framework for loading up the GUI.
 """
-
 from src.model.DC1DataContainer import *
 from src.model.python_thread_worker import *  # multithreading
 from PyQt5 import QtWidgets
@@ -90,7 +89,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.profiling_df = pd.DataFrame(columns=["name", "type", "time elapsed", "timestamp"])
             """
-
 
     last_gui_refresh_time = time.time()
     array_data, latest_buffers, buffer_metadata = None, None, None

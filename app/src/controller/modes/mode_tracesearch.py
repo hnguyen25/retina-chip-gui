@@ -148,9 +148,11 @@ def update_trace_search_plots(app, next_packet, CURRENT_THEME: str, themes: dict
 
     pen = pg.mkPen(color=themes[CURRENT_THEME]['tracePlotting'])
 
+    """why is this here
     from src.controller.windows.window_individualchannel import IndividualChannelInformation
     individualChannel = IndividualChannelInformation()
     individualChannel.setSessionParent(app)
+    """
 
     # Third, fill in plots with what model you have
     for elec in getTracesToPlot(app):
@@ -199,10 +201,47 @@ def update_trace_search_plots(app, next_packet, CURRENT_THEME: str, themes: dict
                 lr.setZValue(-5)
                 app.charts[gridToPlot].addItem(lr)
 
+    def updateElectrodeData(self, debug = False):
+        self.electrode_packets.clear()
+        self.electrode_spikes.clear()
+        self.electrode_spike_times.clear()
+        self.electrode_data.clear()
+        self.electrode_times.clear()
+
+        match = False
+
+        X, Y = self.session_parent.data.get_last_trace_with_electrode_idx(self.current_elec)
+
+        # TODO hook this data with rest of GUI
+
+        """
+        # Create a list of dictionaries of model packets for the selected electrode
+        for i in range(len_filtered_data):
+            if self.session_parent.LoadedData.filtered_data[i]['channel_idx'] == self.current_elec:
+                self.electrode_packets.append(self.session_parent.LoadedData.filtered_data[i])
+                match = True
+        if debug:
+            if not match:
+                print("No model from this electrode yet")
+
+        filtered = True
+        if self.session_parent.settings["filter"] == "None":
+            filtered = False
+
+        # Get lists of times and model from each packet for the selected electrode
+        for i in range(len(self.electrode_packets)):
+            self.session_parent.LoadedData.\
+                calculate_realtime_spike_info_for_channel_in_buffer(self.electrode_packets[i], filtered)
+            self.electrode_spikes.extend(self.electrode_packets[i]["spikeBins"])
+            self.electrode_spike_times.extend(self.electrode_packets[i]["incom_spike_times"])
+            self.electrode_times.extend(self.electrode_packets[i]['times'])
+            self.electrode_data.extend(self.electrode_packets[i]['model'])
+
+        self.recordedTime = round((len(self.electrode_data)) * 0.05, 2)
+        """
 # ================
 # HELPER FUNCTIONS
 # ================
-
 def electrodeToPlotGrid(app, electrodeNum):
     """
 
@@ -227,20 +266,14 @@ def electrodeToPlotGrid(app, electrodeNum):
     return row, col
 
 def getTracesToPlot(app):
-    """
+    """Function to determine which electrodes to plot given what page of spike
+    search GUI user is on
 
     Args:
         app: MainWindow
 
     Returns:
-        None
-    """
-    """
-    Function to determine which electrodes to plot given what page of spike
-    search GUI user is on
-
-    Returns: 36 electrodes #s in a list
-
+        36 electrodes #s in a list
     """
     app.tracesToPlot.clear()
     for i in range(36):
@@ -248,8 +281,6 @@ def getTracesToPlot(app):
         app.FigureLabel.setText("Figure " + str(app.pageNum)
                                  + ": Ch " + str(app.tracesToPlot[0]) + " to Ch " + str(app.tracesToPlot[-1]))
     return app.tracesToPlot
-
-import pyqtgraph as pg
 
 def resetSpikeSearchPlotParams(app):
     """

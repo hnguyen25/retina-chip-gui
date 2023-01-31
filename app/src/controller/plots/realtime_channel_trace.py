@@ -1,3 +1,9 @@
+"""
+This is a plot designed to show trace data from electrodes pulled directly from the packet data received from the FPGA.
+It is dynamic (showing from 1-8 plots at once) depending on the number of channels in each packet. This is more barebones
+than the other channel trace function, to optimize for real-time.
+(compare to plots.individual_channel_trace)
+"""
 import numpy as np
 import pyqtgraph as pg
 import math

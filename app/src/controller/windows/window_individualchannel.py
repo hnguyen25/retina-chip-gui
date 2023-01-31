@@ -83,44 +83,34 @@ class IndividualChannelInformation(QWidget):
         if self.session_parent.gui_state['is_mode_profiling']:
             print("Individual Channel update time: " + str(np.round(end-start,2)))
 
-    def updateElectrodeData(self, debug = False):
-        self.electrode_packets.clear()
-        self.electrode_spikes.clear()
-        self.electrode_spike_times.clear()
-        self.electrode_data.clear()
-        self.electrode_times.clear()
+def updateElectrodeData(self):
+    X, Y = self.session_parent.data.get_last_trace_with_electrode_idx(self.current_elec)
+    # TODO hook this data with rest of GUI
+    """
+    # Create a list of dictionaries of model packets for the selected electrode
+    for i in range(len_filtered_data):
+        if self.session_parent.LoadedData.filtered_data[i]['channel_idx'] == self.current_elec:
+            self.electrode_packets.append(self.session_parent.LoadedData.filtered_data[i])
+            match = True
+    if debug:
+        if not match:
+            print("No model from this electrode yet")
 
-        match = False
+    filtered = True
+    if self.session_parent.settings["filter"] == "None":
+        filtered = False
 
-        X, Y = self.session_parent.data.get_last_trace_with_electrode_idx(self.current_elec)
+    # Get lists of times and model from each packet for the selected electrode
+    for i in range(len(self.electrode_packets)):
+        self.session_parent.LoadedData.\
+            calculate_realtime_spike_info_for_channel_in_buffer(self.electrode_packets[i], filtered)
+        self.electrode_spikes.extend(self.electrode_packets[i]["spikeBins"])
+        self.electrode_spike_times.extend(self.electrode_packets[i]["incom_spike_times"])
+        self.electrode_times.extend(self.electrode_packets[i]['times'])
+        self.electrode_data.extend(self.electrode_packets[i]['model'])
 
-        # TODO hook this data with rest of GUI
-
-        """
-        # Create a list of dictionaries of model packets for the selected electrode
-        for i in range(len_filtered_data):
-            if self.session_parent.LoadedData.filtered_data[i]['channel_idx'] == self.current_elec:
-                self.electrode_packets.append(self.session_parent.LoadedData.filtered_data[i])
-                match = True
-        if debug:
-            if not match:
-                print("No model from this electrode yet")
-
-        filtered = True
-        if self.session_parent.settings["filter"] == "None":
-            filtered = False
-
-        # Get lists of times and model from each packet for the selected electrode
-        for i in range(len(self.electrode_packets)):
-            self.session_parent.LoadedData.\
-                calculate_realtime_spike_info_for_channel_in_buffer(self.electrode_packets[i], filtered)
-            self.electrode_spikes.extend(self.electrode_packets[i]["spikeBins"])
-            self.electrode_spike_times.extend(self.electrode_packets[i]["incom_spike_times"])
-            self.electrode_times.extend(self.electrode_packets[i]['times'])
-            self.electrode_data.extend(self.electrode_packets[i]['model'])
-
-        self.recordedTime = round((len(self.electrode_data)) * 0.05, 2)
-        """
+    self.recordedTime = round((len(self.electrode_data)) * 0.05, 2)
+    """
 
     def updateAmplitudeHist(self):
         vals = self.electrode_data
