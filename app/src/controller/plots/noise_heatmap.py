@@ -69,7 +69,6 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
 
     plot.getAxis("bottom").tickFont = font
     plot.getAxis("bottom").setStyle(tickTextOffset=1)
-    print('first time plotting', app.first_time_plotting)
     if app.first_time_plotting is False:
         data = app.data.df["noise_std"]
         #app.data.df["noise_std"] is a 1024x1 pandas array, transform this into a 32x32 numpy array

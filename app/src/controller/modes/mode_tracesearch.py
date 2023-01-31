@@ -19,7 +19,6 @@ import os
 
 def setup_trace_search(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     """
-
     Args:
         app: MainWindow
         CURRENT_THEME:
