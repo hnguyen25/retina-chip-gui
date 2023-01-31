@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
+    env:
+      DISPLAY: ':99.0'
 
     steps:
     - uses: actions/checkout@v3
