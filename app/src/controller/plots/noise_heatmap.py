@@ -32,7 +32,7 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
         data = None
 
     img = pg.ImageItem(data)
-    cm = pg.colormap.get('plasma', source='matplotlib')
+    cm = pg.colormap.get('autumn', source='matplotlib')
     plot.addItem(img)
 
     if app.noise_heat_map_color_bar is None:

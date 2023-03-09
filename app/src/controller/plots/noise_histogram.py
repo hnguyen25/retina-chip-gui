@@ -48,7 +48,7 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
     #vals = app.model.array_indexed['stats_noise+std'].copy()
     vals = vals[np.nonzero(vals)]
 
-    cm = pg.colormap.get('plasma', source='matplotlib')
+    cm = pg.colormap.get('autumn', source='matplotlib')
 
     if debug:
         print("updating noise histogram plot")

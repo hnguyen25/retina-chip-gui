@@ -140,6 +140,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timer.timeout.connect(self.gui_refresh_thread)
         self.timer.start()
 
+        self.mouseClickTimer = QTimer(self)
+        self.mouseClickTimer.setSingleShot(True)
+
+
     # this is one separate thread running a multiprocessing
     def data_loading_parallelized_thread(self, progress_callback, gui_callback,  NUM_SIMULTANEOUS_PROCESSES=6):
         """
@@ -389,9 +393,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.settings['cursor_col'] = np.clip(int(y), 2, 30)
 
         from src.controller.plots.array_map import update_minimap_indicator
-        update_minimap_indicator(self, self.settings["current_theme"], themes)
-        # TODO update minimap plot with new model
-        #self.update_mini_map_plot()
+        from src.controller.plots.mini_map import update_mini_map_plot
+
+        timeBetweenClicks = 1000
+
+        if not self.mouseClickTimer.isActive():
+            self.mouseClickTimer.start(timeBetweenClicks)
+            next_packet = self.data.to_show.get()
+            update_minimap_indicator(self, self.settings["current_theme"], themes)
+            update_mini_map_plot(self, next_packet, self.settings["current_theme"], themes, None)
+        else:
+            print('Please wait', self.mouseClickTimer.remainingTime(), 'ms before choosing another location.')
 
     def viewNewIndividualChannelInformation(self):
         """Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
