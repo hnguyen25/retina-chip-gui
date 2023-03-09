@@ -75,20 +75,24 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.settings["realTime"] == "No, load preprocessed .npz file":
             # this is non real-time
-            load_npz_file(self)
+            from src.model.data_loading_npz import load_npz_file
 
-            # TODO load gui for npz files
-            """
+            from src.model.data_loading_npz import OfflineDataLoader
+
+            self.data = load_npz_file(self)  # if online, replace with a different data container
+
+            from src.controller.modes.init_charts import setup_layout
             if not setup_layout(self, self.settings['visStyle'],
-                            self.settings["current_theme"], themes,
-                            self.settings["num_channels"]):
-            print("This layout has not been developed yet! Exiting application...")
-            sys.exit()
+                                self.settings["current_theme"], themes,
+                                8): # TODO: offline saved data should have num_channels info in metadata
+                print("This layout has not been developed yet! Exiting application...")
+                sys.exit()
+
             charts_list = self.chart_update_function_mapping.keys()
             self.gui_charts_time_counter = {chart: 100 for chart in charts_list}
 
             self.profiling_df = pd.DataFrame(columns=["name", "type", "time elapsed", "timestamp"])
-            """
+            self.exec_multithreading_offline()
 
     last_gui_refresh_time = time.time()
     array_data, latest_buffers, buffer_metadata = None, None, None
@@ -120,7 +124,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # (1) set up thread for handling the parallelized part of model loading
         data_loading_parallelized_worker = Worker(self.data_loading_parallelized_thread)
         data_loading_parallelized_worker.signals.progress.connect(self.updateStatusBar)
-        # TODO GUI refresh loop cannot be a separate worker
         data_loading_parallelized_worker.signals.gui_callback.connect(self.gui_refresh_loop)
 
         # (2) set up thread for handling the serialized part of model loading
@@ -142,6 +145,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.mouseClickTimer = QTimer(self)
         self.mouseClickTimer.setSingleShot(True)
+
+    def exec_multithreading_offline(self):
+        # main thread = self.gui_refresh_thread + self.gui_refresh_loop
+        # for the offline analysis, the data has already been processed -> we don't actually need to multithread
+
+        # start a view refresh loop
+        self.timer = QTimer(self)
+        self.timer.setSingleShot(False)
+        self.timer.setInterval(1000)  # in milliseconds
+        self.timer.timeout.connect(self.offline_gui_refresh_thread) # we use a special offline version
+        self.timer.start()
+
+        self.mouseClickTimer = QTimer(self)
+        self.mouseClickTimer.setSingleShot(True)
+
 
 
     # this is one separate thread running a multiprocessing
@@ -246,6 +264,37 @@ class MainWindow(QtWidgets.QMainWindow):
              "From model directory " + datarun + "."
         self.statusBar().showMessage(msg)
 
+    MIN_OFFLINE_GUI_REFRESH_INTERVAL = 2
+    # this loop is run by a QTimer in MainWindow.exec_multithread
+    def offline_gui_refresh_thread(self):
+        """
+        Returns:
+        """
+
+        # TODO set the actual values when the offline processed data has more accurate values
+        self.NUM_TOTAL = (32 * 32) / 8 # assuming all channels on array / 8 channels shown simultaneously
+        self.NUM_UNPROCESSED = -1
+        self.NUM_PROCESSED = -1
+        self.NUM_GUI_QUEUE = self.data.to_show.qsize()
+
+        time_elapsed = round(time.time() - self.last_gui_refresh_time, 2)
+        if self.settings['debug_threads']: print('Thread-GUI >> Time elapsed:', time_elapsed)
+
+        if time_elapsed > self.MIN_OFFLINE_GUI_REFRESH_INTERVAL:
+            self.last_gui_refresh_time = time.time()
+            new_packet_displayed = self.gui_refresh_loop(offline=True)
+
+            if new_packet_displayed:
+                self.NUM_DISPLAYED += 1
+        split1 = os.path.split(self.settings['path'])
+        split2 = os.path.split(split1[0])
+        datarun = split2[1] + '/' + split1[1]
+
+        msg = "Viewing packet " + str(self.NUM_DISPLAYED) + "/" + str(self.NUM_TOTAL) + "  (" + str(self.NUM_PROCESSED) \
+              + " loaded into memory,  " + str(self.NUM_GUI_QUEUE) + " waiting to be displayed). " + \
+              "From model directory " + datarun + "."
+        self.statusBar().showMessage(msg)
+
     curr_buf_idx = 0
     def file_loading_parallelized_loop(self, pool, NUM_SIMULTANEOUS_PROCESSES):
         """
@@ -308,22 +357,23 @@ class MainWindow(QtWidgets.QMainWindow):
         channel_idxs = self.data.append_buf(next_packet)
         return True
 
-    def gui_refresh_loop(self):
+    def gui_refresh_loop(self, offline=False):
         """
-
         Returns:
-
         """
         if self.is_paused: return
+
         next_packet = self.data.to_show.get()
 
         # TODO implement a force override of chart updating
         for chart in self.chart_update_function_mapping.keys():
             if (time.time() - self.gui_charts_time_counter[chart]) > self.CHART_MIN_TIME_TO_REFRESH[chart]:
-                # TODO once you finish adapting array stats, expand to ohter plots
+                # print("updating", chart)
+                # TODO once you finish adapting array stats, expand to other plots
                 # run update function for this chart
 
                 if True:
+                #if not chart =="miniMap":
                 #if chart == "channelTraces" or chart == "noiseHistogram" or chart == "arrayMap":
                     extra_params = self.chart_update_extra_params[chart]
                     start_time = time.time()

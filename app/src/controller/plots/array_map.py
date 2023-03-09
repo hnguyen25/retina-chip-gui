@@ -34,7 +34,6 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME: str, themes: dict):
     plot_widget.getPlotItem().hideAxis('right')
 
     cm = pg.colormap.get('autumn', source='matplotlib')
-
     colors = np.array(app.data.df["spikes_avg_amp"]).reshape((32, 32))
 
     # the pyqtgraph color bar REQUIRES it to be set to an image
@@ -49,12 +48,11 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME: str, themes: dict):
     app.charts["arrayMap"].addItem(image)
     # TODO check if average spike amplitude makes sense w/ colors
     app.array_map_color_bar = app.charts["arrayMap"].addColorBar(image, colorMap=cm, label="Spike Amplitude",
-                                                                values=(-10, 20))  # values=(0, np.max(model)))
+                                                                values=(2.5, 3.5))  # values=(0, np.max(model)))
     app.array_map_color_bar.sigLevelsChanged.connect(lambda: on_color_bar_levels_changed(app))
     #app.charts["arrayMapHover"].region.setClipItem(image)
 
     update_minimap_indicator(app, CURRENT_THEME, themes)
-    
 
     elecs_points = []
     for row in range(NUM_TOTAL_ROWS):
@@ -144,7 +142,8 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME: str, themes: dict, ex
                                  'brush': color,
                                  'symbol': 'o'}
             else: # if there is no data at a point, keep it white
-                default_elec_dict = {'pos': (col, row), 'size': app.data.df.at[idx, "array_dot_size"],
+                #default_elec_dict = {'pos': (col, row), 'size': app.data.df.at[idx, "array_dot_size"],
+                default_elec_dict = {'pos': (col, row), 'size': 0.1,
                                  'pen': {'color': 'w'},
                                  'brush': QColor(0, 0, 0, 0),
                                  'symbol': 'o'}

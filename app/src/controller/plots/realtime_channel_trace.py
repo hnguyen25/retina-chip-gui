@@ -51,6 +51,7 @@ def update_channel_trace_plot(app, next_packet, CURRENT_THEME, themes, extra_par
         row, col = idx2map(chan_idx)
 
         # crop to area where model != 0
+        #print(data)
         nonzero_data = np.where(data != 0.)[0]
         first_nonzero_index = nonzero_data[0]
         last_nonzero_index = nonzero_data[-1]
