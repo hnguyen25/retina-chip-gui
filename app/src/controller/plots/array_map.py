@@ -125,7 +125,6 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME: str, themes: dict, ex
             idxs_to_change.append(chan_idx)
             calculate_one_elec_color_and_size(app, chan_idx)
             current_chan_idx = chan_idx
-    
 
     # render all the points
     elecs_points = []
