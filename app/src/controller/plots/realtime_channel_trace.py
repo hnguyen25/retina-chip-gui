@@ -8,6 +8,7 @@ import numpy as np
 import pyqtgraph as pg
 import math
 from PyQt5.QtGui import QColor
+import time
 
 def setupSpikeTrace(list_of_plots, CURRENT_THEME, themes):
     """
@@ -38,10 +39,10 @@ def update_channel_trace_plot(app, next_packet, CURRENT_THEME, themes, extra_par
     """
     trace_plots = extra_params
 
+    start_time  = time.time()
     # Generate subplots
     for m, plt in enumerate(trace_plots):
         plt.clear()
-
         times = next_packet["packet_data"][m]["times"]
         data = next_packet["packet_data"][m]["filtered_data"]
 
@@ -91,3 +92,12 @@ def update_channel_trace_plot(app, next_packet, CURRENT_THEME, themes, extra_par
         plt.getAxis("left").setTextPen(themes[CURRENT_THEME]['font_color'], size='20pt')
         plt.setLabel('left', 'Ch ' + str(next_packet['packet_data'][m]['channel_idx']))
         plt.plot(times, data)
+
+        new_data = {
+            "name": "update channel trace",
+            "time elapsed": round(time.time() - start_time, 5),
+            "timestamp": round(start_time, 5)
+        }
+        app.profiling_df.append(new_data, ignore_index=True)
+        app.profiling_df.to_csv('/Users/sahilsmac/Documents/Test Modules/diagnostics.csv')
+        print ("Time elapsed (update channel trace): " + str(new_data["time elapsed"]))

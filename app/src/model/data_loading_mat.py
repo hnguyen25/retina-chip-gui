@@ -8,6 +8,10 @@ import scipy.io as sio
 from .spike_detection import *
 from ..model.filters import *
 
+from PyQt5.QtWidgets import QMessageBox, QDialog, QLabel, QPushButton, QVBoxLayout
+import sys
+
+
 def load_first_buffer_info(app):
     """
 
@@ -17,6 +21,17 @@ def load_first_buffer_info(app):
     Returns:
 
     """
+    wait_for_data_msg = QMessageBox()
+    wait_for_data_msg.setWindowTitle("Waiting for data.")
+    wait_for_data_msg.setText("Click \"OK\" to continue waiting for data. GUI will pop up when data is loaded. ")
+    wait_for_data_msg.setIcon(QMessageBox.Information)
+
+    wait_for_data_msg.exec ()
+    while len(os.listdir(app.settings["path"])) == 0:
+        continue
+    wait_for_data_msg.close ()
+
+
     data_run = os.path.basename(app.settings["path"])
     file_dir = app.settings["path"] +  "/" + data_run + "_" + str(0) + ".mat"
     first_file_params = {
@@ -26,6 +41,7 @@ def load_first_buffer_info(app):
         "SPIKING_THRESHOLD": app.settings["spikeThreshold"],
         "BIN_SIZE": app.settings["binSize"]
     }
+
     packet = load_one_mat_file(first_file_params)
     app.data.to_serialize.put(packet)
     app.curr_buf_idx = 1
@@ -51,12 +67,11 @@ def load_one_mat_file(params):
     mat_contents = sio.loadmat(file_dir)
     dataRaw = mat_contents['gmem1'][0][:]
 
-    from src.model.raw_data_helpers import removeMultipleCounts
+    from app.src.model.raw_data_helpers import removeMultipleCounts
     data_real, cnt_real, N = removeMultipleCounts(dataRaw)
 
     # Note: this code does not timestamp model bc that cannot be parallelized properly
     packet_data = preprocess_raw_data(data_real, cnt_real, N)
-
     packet = {
         "packet_data": packet_data,
         "packet_idx": params["packet_idx"],
@@ -64,10 +79,10 @@ def load_one_mat_file(params):
         "filter_type": params["filter_type"]
     }
 
-    from src.model.filters import filter_preprocessed_data
+    from app.src.model.filters import filter_preprocessed_data
     packet = filter_preprocessed_data(packet, filter_type=filter_type)
 
-    from src.model.statistics import calculate_channel_stats
+    from app.src.model.statistics import calculate_channel_stats
     packet = calculate_channel_stats(packet, SPIKING_THRESHOLD, BIN_SIZE)
 
     return packet

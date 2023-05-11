@@ -7,6 +7,7 @@ from src.model.python_thread_worker import *  # multithreading
 from PyQt5 import QtWidgets
 from src.view.gui_themes import *
 import multiprocessing
+import time
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Inherited from PyQt main window class. Contains all the functions necessary
@@ -385,13 +386,19 @@ class MainWindow(QtWidgets.QMainWindow):
             y: x value on window as detected by mouse on click
         """
 
-        self.settings['cursor_row'] = np.clip(int(x), 4, 28)
+        self.settings['cursor_row'] = np.clip(int(x), 4, 100)
         self.settings['cursor_col'] = np.clip(int(y), 2, 30)
 
         from src.controller.plots.array_map import update_minimap_indicator
         update_minimap_indicator(self, self.settings["current_theme"], themes)
         # TODO update minimap plot with new model
         #self.update_mini_map_plot()
+
+   # def update_mini_map_plot(self):
+        # get the calculated start/end cell
+        # traverse the cells and grab the information for the array map and load it into the cell
+        # parallelize the above process
+#        return 0
 
     def viewNewIndividualChannelInformation(self):
         """Connected to [View > Individual channel info...]. Opens up a new window containing useful plots

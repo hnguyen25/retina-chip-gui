@@ -5,6 +5,7 @@ from ..model.filters import *
 import warnings
 import queue
 import pandas as pd
+import time
 
 class DC1DataContainer:
     """
@@ -104,6 +105,9 @@ class DC1DataContainer:
 
         avg_packet_spike_count = 0
         packet_data = buf['packet_data']
+
+        # diagnostics
+        start_time = time.time ()
         for packet in packet_data:
 
             # load model
@@ -157,6 +161,16 @@ class DC1DataContainer:
             self.array_spike_times["spike_bins_max_amps"][this_channel_idx] = packet["spike_bins_max_amps"]
 
             avg_packet_spike_count += packet["stats_spikes+cnt"]
+
+        new_data = {
+                    "name": "update packet batch",
+                    "time elapsed": round(time.time() - start_time, 5),
+                    "timestamp": round(start_time, 5)
+                   }
+        self.app.profiling_df.append(new_data, ignore_index=True)
+        self.app.profiling_df.to_csv('/Users/sahilsmac/Documents/Test Modules/diagnostics.csv')
+        print("Time elapsed (process packets): " + str(new_data["time elapsed"]))
+
         # buffer-level information
         buffer_indexed_dict = {
             "file_dir": buf["file_dir"],
@@ -253,7 +267,8 @@ class DC1DataContainer:
                 "file_dir": self.buffer_indexed[buffer_idx]["file_dir"],
                 "filter_type": self.buffer_indexed[buffer_idx]["filter_type"],
                 "SPIKING_THRESHOLD": self.app.settings["spikeThreshold"],
-                "BIN_SIZE": self.app.settings["binSize"]
+                "BIN_SIZE": self.app.settings["binSize"],
+                "packet_idx": electrode_idx
             }
 
             N, Y = None, None

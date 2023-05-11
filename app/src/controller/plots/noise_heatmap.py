@@ -1,5 +1,6 @@
 import pyqtgraph as pg
 import numpy as np
+import time
 
 def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params, debug=False):
     """
@@ -15,6 +16,7 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
     Returns:
 
     """
+    start_time = time.time ()
     plot = app.charts["noiseHeatMap"]
     plot.clear()
 
@@ -46,6 +48,19 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
     if debug:
         print("Data" + str(data))
 
+    # new_data = {
+    #     "name": plot,
+    #     "type": "update noise heat map",
+    #     "time elapsed": round(time.time() - start_time, 5),
+    #     "timestamp": round(start_time, 5)
+    # }
+    #
+    # app.profiling_df.append (new_data, ignore_index=True)
+    # app.profiling_df.to_csv ('retina-chip-gui/diagnostics.csv')
+    # print ("Time elapsed (update noise heatmap): " + str(new_data["time elapsed"]))
+
+
+
 
 def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params, debug=False):
     """
@@ -61,6 +76,7 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
     Returns:
 
     """
+    start_time = time.time()
     plot = app.charts["noiseHeatMap"]
     plot.clear()
 
@@ -91,3 +107,12 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
 
     if debug:
         print("Data" + str(data))
+
+    new_data = {
+        "name": "update noise heat map",
+        "time elapsed": round(time.time() - start_time, 5),
+        "timestamp": round(start_time, 5)
+    }
+    app.profiling_df.append(new_data, ignore_index=True)
+    app.profiling_df.to_csv('/Users/sahilsmac/Documents/Test Modules/diagnostics.csv')
+    print("Time elapsed (update noise heatmap): " + str(new_data["time elapsed"]))
