@@ -1,5 +1,7 @@
 import pyqtgraph as pg
 import numpy as np
+import pandas as pd
+import time
 
 def setupNoiseHistogramPlot(plot_widget, CURRENT_THEME, themes):
     """
@@ -12,6 +14,7 @@ def setupNoiseHistogramPlot(plot_widget, CURRENT_THEME, themes):
     Returns:
 
     """
+    print("set up noise histogram. ")
     plot_widget.getAxis("left").setTextPen(themes[CURRENT_THEME]['font_color'])
     plot_widget.getAxis("bottom").setTextPen(themes[CURRENT_THEME]['font_color'])
     plot_widget.getAxis('top').setTextPen(themes[CURRENT_THEME]['font_color'])
@@ -42,6 +45,7 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
 
     """
 
+    start_time = time.time ()
     app.charts["noiseHistogram"].clear()
 
     vals = np.array(app.data.df["noise_std"]).copy()
@@ -89,6 +93,7 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
     @return:
     """
 
+    start_time = time.time()
     app.charts["noiseHistogram"].clear()
     vals = np.array(app.data.df["noise_std"])
     #vals = app.model.array_indexed['stats_noise+std'].copy()
@@ -126,3 +131,10 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
         y, x = np.histogram(vals, bins=np.linspace(0, 50, 100))
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         app.charts["noiseHistogram"].addItem(curve)
+
+    elapsed_time = round(time.time() - start_time, 5)
+    app.profiling_dict["update noise histogram"].append(elapsed_time)
+    app.profiling_df = pd.DataFrame({key:pd.Series(value) for key, value in app.profiling_dict.items()})
+
+    #app.profiling_df.to_csv('/Users/sahilsmac/Documents/Test Modules/diagnostics.csv')
+    print("Time elapsed (update noise histogram): " + str(elapsed_time))

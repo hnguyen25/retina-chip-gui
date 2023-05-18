@@ -5,9 +5,11 @@ than the other channel trace function, to optimize for real-time.
 (compare to plots.individual_channel_trace)
 """
 import numpy as np
+import pandas as pd
 import pyqtgraph as pg
 import math
 from PyQt5.QtGui import QColor
+import time
 
 def setupSpikeTrace(list_of_plots, CURRENT_THEME, themes):
     """
@@ -38,10 +40,10 @@ def update_channel_trace_plot(app, next_packet, CURRENT_THEME, themes, extra_par
     """
     trace_plots = extra_params
 
+    start_time = time.time()
     # Generate subplots
     for m, plt in enumerate(trace_plots):
         plt.clear()
-
         times = next_packet["packet_data"][m]["times"]
         data = next_packet["packet_data"][m]["filtered_data"]
 
@@ -92,3 +94,10 @@ def update_channel_trace_plot(app, next_packet, CURRENT_THEME, themes, extra_par
         plt.getAxis("left").setTextPen(themes[CURRENT_THEME]['font_color'], size='20pt')
         plt.setLabel('left', 'Ch ' + str(next_packet['packet_data'][m]['channel_idx']))
         plt.plot(times, data)
+
+        elapsed_time = round(time.time() - start_time, 5)
+        app.profiling_dict["update channel trace"].append(elapsed_time)
+        app.profiling_df = pd.DataFrame({key:pd.Series(value) for key, value in app.profiling_dict.items()})
+
+        #app.profiling_df.to_csv('/Users/sahilsmac/Documents/Test Modules/diagnostics.csv')
+        print ("Time elapsed (update channel trace): " + str(elapsed_time))

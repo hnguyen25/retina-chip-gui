@@ -7,6 +7,7 @@ from src.model.python_thread_worker import *  # multithreading
 from PyQt5 import QtWidgets
 from src.view.gui_themes import *
 import multiprocessing
+import time
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Inherited from PyQt main window class. Contains all the functions necessary
@@ -20,6 +21,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
     settings = {}  # session parameters created through user input from the startup pane
     loading_dict = {}  # contains details of the model run currently being analyzed
+
+    # Profiling data frame (used to diagnose elapsed time of updates)
+    profiling_dict = {"loading packets": [],
+                      "update channel trace": [],
+                      "update noise histogram": [],
+                      "update noise heatmap": []}  # "col_name --> [elapsed_time_1, elapsed_time_2, ...]
     profiling_df = None
 
     charts = {}  # keys=name of every possible chart, value=reference to chart in GUI, None if not in it
@@ -439,7 +446,7 @@ class MainWindow(QtWidgets.QMainWindow):
             y: x value on window as detected by mouse on click
         """
 
-        self.settings['cursor_row'] = np.clip(int(x), 4, 28)
+        self.settings['cursor_row'] = np.clip(int(x), 4, 100)
         self.settings['cursor_col'] = np.clip(int(y), 2, 30)
 
         from src.controller.plots.array_map import update_minimap_indicator
@@ -454,6 +461,12 @@ class MainWindow(QtWidgets.QMainWindow):
             update_mini_map_plot(self, next_packet, self.settings["current_theme"], themes, None)
         else:
             print('Please wait', self.mouseClickTimer.remainingTime(), 'ms before choosing another location.')
+
+   # def update_mini_map_plot(self):
+        # get the calculated start/end cell
+        # traverse the cells and grab the information for the array map and load it into the cell
+        # parallelize the above process
+#        return 0
 
     def viewNewIndividualChannelInformation(self):
         """Connected to [View > Individual channel info...]. Opens up a new window containing useful plots
