@@ -23,8 +23,8 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME: str, themes: dict):
     plot_widget.showGrid(x=False, y=False, alpha=0)
     plot_widget.setAspectLocked()
 
-    plot_widget.setLimits(xMin=-7, xMax=39,
-                          yMin=-7, yMax=39,
+    plot_widget.setLimits(xMin=-4, xMax=35,
+                          yMin=-4, yMax =35,
                           minXRange=5, maxXRange=100,
                           minYRange=5, maxYRange=100)
 
@@ -33,8 +33,7 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME: str, themes: dict):
     plot_widget.getPlotItem().hideAxis('left')
     plot_widget.getPlotItem().hideAxis('right')
 
-    cm = pg.colormap.get('plasma', source='matplotlib')
-
+    cm = pg.colormap.get('autumn', source='matplotlib')
     colors = np.array(app.data.df["spikes_avg_amp"]).reshape((32, 32))
 
     # the pyqtgraph color bar REQUIRES it to be set to an image
@@ -49,7 +48,7 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME: str, themes: dict):
     app.charts["arrayMap"].addItem(image)
     # TODO check if average spike amplitude makes sense w/ colors
     app.array_map_color_bar = app.charts["arrayMap"].addColorBar(image, colorMap=cm, label="Spike Amplitude",
-                                                                 values=(-10, 20))  # values=(0, np.max(model)))
+                                                                values=(2.5, 3.5))  # values=(0, np.max(model)))
     app.array_map_color_bar.sigLevelsChanged.connect(lambda: on_color_bar_levels_changed(app))
     #app.charts["arrayMapHover"].region.setClipItem(image)
 
@@ -86,6 +85,10 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME: str, themes: dict, ex
     curr_rec_elecs_box = []
     dot_scaling_changed = False
 
+    current_chan_idx = 0
+    current_row = 0
+    current_col = 0
+
     for i in range(len(next_packet['packet_data'])):
         # get packet info
         chan_idx = next_packet['packet_data'][i]['channel_idx']
@@ -94,8 +97,8 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME: str, themes: dict, ex
 
         # add squares around electrodes currently being recorded from + visualized in spike trace
         spot_dict = {'pos': (col, row), 'size': 1,
-                     'pen': {'color': pg.mkColor(themes[CURRENT_THEME]['light1']), 'width': 2},
-                     'brush': QColor(255, 0, 255, 0),
+                     'pen': {'color': pg.mkColor(themes[CURRENT_THEME]['blue1']), 'width': 2},
+                     'brush': QColor(0, 0, 0, 0),
                      'symbol': 's'}
         curr_rec_elecs_box.append(spot_dict)
 
@@ -121,6 +124,7 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME: str, themes: dict, ex
             chan_idx = next_packet['packet_data'][i]['channel_idx']
             idxs_to_change.append(chan_idx)
             calculate_one_elec_color_and_size(app, chan_idx)
+            current_chan_idx = chan_idx
 
     # render all the points
     elecs_points = []
@@ -129,17 +133,22 @@ def update_array_map_plot(app, next_packet, CURRENT_THEME: str, themes: dict, ex
         for col in range(NUM_TOTAL_COLS):
             from src.model.data_loading_mat import map2idx
             idx = map2idx(row, col)
-
-            array_dot_color_idx = app.data.df.at[idx, "array_dot_color"]
-            #if array_dot_color_idx > 0:
-            #    print('ar dot color idx:', 'r', row, 'c', col, '/', array_dot_color_idx)
-            color = color_map.map(array_dot_color_idx)
-
-            default_elec_dict = {'pos': (col, row), 'size': app.data.df.at[idx, "array_dot_size"],
+            if idx <= current_chan_idx:
+                array_dot_color_idx = app.data.df.at[idx, "array_dot_color"]
+                color = color_map.map(array_dot_color_idx)
+                default_elec_dict = {'pos': (col, row), 'size': app.data.df.at[idx, "array_dot_size"],
                                  'pen': color,
                                  'brush': color,
                                  'symbol': 'o'}
+            else: # if there is no data at a point, keep it white
+                #default_elec_dict = {'pos': (col, row), 'size': app.data.df.at[idx, "array_dot_size"],
+                default_elec_dict = {'pos': (col, row), 'size': 0.1,
+                                 'pen': {'color': 'w'},
+                                 'brush': QColor(0, 0, 0, 0),
+                                 'symbol': 'o'}
+            
             elecs_points.append(default_elec_dict)
+
     elecs_plot = pg.ScatterPlotItem(pxMode=False)
     elecs_plot.addPoints(elecs_points)
     app.update_subplot_element("arrayMap", 'default_elecs_plot', elecs_plot)
@@ -240,8 +249,10 @@ def on_color_bar_levels_changed(app):
         for col in range(NUM_TOTAL_COLS):
             from src.model.data_loading_mat import map2idx
             idx = map2idx(row, col)
-            color = color_map.map(app.data.df.at[idx, "array_dot_color"])
 
+            array_dot_color_idx = app.data.df.at[idx, "array_dot_color"]
+            color = color_map.map(array_dot_color_idx)
+            # color = color_map.map(app.data.df.at[idx, "array_dot_color"])
 
             default_elec_dict = {'pos': (col, row), 'size': app.data.df.at[idx, "array_dot_size"],
                                  'pen': color,
@@ -284,6 +295,7 @@ class HoverRegion():
         #                             rateLimit=60,
         #                             slot=self.mouseClicked)
         self.window.scene().sigMouseClicked.connect(self.mouseClicked)
+
     #def update(self):
     #    self.region.setZValue(10)
     #   self.window.setXRange(-10, 40, padding=0)
@@ -340,6 +352,91 @@ def update_minimap_indicator(app, CURRENT_THEME: str, themes: dict): # this is c
 
     minimap_square_indicator = pg.QtGui.QGraphicsRectItem(app.settings['cursor_row'] - 4.5,
                                                           app.settings['cursor_col'] - 2.5, 8, 4)
-    minimap_square_indicator.setPen(pg.mkPen(themes[CURRENT_THEME]['blue3']))
-    minimap_square_indicator.setBrush(QColor(255, 0, 255, 0))
+    minimap_square_indicator.setPen(pg.mkPen(themes[CURRENT_THEME]['light1']))
+    minimap_square_indicator.setBrush(QColor(0, 0, 0, 0))
     app.update_subplot_element("arrayMap", 'minimap_square_indicator', minimap_square_indicator)
+
+
+def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
+    """
+
+    Args:
+        app:
+        next_packet:
+        CURRENT_THEME:
+        themes:
+        extra_params: 
+
+    Returns:
+
+    """
+    app.charts["miniMap"].clear()
+
+    BAR_LENGTH = 4
+
+    # same as self.settings['binSize'] but for the minimap.
+    # so that the view doesn't freeze
+    # TODO
+    MIN_BIN_LENGTH = 4
+    MAX_SPIKES = 16  # can't draw every spike or view will crash -> group spikes together
+  
+    curr_idxs = []
+    for packet in next_packet['packet_data']:
+        curr_idxs.append(packet['channel_idx'])
+
+    # make a legend
+    legend_loc_x = app.settings['cursor_row'] - 4 - 1.5
+    legend_loc_y = app.settings['cursor_col'] - 2
+
+    spike_indicator_base = pg.QtGui.QGraphicsRectItem(legend_loc_x * 5, legend_loc_y * 5, BAR_LENGTH, 0.2)
+    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
+    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
+
+    legend_text = str(round(app.data.buffer_indexed[0]["time_elapsed"], 0)) + " ms"
+    spike_indicator_text = pg.TextItem(legend_text,
+                                       themes[CURRENT_THEME]['font_color'],
+                                       anchor=(0, 0))
+    spike_indicator_text.setPos(legend_loc_x * 5, legend_loc_y * 5)
+    spike_indicator_text.setParentItem(spike_indicator_base)
+    app.charts["miniMap"].addItem(spike_indicator_base)
+    app.charts["miniMap"].addItem(spike_indicator_text)
+
+    # now visualize the selected electrodes in the window of the minimap
+    for row in range(app.settings['cursor_row'] - 4, app.settings['cursor_row'] + 4):
+        for col in range(app.settings['cursor_col'] - 2, app.settings['cursor_col'] + 2):
+            if (row > -2) and (col > -2):
+                from src.model.data_loading_mat import map2idx
+                elec_idx = str(map2idx(col, row))
+                spike_indicator_base = pg.QtGui.QGraphicsRectItem(row * 5, col * 5, BAR_LENGTH, 0.2)
+
+                if elec_idx not in curr_idxs:
+                    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
+                    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
+                else:
+                    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['orange']))
+                    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['orange']))
+
+                spike_indicator_text = pg.TextItem(elec_idx,
+                                                   themes[CURRENT_THEME]['font_color'],
+                                                   anchor=(0, 0))
+                spike_indicator_text.setPos(row * 5, col * 5)
+                spike_indicator_text.setParentItem(spike_indicator_base)
+
+                app.charts["miniMap"].addItem(spike_indicator_base)
+                app.charts["miniMap"].addItem(spike_indicator_text)
+
+                spike_bins = app.data.array_spike_times["spike_bins"][int(elec_idx)]
+                spike_bins_max_amps = app.data.array_spike_times["spike_bins_max_amps"][int(elec_idx)]
+
+                spikeLocs = np.argwhere(spike_bins == True)
+                num_bins = len(spike_bins)
+
+                for i in spikeLocs:
+                    spike_loc_on_vis_bar = (i / num_bins) * BAR_LENGTH
+                    spike_height_on_vis_bar = np.abs(spike_bins_max_amps[i] / 20)
+                    spike_indicator = pg.QtGui.QGraphicsRectItem(row * 5 + spike_loc_on_vis_bar, col * 5, 0.03,
+                                                                 spike_height_on_vis_bar)
+                    spike_indicator.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
+                    spike_indicator.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
+                    spike_indicator.setParentItem(spike_indicator_base)
+                    app.charts["miniMap"].addItem(spike_indicator)

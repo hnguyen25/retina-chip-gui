@@ -94,6 +94,7 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
         curr_idxs.append(packet['channel_idx'])
 
     # make a legend
+    """
     legend_loc_x = app.settings['cursor_row'] - 4 - 1.5
     legend_loc_y = app.settings['cursor_col'] - 2
 
@@ -109,10 +110,12 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
     spike_indicator_text.setParentItem(spike_indicator_base)
     app.charts["miniMap"].addItem(spike_indicator_base)
     app.charts["miniMap"].addItem(spike_indicator_text)
+    """
 
     # now visualize the selected electrodes in the window of the minimap
     for row in range(app.settings['cursor_row'] - 4, app.settings['cursor_row'] + 4):
         for col in range(app.settings['cursor_col'] - 2, app.settings['cursor_col'] + 2):
+            #print('in minimap', 'r', row, 'c', col)
             if (row > -2) and (col > -2):
                 from src.model.data_loading_mat import map2idx
                 elec_idx = str(map2idx(col, row))

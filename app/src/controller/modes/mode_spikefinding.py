@@ -107,26 +107,26 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     # (3) Set up additional functionality
     app.charts["arrayMapHover"] = HoverRegion(app.charts["arrayMap"], app.showArrayLocOnStatusBar,
                                               app.onArrayMapClick)
-    app.RewindButton = QPushButton("⏪")
-    app.RewindButton.setToolTip('REWIND plotting to the very first recording')
-    app.RewindButton.setStyleSheet("background-color: " + themes[CURRENT_THEME]['background_borders'])
+    #app.RewindButton = QPushButton("⏪")
+    #app.RewindButton.setToolTip('REWIND plotting to the very first recording')
+    #app.RewindButton.setStyleSheet("background-color: " + themes[CURRENT_THEME]['background_borders'])
 
     app.TogglePlayButton = QPushButton("⏸︎")
     app.TogglePlayButton.setToolTip('PAUSE plotting on the current packet')
     app.TogglePlayButton.setStyleSheet("background-color: " + themes[CURRENT_THEME]['background_borders'])
 
-    app.FastForwardButton = QPushButton("⏩")
-    app.FastForwardButton.setToolTip('FAST FORWARD plotting to the latest processed packet')
-    app.FastForwardButton.setStyleSheet("background-color: " + themes[CURRENT_THEME]['background_borders'])
+    #app.FastForwardButton = QPushButton("⏩")
+    #app.FastForwardButton.setToolTip('FAST FORWARD plotting to the latest processed packet')
+    #app.FastForwardButton.setStyleSheet("background-color: " + themes[CURRENT_THEME]['background_borders'])
 
-    app.statusBar().addPermanentWidget(app.RewindButton)
+    #app.statusBar().addPermanentWidget(app.RewindButton)
     app.statusBar().addPermanentWidget(app.TogglePlayButton)
-    app.statusBar().addPermanentWidget(app.FastForwardButton)
+    #app.statusBar().addPermanentWidget(app.FastForwardButton)
 
     from src.controller.modes.mode_spikefinding import OnRewind, OnPlay, OnFastForward
-    app.RewindButton.clicked.connect(OnRewind)
+    #app.RewindButton.clicked.connect(OnRewind)
     app.TogglePlayButton.clicked.connect(OnPlay)
-    app.FastForwardButton.clicked.connect(OnFastForward)
+    #app.FastForwardButton.clicked.connect(OnFastForward)
 
     app.actionUpdateSession.triggered.connect(app.OnNewSession)
 
