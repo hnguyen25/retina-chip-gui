@@ -21,6 +21,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
     settings = {}  # session parameters created through user input from the startup pane
     loading_dict = {}  # contains details of the model run currently being analyzed
+
+    # Profiling data frame (used to diagnose elapsed time of updates)
+    profiling_dict = {"loading packets": [],
+                      "update channel trace": [],
+                      "update noise histogram": [],
+                      "update noise heatmap": []}  # "col_name --> [elapsed_time_1, elapsed_time_2, ...]
     profiling_df = None
 
     charts = {}  # keys=name of every possible chart, value=reference to chart in GUI, None if not in it

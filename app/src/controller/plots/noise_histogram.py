@@ -1,5 +1,6 @@
 import pyqtgraph as pg
 import numpy as np
+import pandas as pd
 import time
 
 def setupNoiseHistogramPlot(plot_widget, CURRENT_THEME, themes):
@@ -131,11 +132,9 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
         curve = pg.PlotCurveItem(x, y, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
         app.charts["noiseHistogram"].addItem(curve)
 
-    new_data = {
-        "name": "update noise histogram",
-        "time elapsed": round(time.time() - start_time, 5),
-        "timestamp": round(start_time, 5)
-    }
-    app.profiling_df.append(new_data, ignore_index=True)
-    app.profiling_df.to_csv('/Users/sahilsmac/Documents/Test Modules/diagnostics.csv')
-    print("Time elapsed (update noise histogram): " + str(new_data["time elapsed"]))
+    elapsed_time = round(time.time() - start_time, 5)
+    app.profiling_dict["update noise histogram"].append(elapsed_time)
+    app.profiling_df = pd.DataFrame({key:pd.Series(value) for key, value in app.profiling_dict.items()})
+
+    #app.profiling_df.to_csv('/Users/sahilsmac/Documents/Test Modules/diagnostics.csv')
+    print("Time elapsed (update noise histogram): " + str(elapsed_time))
