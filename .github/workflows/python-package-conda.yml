@@ -12,6 +12,9 @@ jobs:
       max-parallel: 5
     env:
       DISPLAY: ':99.0'
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
     - uses: actions/checkout@v3
