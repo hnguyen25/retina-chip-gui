@@ -122,6 +122,8 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     app.FastForwardButton.setStyleSheet("background-color: " + themes[CURRENT_THEME]['background_borders'])
 
     app.ModeButton = QPushButton(defaultMode)
+    app.ModeButton.setToolTip('Toggle between summary and real-time viewing.')
+    app.ModeButton.setStyleSheet("color: white")
 
     app.statusBar().addPermanentWidget(app.ModeButton)
     app.statusBar().addPermanentWidget(app.RewindButton)
@@ -132,7 +134,6 @@ def setup_spike_finding(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
     app.RewindButton.clicked.connect(OnRewind)
     app.TogglePlayButton.clicked.connect(OnPlay)
     app.FastForwardButton.clicked.connect(OnFastForward)
-
     app.ModeButton.clicked.connect(lambda: ChangeMode(app))
 
     app.actionUpdateSession.triggered.connect(app.OnNewSession)

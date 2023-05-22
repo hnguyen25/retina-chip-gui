@@ -121,20 +121,20 @@ def setup_compression(app, CURRENT_THEME, themes, NUM_CHANNELS_PER_BUFFER):
 
     # app.ModeButton = QPushButton("Summary vs. Real-Time")
     # app.ModeButton.setToolTip('Toggle between summary and real-time viewing.')
-    # app.ModeButton.setStyleSheet("background-color: " + themes[CURRENT_THEME]['background_borders'])
+    # app.ModeButton.setStyleSheet("background-color: white")
 
     app.statusBar().addPermanentWidget(app.RewindButton)
     app.statusBar().addPermanentWidget(app.TogglePlayButton)
     app.statusBar().addPermanentWidget(app.FastForwardButton)
 
-    app.modeButton.clicked.connect(ChangeMode)
+    # app.modeButton.clicked.connect(ChangeMode)
     # app.statusBar().addPermanentWidget(app.ModeButton)
 
     from src.controller.modes.mode_compression import OnRewind, OnPlay, OnFastForward #, ChangeMode
     app.RewindButton.clicked.connect(OnRewind)
     app.TogglePlayButton.clicked.connect(OnPlay)
     app.FastForwardButton.clicked.connect(OnFastForward)
-    # app.ModeButton.clicked.connect(ChangeMode)
+    app.ModeButton.clicked.connect(ChangeMode)
 
     app.actionUpdateSession.triggered.connect(app.OnNewSession)
 

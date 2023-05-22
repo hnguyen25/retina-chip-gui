@@ -330,7 +330,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 #if chart == "channelTraces" or chart == "noiseHistogram" or chart == "arrayMap":
                     extra_params = self.chart_update_extra_params[chart]
                     start_time = time.time()
-                    self.chart_update_function_mapping[chart](self, next_packet, self.settings["current_theme"], themes, extra_params)
+                    if chart == "miniMap":
+                        self.chart_update_function_mapping[chart](self, self.settings["current_theme"], themes, extra_params)
+                    else:
+                        self.chart_update_function_mapping[chart](self, next_packet, self.settings["current_theme"], themes, extra_params)
+                    
                     if self.settings["is_mode_profiling"]:
                         new_data = {
                              "name": chart,
@@ -402,9 +406,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if not self.mouseClickTimer.isActive():
             self.mouseClickTimer.start(timeBetweenClicks)
-            next_packet = self.data.to_show.get()
+            print('hi!')
+            # next_packet = self.data.to_show.get()
             update_minimap_indicator(self, self.settings["current_theme"], themes)
-            update_mini_map_plot(self, next_packet, self.settings["current_theme"], themes, None)
+            update_mini_map_plot(self, self.settings["current_theme"], themes, None)
         else:
             print('Please wait', self.mouseClickTimer.remainingTime(), 'ms before choosing another location.')
 

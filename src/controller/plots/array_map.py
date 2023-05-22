@@ -58,7 +58,6 @@ def setupArrayMap(app, plot_widget, CURRENT_THEME: str, themes: dict):
     #app.charts["arrayMapHover"].region.setClipItem(image)
 
     update_minimap_indicator(app, CURRENT_THEME, themes)
-    
 
     elecs_points = []
     for row in range(NUM_TOTAL_ROWS):
@@ -394,7 +393,7 @@ def update_minimap_indicator(app, CURRENT_THEME: str, themes: dict): # this is c
     app.update_subplot_element("arrayMap", 'minimap_square_indicator', minimap_square_indicator)
 
 
-def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
+def update_mini_map_plot(app, CURRENT_THEME, themes, extra_params):
     """
 
     Args:
@@ -417,9 +416,9 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
     MIN_BIN_LENGTH = 4
     MAX_SPIKES = 16  # can't draw every spike or view will crash -> group spikes together
   
-    curr_idxs = []
-    for packet in next_packet['packet_data']:
-        curr_idxs.append(packet['channel_idx'])
+    # curr_idxs = []
+    # for packet in next_packet['packet_data']:
+    #     curr_idxs.append(packet['channel_idx'])
 
     # make a legend
     legend_loc_x = app.settings['cursor_row'] - 4 - 1.5
@@ -446,12 +445,12 @@ def update_mini_map_plot(app, next_packet, CURRENT_THEME, themes, extra_params):
                 elec_idx = str(map2idx(col, row))
                 spike_indicator_base = pg.QtGui.QGraphicsRectItem(row * 5, col * 5, BAR_LENGTH, 0.2)
 
-                if elec_idx not in curr_idxs:
-                    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
-                    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
-                else:
-                    spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['orange']))
-                    spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['orange']))
+                # if elec_idx not in curr_idxs:
+                spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['blue1']))
+                spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['blue1']))
+                # else:
+                #     spike_indicator_base.setPen(pg.mkPen(themes[CURRENT_THEME]['orange']))
+                #     spike_indicator_base.setBrush(pg.mkBrush(themes[CURRENT_THEME]['orange']))
 
                 spike_indicator_text = pg.TextItem(elec_idx,
                                                    themes[CURRENT_THEME]['font_color'],

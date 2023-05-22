@@ -69,9 +69,7 @@ class DC1DataContainer:
                                      0., 0.])
         self.df = pd.DataFrame(initial_data, columns=df_columns)
 
-        # self.indexesRec = []
-
-        self.stats = {"largest_spike_cnt": 0, "indexesRec": []}
+        self.stats = {"largest_spike_cnt": 0}
         self.array_spike_times = {
             "spike_bins": [[] for i in range(self.ARRAY_NUM_ROWS * self.ARRAY_NUM_COLS)],
             "spike_bins_max_amps": [[] for i in range(self.ARRAY_NUM_ROWS * self.ARRAY_NUM_COLS)]
