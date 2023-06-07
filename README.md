@@ -1,7 +1,5 @@
 # Retina Chip GUI [![CI](https://github.com/hnguyen25/retina-chip-gui/actions/workflows/python-package-conda.yml/badge.svg?branch=testing)](https://github.com/hnguyen25/retina-chip-gui/actions/workflows/python-package-conda.yml)
-maintained by Huy Nguyen (nguyen5h@stanford.edu), with contributions from Maddy Hays & John Bailey
-
-For full documentation: https://hnguyen25.github.io/retina-chip-gui/
+Maintained by Huy Nguyen (nguyen5h@stanford.edu), with contributions by researchers within the Stanford Artificial Retina Project. For full documentation: https://hnguyen25.github.io/retina-chip-gui/
 
 ## Status
 
