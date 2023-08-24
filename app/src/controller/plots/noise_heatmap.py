@@ -109,9 +109,9 @@ def update_noise_heat_map(app, next_packet, CURRENT_THEME, themes, extra_params,
     if debug:
         print("Data" + str(data))
 
-    elapsed_time = round(time.time() - start_time, 5)
+    #elapsed_time = round(time.time() - start_time, 5)
     app.profiling_dict["update noise heatmap"].append(elapsed_time)
     app.profiling_df = pd.DataFrame({key:pd.Series(value) for key, value in app.profiling_dict.items()})
 
     #app.profiling_df.to_csv('/Users/sahilsmac/Documents/Test Modules/diagnostics.csv')
-    print("Time elapsed (update noise heatmap): " + str(elapsed_time))
+    #print("Time elapsed (update noise heatmap): " + str(elapsed_time))

@@ -162,11 +162,11 @@ class DC1DataContainer:
 
             avg_packet_spike_count += packet["stats_spikes+cnt"]
 
-        elapsed_time = round(time.time() - start_time, 5)
-        self.app.profiling_dict["loading packets"].append(elapsed_time)
+        #elapsed_time = round(time.time() - start_time, 5)
+        #self.app.profiling_dict["loading packets"].append(elapsed_time)
         self.app.profiling_df = pd.DataFrame({key:pd.Series(value) for key, value in self.app.profiling_dict.items()})
         #self.app.profiling_df.to_csv('/Users/sahilsmac/Documents/Test Modules/diagnostics.csv')
-        print("Time elapsed (process packets): " + str(elapsed_time))
+        #print("Time elapsed (process packets): " + str(elapsed_time))
 
         # buffer-level information
         buffer_indexed_dict = {

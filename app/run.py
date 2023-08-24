@@ -3,16 +3,21 @@ script to run entire application
 """
 import os, sys
 sys.path.append("app")
-
+import datetime
 import multiprocessing as mp
 from PyQt5 import QtWidgets, QtCore
 from src.controller.windows.window_sessionstartup import SessionStartupGUI
 from src.MainWindow import MainWindow
 
-
 APP_TITLE = 'Stanford Artificial Retina Project | Retina Chip v1.0 Experimental Visualization'
 WINDOWED_APP_SIZE = [1000, 750]  # size of main application (W x H)
 DEBUG_SETTINGS = {
+    'include_times': True,
+    'include_unfiltered': True,
+    'include_filtered': True,
+    'include_spikes': True,
+    'include_stats': True,
+    'processed_data_folder_dir': '/Users/huy/Developer/retina-chip-gui/data/processed',
     'current_theme': 'dark',
     # different GUI modes
     'is_mode_profiling': True,  # if on, measures how long different aspects of the GUI takes to compute
@@ -69,7 +74,8 @@ if __name__ == "__main__":
 
             SESSION_SETTINGS = session_startup.settings
             print("SESSION_SETTINGS", SESSION_SETTINGS)
-            settings = {**SESSION_SETTINGS, **DEBUG_SETTINGS} # get all settings, both from user and developer
+            settings = {**SESSION_SETTINGS, **DEBUG_SETTINGS,
+                        "init_gui_start_time": str(datetime.datetime.now()).replace(" ", "_")} # get all settings, both from user and developer
 
             # start analysis window of choice
             window = MainWindow(settings=settings, window_title=APP_TITLE)

@@ -137,4 +137,4 @@ def update_noise_histogram_plot(app, next_packet, CURRENT_THEME, themes, debug=F
     app.profiling_df = pd.DataFrame({key:pd.Series(value) for key, value in app.profiling_dict.items()})
 
     #app.profiling_df.to_csv('/Users/sahilsmac/Documents/Test Modules/diagnostics.csv')
-    print("Time elapsed (update noise histogram): " + str(elapsed_time))
+    #print("Time elapsed (update noise histogram): " + str(elapsed_time))

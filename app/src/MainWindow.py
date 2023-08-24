@@ -8,6 +8,8 @@ from PyQt5 import QtWidgets
 from src.view.gui_themes import *
 import multiprocessing
 import time
+import datetime
+from src.model.data_export import *
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Inherited from PyQt main window class. Contains all the functions necessary
@@ -166,8 +168,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.mouseClickTimer = QTimer(self)
         self.mouseClickTimer.setSingleShot(True)
-
-
 
     # this is one separate thread running a multiprocessing
     def data_loading_parallelized_thread(self, progress_callback, gui_callback,  NUM_SIMULTANEOUS_PROCESSES=6):
@@ -406,7 +406,18 @@ class MainWindow(QtWidgets.QMainWindow):
                     "timestamp": round(start_time, 5)
                 }
                 self.profiling_df = self.profiling_df.append(new_data, ignore_index=True)
-            
+
+        path = os.path.normpath(next_packet["file_dir"])
+        # ex: ['', 'Users', 'huy', 'Developer', 'retina-chip-gui', 'app', 'debugData', '2022-02-18-0', 'data001', 'data001_1.mat']
+        path_list = path.split(os.sep)
+        run_name = path_list[-3] + "+" + path_list[-2] + "_processedat+" + self.settings["init_gui_start_time"]
+
+        export_packet_data(self.settings["processed_data_folder_dir"], run_name, next_packet,
+                           include_times=True,
+                           include_unfiltered=True,
+                           include_filtered=True,
+                           include_spikes=True,
+                           include_stats=True)
         return True
 
     def update_subplot_element(self, chart, key, value):
